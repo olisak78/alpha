@@ -1,0 +1,28 @@
+[
+  {
+    "id": "n1",
+    "title": "Timesheet reminder",
+    "message": "Please update your Synerion timesheet for this month.",
+    "createdAt": "2025-08-10T09:00:00Z",
+    "severity": "warning",
+    "dueDate": "2025-08-31T23:59:59Z",
+    "readBy": []
+  },
+  {
+    "id": "n2",
+    "title": "Mandatory learning assigned",
+    "message": "You have a new mandatory learning to complete by the end of September.",
+    "createdAt": "2025-08-10T08:30:00Z",
+    "severity": "warning",
+    "dueDate": "2025-09-30T23:59:59Z",
+    "readBy": []
+  },
+  {
+    "id": "n3",
+    "title": "Great job — moving up!",
+    "message": "You climbed 2 places in the team scoreboard and are now #3 — on the podium. Keep up the great work!",
+    "createdAt": "2025-08-10T08:00:00Z",
+    "severity": "success",
+    "readBy": []
+  }
+]
