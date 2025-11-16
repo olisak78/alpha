@@ -3,11 +3,9 @@ import { ComponentType, ComponentStatus, ComponentLink, ComponentMetadata } from
 
 export interface Component {
   id: string; // UUID
-  //organization_id: string;
   name: string;
   display_name: string;
   description?: string;
-  //component_type: ComponentType;
   status: ComponentStatus;
   group_name?: string;
   git_repository_url?: string;
@@ -16,7 +14,6 @@ export interface Component {
   metadata?: ComponentMetadata;
   created_at: string;
   updated_at: string;
-  // Legacy fields for backward compatibility
   coverage?: number;
   vulnerabilities?: number;
   legacyLinks?: {
@@ -35,6 +32,23 @@ export interface Landscape {
   awsAccount: string;
   camProfile: string;
   deploymentStatus: "deployed" | "deploying" | "failed";
+  technical_name?: string;
+  environment?: string;
+  landscape_url?: string;
+  metadata?: Record<string, any>;
+  title?: string;
+  domain?: string;
+  git?: string;
+  concourse?: string;
+  kibana?: string;
+  dynatrace?: string;
+  cockpit?: string;
+  'operation-console'?: string;
+  type?: string;
+  grafana?: string;
+  prometheus?: string;
+  gardener?: string;
+  plutono?: string;
 }
 
 export interface FeatureToggle {

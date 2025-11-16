@@ -6,7 +6,7 @@ export function LinksHeader() {
   const numOfLinks = filteredLinks.length;
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center gap-3">
         <div>
           <h2 className="text-xl font-semibold">Important Links</h2>
         </div>

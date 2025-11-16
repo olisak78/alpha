@@ -13,6 +13,7 @@ import TeamsPage from "./pages/TeamsPage";
 import NotFound from "./pages/NotFound";
 import CisPage from "./pages/CisPage";
 import ComponentDetailPage from "./pages/ComponentDetailPage";
+import ComponentViewPage from "./pages/ComponentViewPage";
 import UnifiedServicesPage from "./pages/UnifiedServicesPage";
 import CloudAutomationPage from "./pages/CloudAutomationPage";
 import SelfServicePage from "./pages/SelfServicePage";
@@ -21,8 +22,6 @@ import LinksPage from "./pages/LinksPage";
 import AIArenaPage from "./pages/AIArenaPage";
 import { QueryProvider } from './providers/QueryProvider';
 import { SidebarProvider } from "./contexts/SidebarContext";
-
-
 
 const queryClient = new QueryClient();
 
@@ -54,12 +53,18 @@ const App = () => (
                     <Route path="teams/:tabId" element={<TeamsPage />} />
                     <Route path="teams/:tabId/*" element={<TeamsPage />} />
                     <Route path="cis" element={<CisPage />} />
-                    <Route path="cis/components/:entityName" element={<ComponentDetailPage />} />
+                    <Route path="cis/component/:componentId" element={<ComponentViewPage />} />
+                    <Route path="cis/component/:componentId/:tabId" element={<ComponentViewPage />} />
+                    {/* <Route path="cis/components/:entityName" element={<ComponentDetailPage />} /> */}
                     <Route path="cis/:tabId" element={<CisPage />} />
                     <Route path="unified-services" element={<UnifiedServicesPage />} />
+                    <Route path="unified-services/component/:componentId" element={<ComponentViewPage />} />
+                    <Route path="unified-services/component/:componentId/:tabId" element={<ComponentViewPage />} />
                     <Route path="unified-services/components/:entityName" element={<ComponentDetailPage />} />
                     <Route path="unified-services/:tabId" element={<UnifiedServicesPage />} />
                     <Route path="cloud-automation" element={<CloudAutomationPage />} />
+                    <Route path="cloud-automation/component/:componentId" element={<ComponentViewPage />} />
+                    <Route path="cloud-automation/component/:componentId/:tabId" element={<ComponentViewPage />} />
                     <Route path="cloud-automation/components/:entityName" element={<ComponentDetailPage />} />
                     <Route path="cloud-automation/:tabId" element={<CloudAutomationPage />} />
                     <Route path="self-service" element={<SelfServicePage />} />

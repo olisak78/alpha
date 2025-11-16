@@ -1,22 +1,28 @@
 import { apiClient } from './ApiClient';
 import type { Landscape } from '@/types/developer-portal';
 
-/**
- * API response from /api/v1/landscapes endpoint
- */
+
 export interface LandscapeApiResponse {
   id: string;
   name: string;
-  title?: string; // Optional - fallback to name if not provided
+  title?: string;
   description: string;
   domain: string;
   environment: string;
-  metadata?: Record<string, any>; // Metadata from backend
+  git?: string;
+  concourse?: string;
+  kibana?: string;
+  dynatrace?: string;
+  cockpit?: string;
+  'operation-console'?: string;
+  type?: string;
+  grafana?: string;
+  prometheus?: string;
+  gardener?: string;
+  plutono?: string;
+  metadata?: Record<string, any>;
 }
 
-/**
- * Fetch landscapes by project name
- */
 export async function fetchLandscapesByProject(
   projectName: string
 ): Promise<Landscape[]> {
@@ -27,16 +33,29 @@ export async function fetchLandscapesByProject(
   // Transform API response to internal Landscape type
   return response.map(landscape => ({
     id: landscape.id, // Keep UUID as id for component filtering
-    name: landscape.title || landscape.name, // Display name (e.g., "Europe (Frankfurt)")
-    technical_name: landscape.name, // Technical name from backend (e.g., "cf-eu10-canary")
+    name: landscape.title || landscape.name, 
+    technical_name: landscape.name, 
     status: 'active' as const,
     githubConfig: '#',
     awsAccount: landscape.id,
     camProfile: '#',
     deploymentStatus: 'deployed' as const,
     environment: landscape.environment,
-    landscape_url: landscape.domain, // Domain for health checks (e.g., "sap.hana.ondemand.com")
-    metadata: landscape.metadata, // Pass through metadata from backend
+    landscape_url: landscape.domain, 
+    metadata: landscape.metadata, 
+    title: landscape.title,
+    domain: landscape.domain,
+    git: landscape.git,
+    concourse: landscape.concourse,
+    kibana: landscape.kibana,
+    dynatrace: landscape.dynatrace,
+    cockpit: landscape.cockpit,
+    'operation-console': landscape['operation-console'],
+    type: landscape.type,
+    grafana: landscape.grafana,
+    prometheus: landscape.prometheus,
+    gardener: landscape.gardener,
+    plutono: landscape.plutono,
   } as any));
 }
 

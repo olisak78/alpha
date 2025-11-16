@@ -173,4 +173,10 @@ export const queryKeys = {
   categories: {
     all: ['categories'] as const,
   },
+
+  swagger: {
+    all: ['swagger'] as const,
+    byComponent: (componentId: string, landscapeName: string) =>
+      [...queryKeys.swagger.all, 'component', componentId, landscapeName] as const,
+  },
 } as const;

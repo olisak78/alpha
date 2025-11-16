@@ -3,16 +3,13 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
 image:
   repository: atom-cfs-docker.common.repositories.cloud.sap/dev/amit/developer-portal/frontend
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.4"
-
+  tag: "1.0.18"
 imagePullSecrets:
   - name: gcr-registry
-
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -21,26 +18,21 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 podAnnotations: {}
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 101
   fsGroup: 101
-
 securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
-
 service:
   type: ClusterIP
   port: 80
   targetPort: 8080
-
 ingress:
   enabled: true
   host: dev.developer-portal.cfs.c.eu-de-2.cloud.sap
@@ -49,7 +41,6 @@ ingress:
     # Additional custom annotations can be added here
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-
 resources:
   limits:
     cpu: 500m
@@ -57,7 +48,6 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 livenessProbe:
   httpGet:
     path: /health
@@ -66,7 +56,6 @@ livenessProbe:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
-
 readinessProbe:
   httpGet:
     path: /health
@@ -75,22 +64,16 @@ readinessProbe:
   periodSeconds: 5
   timeoutSeconds: 3
   failureThreshold: 3
-
 autoscaling:
   enabled: false
   minReplicas: 2
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
-
 # Environment variables for runtime configuration
 env:
   BACKEND_URL: "https://dev.backend.developer-portal.cfs.c.eu-de-2.cloud.sap"
   ENV: "development"
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
-

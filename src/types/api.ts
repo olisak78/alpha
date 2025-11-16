@@ -339,6 +339,20 @@ export interface Landscape {
   metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+  title?: string;
+  domain?: string;
+  environment?: string;
+  git?: string;                 
+  concourse?: string;            
+  kibana?: string;                
+  dynatrace?: string;             
+  cockpit?: string;                
+  'operation-console'?: string;   
+  type?: string;
+  grafana?: string;               
+  prometheus?: string;            
+  gardener?: string;              
+  plutono?: string;               
 }
 
 /**

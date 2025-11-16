@@ -33,11 +33,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
 
   return (
     <div className="flex items-center gap-2">
-      {!isHidden('git') && (
+      {!isHidden('git') && availability.git && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.git}
           onClick={() => handleToolClick(urls.git)}
           className="flex items-center gap-2"
         >
@@ -46,11 +45,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
         </Button>
       )}
 
-      {!isHidden('concourse') && (
+      {!isHidden('concourse') && availability.concourse && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.concourse}
           onClick={() => handleToolClick(urls.concourse)}
           className="flex items-center gap-2"
         >
@@ -59,11 +57,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
         </Button>
       )}
 
-      {!isHidden('kibana') && (
+        {!isHidden('kibana') && availability.kibana && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.kibana}
           onClick={() => handleToolClick(urls.kibana)}
           className="flex items-center gap-2"
         >
@@ -72,11 +69,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
         </Button>
       )}
 
-      {!isHidden('dynatrace') && (
+      {!isHidden('dynatrace') && availability.dynatrace && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.dynatrace}
           onClick={() => handleToolClick(urls.dynatrace)}
           className="flex items-center gap-2"
         >
@@ -85,11 +81,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
         </Button>
       )}
 
-      {!isHidden('cockpit') && (
+      {!isHidden('cockpit') && availability.cockpit && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.cockpit}
           onClick={() => handleToolClick(urls.cockpit)}
           className="flex items-center gap-2"
         >
@@ -98,11 +93,10 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData, hidden
         </Button>
       )}
 
-      {!isHidden('plutono') && (
+       {!isHidden('plutono') && availability.plutono && (
         <Button
           variant="outline"
           size="sm"
-          disabled={!availability.plutono}
           onClick={() => handleToolClick(urls.plutono)}
           className="flex items-center gap-2"
         >

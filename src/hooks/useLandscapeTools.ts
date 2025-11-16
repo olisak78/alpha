@@ -1,18 +1,23 @@
 import { useMemo } from 'react';
-import landscapesData from '@/data/landscapes/landscapes.json';
 
 interface LandscapeData {
   id?: string;
   name?: string;
+  title?: string;
+  description?: string;
   domain?: string;
-  landscape_url?: string;
-  'landscape-repository'?: string;
-  'apm-infra-environment'?: string;
-  metadata?: {
-    domain?: string;
-    'landscape-repository'?: string;
-    'apm-infra-environment'?: string;
-  };
+  environment?: string;
+  git?: string;
+  concourse?: string;
+  kibana?: string;
+  dynatrace?: string;
+  cockpit?: string;
+  'operation-console'?: string;
+  type?: string;
+  grafana?: string;
+  prometheus?: string;
+  gardener?: string;
+  plutono?: string;
 }
 
 interface LandscapeToolUrls {
@@ -43,7 +48,6 @@ export function useLandscapeTools(
   landscapeData?: LandscapeData | null
 ): UseLandscapeToolsReturn {
   return useMemo(() => {
-    // Default state when no landscape is selected
     if (!selectedLandscapeId) {
       return {
         urls: {
@@ -65,13 +69,8 @@ export function useLandscapeTools(
       };
     }
 
-    // Prefer API landscape data if provided, otherwise fallback to static JSON
-    let landscape: LandscapeData | undefined = landscapeData || undefined;
-
-    // Fallback to static JSON if no API data provided
-    if (!landscape) {
-      landscape = landscapesData[selectedLandscapeId as keyof typeof landscapesData] as LandscapeData | undefined;
-    }
+    // Removed fallback to static JSON - now only use API landscape data
+    const landscape = landscapeData;
 
     // If landscape not found, return disabled state
     if (!landscape) {
@@ -94,17 +93,12 @@ export function useLandscapeTools(
         },
       };
     }
-
-    // Get the domain from the landscape data (check multiple possible locations)
-    const domain = landscape.landscape_url || landscape.domain || landscape.metadata?.domain || '';
-
-    // Build URLs from the landscape data (check metadata if top-level fields don't exist)
-    const gitUrl = landscape['landscape-repository'] || landscape.metadata?.['landscape-repository'] || null;
-    const concourseUrl = domain ? `https://concourse.cf.${domain}/teams/product-cf/pipelines/landscape-update-pipeline` : null;
-    const kibanaUrl = domain ? `https://logs.cf.${domain}/app/dashboards#/view/Requests-and-Logs` : null;
-    const dynatraceUrl = landscape['apm-infra-environment'] || landscape.metadata?.['apm-infra-environment'] || null;
-    const cockpitUrl = domain ? `https://cockpit.${domain}` : null;
-    const plutonoUrl = landscape.metadata?.['grafana'] || null;
+    const gitUrl = landscape.git || null;
+    const concourseUrl = landscape.concourse || null;
+    const kibanaUrl = landscape.kibana || null;
+    const dynatraceUrl = landscape.dynatrace || null;
+    const cockpitUrl = landscape.cockpit || null;
+    const plutonoUrl = landscape.plutono || null;
 
     return {
       urls: {

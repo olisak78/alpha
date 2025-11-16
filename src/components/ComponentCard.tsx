@@ -14,7 +14,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Component } from "@/types/api";
-import { ComponentStatus } from "@/types/api";
 import { useSonarMeasures } from "@/hooks/api/useSonarMeasures";
 import { fetchSystemInfo, type SystemInformation } from "@/services/healthApi";
 
@@ -47,77 +46,35 @@ export default function ComponentCard({
   const [systemInfoUrl, setSystemInfoUrl] = useState<string | null>(null);
   const [loadingSystemInfo, setLoadingSystemInfo] = useState(false);
 
+  // Navigate to component view page
   const handleComponentClick = () => {
-    const componentPath = system === "cis"
-      ? `/cis/components/${component.name}`
-      : `/${system}/components/${component.name}`;
-    navigate(componentPath);
+    navigate(`/${system}/component/${component.name}`);
   };
 
-  // Fetch SonarQube measures - always visible now
-  const { data: sonarMetrics, isLoading: sonarLoading, hasAlias } = useSonarMeasures(
-    component.sonar,
+  // Handle card click - only navigate if not clicking on buttons
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // Don't navigate if clicking on buttons or interactive elements
+    if (!target.closest('button') && !target.closest('a')) {
+      handleComponentClick();
+    }
+  };
+
+  // SonarQube integration
+  const { data: sonarMetrics, isLoading: sonarLoading } = useSonarMeasures(
+    component.sonar || null,
     true
   );
 
-  // Fetch system information when landscape is selected
-  useEffect(() => {
-    if (!selectedLandscape || !selectedLandscapeData) {
-      setSystemInfo(null);
-      setSystemInfoUrl(null);
-      return;
-    }
+  const formatMetric = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return 'N/A';
+    return value.toString();
+  };
 
-    const abortController = new AbortController();
-    setLoadingSystemInfo(true);
-
-    const landscapeConfig = {
-      id: selectedLandscapeData.id,
-      name: selectedLandscapeData.name,
-      route: selectedLandscapeData.landscape_url || selectedLandscapeData.domain || selectedLandscapeData.metadata?.route
-    };
-
-    fetchSystemInfo(component, landscapeConfig, abortController.signal)
-      .then((result) => {
-        if (result.status === 'success' && result.data) {
-          setSystemInfo(result.data);
-          setSystemInfoUrl(result.url || null);
-        } else {
-          setSystemInfo(null);
-          setSystemInfoUrl(null);
-        }
-      })
-      .catch((error) => {
-        if (error.name !== 'AbortError') {
-          setSystemInfo(null);
-          setSystemInfoUrl(null);
-        }
-      })
-      .finally(() => {
-        setLoadingSystemInfo(false);
-      });
-
-    return () => {
-      abortController.abort();
-    };
-  }, [component, selectedLandscape, selectedLandscapeData]);
-
-
-  const openLink = (e: React.MouseEvent, url: string) => {
-    e.stopPropagation();
+  const openLink = (url: string) => {
     if (url && url !== "#") {
       window.open(url, "_blank", "noopener,noreferrer");
     }
-  };
-
-  // Component status is not available in the new API structure, using a default
-  const statusColor = "bg-green-500"; // Default to active
-  const statusLabel = "Active"; // Default status
-
-  // Format metric values for display
-  const formatMetric = (value: number | null, suffix: string = ''): string => {
-    if (value === null) return 'N/A';
-    return `${value}${suffix}`;
   };
 
   return (
@@ -232,26 +189,59 @@ export default function ComponentCard({
               )}
             </div>
           </div>
+          <Code className="h-4 w-4 text-muted-foreground ml-2 flex-shrink-0" />
         </div>
 
-        {/* Quality metrics - always visible, cleaner design */}
-        <div className="grid grid-cols-4 gap-2 pt-3 mt-3 border-t border-border/50">
+        {/* Action Buttons */}
+        <div className="flex gap-2 mb-3">
+          {component.github && component.github.trim() !== '' && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                openLink(component.github!);
+              }}
+            >
+              <Github className="h-3 w-3 mr-1" />
+              GitHub
+            </Button>
+          )}
+          {component.sonar && component.sonar.trim() !== '' && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                openLink(component.sonar!);
+              }}
+            >
+              <Activity className="h-3 w-3 mr-1" />
+              Sonar
+            </Button>
+          )}
+        </div>
+
+        {/* Quality Metrics Grid */}
+        <div className="grid grid-cols-4 gap-2">
           <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-            <Shield className="h-3.5 w-3.5 text-muted-foreground mb-1" />
+            <Shield className="h-3.5 w-3.5 mb-1 text-blue-600" />
             <span className="font-semibold text-xs">
-              {sonarLoading ? '...' : formatMetric(sonarMetrics?.coverage ?? null, '%')}
+              {sonarLoading ? '...' : `${formatMetric(sonarMetrics?.coverage)}%`}
             </span>
             <span className="text-[10px] text-muted-foreground mt-0.5">Coverage</span>
           </div>
           <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-            <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mb-1" />
+            <AlertTriangle className="h-3.5 w-3.5 mb-1 text-yellow-600" />
             <span className="font-semibold text-xs">
-              {sonarLoading ? '...' : formatMetric(sonarMetrics?.vulnerabilities ?? null)}
+              {sonarLoading ? '...' : formatMetric(sonarMetrics?.vulnerabilities)}
             </span>
             <span className="text-[10px] text-muted-foreground mt-0.5">Vulns</span>
           </div>
           <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-            <Code className="h-3.5 w-3.5 text-muted-foreground mb-1" />
+            <Activity className="h-3.5 w-3.5 mb-1 text-orange-600" />
             <span className="font-semibold text-xs">
               {sonarLoading ? '...' : formatMetric(sonarMetrics?.codeSmells ?? null)}
             </span>
