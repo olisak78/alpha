@@ -1,10 +1,9 @@
 import ComponentCard from "@/components/ComponentCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Github } from "lucide-react";
 import type { Component } from "@/types/api";
-// NEW: Import health check type
 import type { ComponentHealthCheck } from "@/types/health";
+import { GithubIcon } from "../icons/GithubIcon";
 
 interface TeamComponentsProps {
   components: Component[];
@@ -18,9 +17,9 @@ interface TeamComponentsProps {
   compactView?: boolean;
   teamNamesMap?: Record<string, string>;
   teamColorsMap?: Record<string, string>;
-  // NEW: Health status props
   componentHealthMap?: Record<string, ComponentHealthCheck>;
   isLoadingHealth?: boolean;
+  onComponentClick?: (componentId: string) => void;
 }
 
 export function TeamComponents({
@@ -38,6 +37,8 @@ export function TeamComponents({
   // NEW: Health status props with default values
   componentHealthMap = {},
   isLoadingHealth = false,
+  onComponentClick,
+
 }: TeamComponentsProps) {
   if (!components || components.length === 0) {
     return (
@@ -90,7 +91,7 @@ export function TeamComponents({
               onClick={() => openLink(component.github!)}
               className="flex-shrink-0"
             >
-              <Github className="h-3.5 w-3.5 mr-1.5" />
+              <GithubIcon className="h-3.5 w-3.5 mr-1.5" />
               GitHub
             </Button>
           )}
@@ -130,9 +131,10 @@ export function TeamComponents({
         getComponentAlerts={() => null}
         teamName={ownerTeamName}
         teamColor={ownerTeamColor}
-        // NEW: Pass health check for this specific component
         healthCheck={componentHealthMap[component.id]}
         isLoadingHealth={isLoadingHealth}
+        onClick={onComponentClick ? () => onComponentClick(component.name) : undefined}
+
       />
     );
   };

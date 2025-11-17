@@ -9,7 +9,6 @@ import {
   CheckCircle,
   Github,
   ChevronDown,
-  // NEW: Import Loader2 icon for health status loading state
   Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Component } from "@/types/api";
 import { useSonarMeasures } from "@/hooks/api/useSonarMeasures";
 import { fetchSystemInfo, type SystemInformation } from "@/services/healthApi";
-// NEW: Import health check types
 import type { ComponentHealthCheck, HealthStatus } from "@/types/health";
 import { GithubIcon } from "./icons/GithubIcon";
 
@@ -34,9 +32,9 @@ interface ComponentCardProps {
   system: string;
   teamName?: string;
   teamColor?: string;
-  // NEW: Add health check props
   healthCheck?: ComponentHealthCheck;
   isLoadingHealth?: boolean;
+  onClick?: () => void;
 }
 
 export default function ComponentCard({
@@ -51,6 +49,7 @@ export default function ComponentCard({
   // NEW: Destructure health check props
   healthCheck,
   isLoadingHealth = false,
+  onClick,
 }: ComponentCardProps) {
   const navigate = useNavigate();
   const [systemInfo, setSystemInfo] = useState<SystemInformation | null>(null);
@@ -64,11 +63,12 @@ export default function ComponentCard({
   // Handle card click - only navigate if not clicking on buttons
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    // Don't navigate if clicking on buttons or interactive elements
-    if (!target.closest('button') && !target.closest('a')) {
+   const isHealthUp = !healthCheck || healthCheck.status === 'UP';
+    if (!target.closest('button') && !target.closest('a') && onClick && isHealthUp) {
       handleComponentClick();
     }
   };
+  const isClickable = onClick && (!healthCheck || healthCheck.status === 'UP');
 
   // SonarQube integration
   const { data: sonarMetrics, isLoading: sonarLoading } = useSonarMeasures(
@@ -87,7 +87,6 @@ export default function ComponentCard({
     }
   };
 
-  // NEW: Helper function to render health status badge
   const getHealthStatusBadge = () => {
     // Only show health status when a landscape is selected
     if (!selectedLandscape) return null;
@@ -144,7 +143,8 @@ export default function ComponentCard({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 border-border/60 hover:border-border">
+    <Card  style={isClickable ? { cursor: 'pointer' } : undefined}
+      onClick={isClickable ? handleCardClick : undefined} className="hover:shadow-lg transition-all duration-200 border-border/60 hover:border-border">
       <CardContent className="p-4">
         {/* Header */}
         <div className="space-y-2.5">
@@ -223,7 +223,7 @@ export default function ComponentCard({
         </div>
 
         {/* Action Buttons */}
-         <div className="flex gap-2 justify-end pb-6">
+        <div className="flex gap-2 justify-end pb-6">
           {component.github && component.github.trim() !== '' && (
             <Button
               variant="outline"

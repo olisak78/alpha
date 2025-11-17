@@ -8,7 +8,7 @@ import TimelinesTab from "@/components/tabs/TimelinesTab";
 import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
 import { useTeams } from "@/hooks/api/useTeams";
-import { componentVersions} from "@/types/developer-portal";
+import { componentVersions } from "@/types/developer-portal";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useComponentManagement, useFeatureToggles, useLandscapeManagement, usePortalState } from "@/contexts/hooks";
@@ -20,18 +20,20 @@ import { useHealth } from "@/hooks/api/useHealth";
 import type { ComponentHealthCheck } from "@/types/health";
 import { ViewSwitcher } from "@/components/ViewSwitcher";
 import { HealthOverview, HealthTable } from "@/components/Health";
+import { useNavigate } from "react-router-dom";
 
 const TAB_VISIBILITY = {
   components: true,
-  health: false,              
-  alerts: true,             
-  'feature-toggle': false,   
-  delivery: false,           
-  timelines: false,        
-  askoc: false              
+  health: false,
+  alerts: true,
+  'feature-toggle': false,
+  delivery: false,
+  timelines: false,
+  askoc: false
 } as const;
 
 export default function CisPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("components");
   const [componentView, setComponentView] = useState<'grid' | 'table'>('grid');
   const [teamComponentsExpanded, setTeamComponentsExpanded] = useState<Record<string, boolean>>({});
@@ -74,7 +76,7 @@ export default function CisPage() {
   } = useFeatureToggles();
 
   const activeProject = "CIS@2.0";
-  
+
   const {
     data: cisComponentsData,
     isLoading: cisComponentsLoading,
@@ -89,7 +91,7 @@ export default function CisPage() {
 
   const { data: teamsData } = useTeams();
   const cisApiComponents = cisComponentsData || [];
-  
+
 
   // Create a mapping of team ID to team name
   const teamNamesMap = useMemo(() => {
@@ -166,12 +168,12 @@ export default function CisPage() {
 
   const landscapeConfig = useMemo(() => {
     if (!selectedApiLandscape) return null;
-    
-    const route = selectedApiLandscape.metadata?.route || 
-                  selectedApiLandscape.landscape_url || 
-                  'sap.hana.ondemand.com';
-    
-    
+
+    const route = selectedApiLandscape.metadata?.route ||
+      selectedApiLandscape.landscape_url ||
+      'sap.hana.ondemand.com';
+
+
     return {
       name: selectedApiLandscape.name,
       route: route
@@ -233,6 +235,10 @@ export default function CisPage() {
     }));
   };
 
+  const handleComponentClick = (componentName: string) => {
+    navigate(`/cis/component/${componentName}`);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "components":
@@ -246,7 +252,7 @@ export default function CisPage() {
               onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
               hiddenButtons={['plutono']}
             />
-           {componentView === 'grid' ? (
+            {componentView === 'grid' ? (
               <>
                 <ComponentsTabContent
                   title="CIS Cloud Foundry Components"
@@ -274,6 +280,7 @@ export default function CisPage() {
                   viewSwitcher={
                     <ViewSwitcher view={componentView} onViewChange={setComponentView} />
                   }
+                  onComponentClick={handleComponentClick}
                 />
 
                 {libraryComponents.length > 0 && (
@@ -297,6 +304,7 @@ export default function CisPage() {
                       onSortOrderChange={setComponentSortOrder}
                       componentHealthMap={{}}
                       isLoadingHealth={false}
+                      onComponentClick={handleComponentClick}
                     />
                   </div>
                 )}
@@ -321,12 +329,15 @@ export default function CisPage() {
                       healthChecks={healthChecks}
                       isLoading={isLoadingHealth}
                       landscape={selectedApiLandscape?.name || ''}
+                      teamNamesMap={teamNamesMap}
+                      onComponentClick={handleComponentClick}
+                      components={filteredComponents}
                     />
                   </>
                 ) : (
                   <div className="border-2 border-dashed rounded-lg p-12 text-center">
                     <p className="text-muted-foreground">
-                      {!selectedLandscape 
+                      {!selectedLandscape
                         ? 'Select a landscape to view component health status'
                         : 'No components found in this landscape'}
                     </p>

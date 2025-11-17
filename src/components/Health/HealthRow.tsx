@@ -1,22 +1,24 @@
-/**
- * Health Row Component
- * Displays a single component's health status in table format
- */
-
-import React from 'react';
 import type { ComponentHealthCheck } from '@/types/health';
 import { StatusBadge } from './StatusBadge';
-import { HealthDetails } from './HealthDetails';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface HealthRowProps {
   healthCheck: ComponentHealthCheck;
   isExpanded: boolean;
   onToggle: () => void;
+  teamName?: string;
+  componentName?: string;
+  onComponentClick?: (componentName: string) => void;
 }
 
-export function HealthRow({ healthCheck, isExpanded, onToggle }: HealthRowProps) {
+export function HealthRow({
+  healthCheck,
+  isExpanded,
+  onToggle,
+  teamName,
+  componentName,
+  onComponentClick,
+}: HealthRowProps) {
   const formatResponseTime = (ms?: number) => {
     if (!ms) return '-';
     if (ms < 1000) return `${Math.round(ms)}ms`;
@@ -30,63 +32,52 @@ export function HealthRow({ healthCheck, isExpanded, onToggle }: HealthRowProps)
 
   const hasDetails = healthCheck.response && healthCheck.response.components;
 
+  const handleRowClick = () => {
+    if (onComponentClick && componentName && healthCheck.status === 'UP') {
+      onComponentClick(componentName);
+    }
+  };
+  const isClickable = onComponentClick && componentName && healthCheck.status === 'UP';
   return (
     <>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+      <tr
+        className={`hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors ${isClickable ? 'cursor-pointer' : ''}`}
+        onClick={isClickable ? handleRowClick : undefined}
+      >
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            {hasDetails ? (
-              <button
-                onClick={onToggle}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
-              >
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-            ) : (
-              <div className="w-4" /> /* Spacer for alignment */
-            )}
-            <span className="text-sm font-medium text-gray-900 dark:text-white">
-              {healthCheck.componentName}
-            </span>
+            <div className="flex flex-col">
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                {healthCheck.componentName}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {healthCheck.componentId}
+              </span>
+            </div>
           </div>
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
-          <StatusBadge status={healthCheck.status} error={healthCheck.error} />
+          <StatusBadge
+            status={healthCheck.status}
+            error={healthCheck.error}
+          />
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+          {formatResponseTime(healthCheck.responseTime)}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+          {formatLastChecked(healthCheck.lastChecked)}
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {formatResponseTime(healthCheck.responseTime)}
-          </span>
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {formatLastChecked(healthCheck.lastChecked)}
-          </span>
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-right">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(healthCheck.healthUrl, '_blank', 'noopener,noreferrer')}
-            title="Open health endpoint"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
+          {teamName ? (
+            <Badge variant="secondary" className="text-xs">
+              {teamName}
+            </Badge>
+          ) : (
+            <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+          )}
         </td>
       </tr>
-
-      {isExpanded && hasDetails && (
-        <tr>
-          <td colSpan={5} className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50">
-            <HealthDetails response={healthCheck.response!} />
-          </td>
-        </tr>
-      )}
     </>
   );
 }

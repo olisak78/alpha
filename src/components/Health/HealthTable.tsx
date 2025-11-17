@@ -13,9 +13,28 @@ interface HealthTableProps {
   healthChecks: ComponentHealthCheck[];
   isLoading: boolean;
   landscape: string;
+  teamNamesMap?: Record<string, string>;
+  onComponentClick?: (componentName: string) => void;
+  components?: Array<{ id: string; name: string; owner_id?: string | null }>;
 }
 
-export function HealthTable({ healthChecks, isLoading, landscape }: HealthTableProps) {
+export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap = {}, onComponentClick, components = [], }: HealthTableProps) {
+  const componentOwnerMap = useMemo(() => {
+    const map: Record<string, string | null> = {};
+    components.forEach(comp => {
+      map[comp.id] = comp.owner_id || null;
+    });
+    return map;
+  }, [components]);
+
+  const componentNameMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    components.forEach(comp => {
+      map[comp.id] = comp.name;
+    });
+    return map;
+  }, [components]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -27,15 +46,8 @@ export function HealthTable({ healthChecks, isLoading, landscape }: HealthTableP
   }, [healthChecks, searchQuery]);
 
   const toggleRow = (componentId: string) => {
-    setExpandedRows(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(componentId)) {
-        newSet.delete(componentId);
-      } else {
-        newSet.add(componentId);
-      }
-      return newSet;
-    });
+    // No longer toggle expansion in table view
+    return;
   };
 
   if (isLoading && healthChecks.length === 0) {
@@ -79,20 +91,31 @@ export function HealthTable({ healthChecks, isLoading, landscape }: HealthTableP
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Last Checked
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Actions
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Team
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {filteredHealthChecks.map((check) => (
-                <HealthRow
-                  key={check.componentId}
-                  healthCheck={check}
-                  isExpanded={expandedRows.has(check.componentId)}
-                  onToggle={() => toggleRow(check.componentId)}
-                />
-              ))}
+              {filteredHealthChecks.map((check) => {
+                // NEW: Look up owner_id for this component
+                const ownerId = componentOwnerMap[check.componentId];
+                const teamName = ownerId ? teamNamesMap[ownerId] : undefined;
+                const componentName = componentNameMap[check.componentId];
+                return (
+                  <HealthRow
+                    key={check.componentId}
+                    healthCheck={check}
+                    isExpanded={false}
+                    onToggle={() => toggleRow(check.componentId)}
+                    // NEW: Pass team name for this component
+                    teamName={teamName}
+                    componentName={componentName}
+                    // NEW: Pass click handler for navigation
+                    onComponentClick={onComponentClick}
+                  />
+                );
+              })}
             </tbody>
           </table>
 
