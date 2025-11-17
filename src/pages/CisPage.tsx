@@ -2,14 +2,13 @@ import { useState, useMemo, useEffect } from "react";
 import cisTimelines from "@/data/cis-timelines.json";
 import AskOCTab from "@/components/AskOCTab";
 import DeliveryTab from "@/components/DeliveryTab";
-import { LandscapeFilter } from "@/components/LandscapeFilter";
 import { LandscapeLinksSection } from "@/components/LandscapeLinksSection";
 import FeatureToggleTab from "@/components/tabs/FeatureToggleTab";
 import TimelinesTab from "@/components/tabs/TimelinesTab";
 import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
 import { useTeams } from "@/hooks/api/useTeams";
-import { componentVersions, DEFAULT_LANDSCAPE } from "@/types/developer-portal";
+import { componentVersions} from "@/types/developer-portal";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useComponentManagement, useFeatureToggles, useLandscapeManagement, usePortalState } from "@/contexts/hooks";
@@ -18,6 +17,9 @@ import { ComponentsTabContent } from "@/components/ComponentsTabContent";
 import { HealthDashboard } from "@/components/Health/HealthDashboard";
 import { filterComponentsByLandscape, getLibraryComponents } from "@/utils/componentFiltering";
 import AlertsPage from "./AlertsPage";
+// NEW: Import health hook for fetching component health statuses
+import { useHealth } from "@/hooks/api/useHealth";
+import type { ComponentHealthCheck } from "@/types/health";
 
 const TAB_VISIBILITY = {
   components: true,
@@ -49,7 +51,6 @@ export default function CisPage() {
     getLandscapeGroups,
     getFilteredLandscapeIds,
     getProductionLandscapeIds,
-    getDefaultLandscape,
   } = useLandscapeManagement();
 
   const {
@@ -171,6 +172,75 @@ export default function CisPage() {
     return groups;
   }, [apiLandscapes]);
 
+  // NEW: Create landscape configuration for health checks
+  // FIXED: Use the same route property that HealthDashboard uses
+  const landscapeConfig = useMemo(() => {
+    if (!selectedApiLandscape) return null;
+    
+    // IMPORTANT: Match the exact property access pattern from HealthDashboard
+    // Try metadata.route first, then fall back to landscape_url
+    const route = selectedApiLandscape.metadata?.route || 
+                  selectedApiLandscape.landscape_url || 
+                  'sap.hana.ondemand.com';
+    
+    console.log('🔍 Components Tab - Landscape Config:', {
+      landscapeId: selectedApiLandscape.id,
+      landscapeName: selectedApiLandscape.name,
+      route: route,
+      metadata: selectedApiLandscape.metadata,
+      landscape_url: selectedApiLandscape.landscape_url
+    });
+    
+    return {
+      name: selectedApiLandscape.name,
+      route: route
+    };
+  }, [selectedApiLandscape]);
+
+  // NEW: Fetch health data for Components tab
+  // Only fetch health when on components tab, a landscape is selected, and we have valid config
+  const {
+    components: healthChecks,
+    isLoading: isLoadingHealth,
+  } = useHealth({
+    components: filteredComponents,
+    landscape: landscapeConfig || { name: '', route: '' },
+    enabled: !!selectedLandscape && !!landscapeConfig && activeTab === 'components'
+  });
+
+  // NEW: Debug logging for health checks
+  useEffect(() => {
+    if (activeTab === 'components' && healthChecks.length > 0) {
+      console.log('🏥 Components Tab - Health Checks:', {
+        total: healthChecks.length,
+        up: healthChecks.filter(h => h.status === 'UP').length,
+        down: healthChecks.filter(h => h.status === 'DOWN').length,
+        error: healthChecks.filter(h => h.status === 'ERROR').length,
+        sample: healthChecks.slice(0, 3).map(h => ({
+          componentId: h.componentId,
+          componentName: h.componentName,
+          status: h.status,
+          healthUrl: h.healthUrl,
+          error: h.error
+        }))
+      });
+    }
+  }, [activeTab, healthChecks]);
+
+  // NEW: Create a lookup map for component health status
+  // This allows ComponentCard to quickly find the health status for a specific component
+  const componentHealthMap = useMemo(() => {
+    const map: Record<string, ComponentHealthCheck> = {};
+    healthChecks.forEach(check => {
+      map[check.componentId] = check;
+    });
+    
+    console.log('📊 Component Health Map Keys:', Object.keys(map).slice(0, 5));
+    console.log('📊 Sample Component IDs:', filteredComponents.slice(0, 5).map(c => c.id));
+    
+    return map;
+  }, [healthChecks, filteredComponents]);
+
   // Memoize header tabs
   const headerTabs = useMemo(() => [
     { id: "components", label: "Components" },
@@ -224,7 +294,7 @@ export default function CisPage() {
               hiddenButtons={['plutono']}
             />
 
-            {/* Regular Components Section */}
+            {/* Regular Components Section - NOW WITH HEALTH STATUS */}
             <ComponentsTabContent
               title="CIS Cloud Foundry Components"
               components={filteredComponents}
@@ -246,6 +316,9 @@ export default function CisPage() {
               teamColorsMap={teamColorsMap}
               sortOrder={componentSortOrder}
               onSortOrderChange={setComponentSortOrder}
+              // NEW: Pass health status map and loading state to components
+              componentHealthMap={componentHealthMap}
+              isLoadingHealth={isLoadingHealth}
             />
 
             {/* Library Components Section */}
@@ -268,6 +341,9 @@ export default function CisPage() {
                   teamColorsMap={teamColorsMap}
                   sortOrder={componentSortOrder}
                   onSortOrderChange={setComponentSortOrder}
+                  // NEW: Libraries typically don't have health endpoints, but pass empty map
+                  componentHealthMap={{}}
+                  isLoadingHealth={false}
                 />
               </div>
             )}

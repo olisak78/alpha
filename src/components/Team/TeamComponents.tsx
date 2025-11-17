@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
 import type { Component } from "@/types/api";
+// NEW: Import health check type
+import type { ComponentHealthCheck } from "@/types/health";
 
 interface TeamComponentsProps {
   components: Component[];
@@ -10,12 +12,15 @@ interface TeamComponentsProps {
   teamComponentsExpanded: Record<string, boolean>;
   onToggleExpanded: (componentId: string) => void;
   system: string;
-  showProjectGrouping?: boolean; // New prop to control project grouping
+  showProjectGrouping?: boolean;
   selectedLandscape?: string | null;
-  selectedLandscapeData?: any; // Landscape data with metadata
-  compactView?: boolean; // New prop to use compact view for team pages
-  teamNamesMap?: Record<string, string>; // Map of owner_id to team name
-  teamColorsMap?: Record<string, string>; // Map of owner_id to team color
+  selectedLandscapeData?: any;
+  compactView?: boolean;
+  teamNamesMap?: Record<string, string>;
+  teamColorsMap?: Record<string, string>;
+  // NEW: Health status props
+  componentHealthMap?: Record<string, ComponentHealthCheck>;
+  isLoadingHealth?: boolean;
 }
 
 export function TeamComponents({
@@ -30,6 +35,9 @@ export function TeamComponents({
   compactView = false,
   teamNamesMap = {},
   teamColorsMap = {},
+  // NEW: Health status props with default values
+  componentHealthMap = {},
+  isLoadingHealth = false,
 }: TeamComponentsProps) {
   if (!components || components.length === 0) {
     return (
@@ -53,33 +61,34 @@ export function TeamComponents({
     return (
       <div
         key={component.id}
-        className="group relative flex items-center justify-between px-4 py-3 rounded-lg border border-border/60 bg-card hover:border-primary/40 hover:shadow-md transition-all duration-200"
+        className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
       >
-        {/* Left side - Component name */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-primary/80 to-primary/40 group-hover:from-primary group-hover:to-primary/60 transition-all" />
-          <span className="font-medium text-sm truncate group-hover:text-primary transition-colors">
-            {component.title || component.name}
-          </span>
-        </div>
-
-        {/* Right side - Team badge and GitHub link */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {ownerTeamName && (
-            <Badge
-              variant="secondary"
-              className="text-xs px-2 py-0.5 text-white border-0"
-              style={{ backgroundColor: ownerTeamColor || '#6b7280' }}
-            >
-              {ownerTeamName}
-            </Badge>
-          )}
-          {component.github && component.github.trim() !== '' && (
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold truncate">{component.title || component.name}</h4>
+              {ownerTeamName && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs flex-shrink-0 text-white border-0"
+                  style={{ backgroundColor: ownerTeamColor || '#6b7280' }}
+                >
+                  {ownerTeamName}
+                </Badge>
+              )}
+            </div>
+            {component.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {component.description}
+              </p>
+            )}
+          </div>
+          {component.github && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-8 px-3 text-xs opacity-60 group-hover:opacity-100 transition-opacity"
               onClick={() => openLink(component.github!)}
+              className="flex-shrink-0"
             >
               <Github className="h-3.5 w-3.5 mr-1.5" />
               GitHub
@@ -121,6 +130,9 @@ export function TeamComponents({
         getComponentAlerts={() => null}
         teamName={ownerTeamName}
         teamColor={ownerTeamColor}
+        // NEW: Pass health check for this specific component
+        healthCheck={componentHealthMap[component.id]}
+        isLoadingHealth={isLoadingHealth}
       />
     );
   };

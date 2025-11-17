@@ -9,6 +9,8 @@ import {
   CheckCircle,
   Github,
   ChevronDown,
+  // NEW: Import Loader2 icon for health status loading state
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import { Component } from "@/types/api";
 import { useSonarMeasures } from "@/hooks/api/useSonarMeasures";
 import { fetchSystemInfo, type SystemInformation } from "@/services/healthApi";
+// NEW: Import health check types
+import type { ComponentHealthCheck, HealthStatus } from "@/types/health";
+import { GithubIcon } from "./icons/GithubIcon";
 
 interface ComponentCardProps {
   component: Component;
@@ -29,6 +34,9 @@ interface ComponentCardProps {
   system: string;
   teamName?: string;
   teamColor?: string;
+  // NEW: Add health check props
+  healthCheck?: ComponentHealthCheck;
+  isLoadingHealth?: boolean;
 }
 
 export default function ComponentCard({
@@ -40,6 +48,9 @@ export default function ComponentCard({
   selectedLandscapeData,
   teamName,
   teamColor,
+  // NEW: Destructure health check props
+  healthCheck,
+  isLoadingHealth = false,
 }: ComponentCardProps) {
   const navigate = useNavigate();
   const [systemInfo, setSystemInfo] = useState<SystemInformation | null>(null);
@@ -77,6 +88,62 @@ export default function ComponentCard({
     }
   };
 
+  // NEW: Helper function to render health status badge
+  const getHealthStatusBadge = () => {
+    // Only show health status when a landscape is selected
+    if (!selectedLandscape) return null;
+
+    // Show loading state while fetching health data
+    if (isLoadingHealth) {
+      return (
+        <Badge variant="outline" className="flex items-center gap-1 text-xs px-2 py-0.5 border-blue-300 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span>Checking</span>
+        </Badge>
+      );
+    }
+
+    // If no health check data available, don't show badge
+    if (!healthCheck) return null;
+
+    const status = healthCheck.status;
+
+    // Render appropriate badge based on health status
+    switch (status) {
+      case 'UP':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1 text-xs px-2 py-0.5 border-green-500 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 dark:border-green-800">
+            <div className="h-2 w-2 rounded-full bg-green-500" />
+            <span>UP</span>
+          </Badge>
+        );
+      case 'DOWN':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1 text-xs px-2 py-0.5 border-red-500 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300 dark:border-red-800">
+            <div className="h-2 w-2 rounded-full bg-red-500" />
+            <span>DOWN</span>
+          </Badge>
+        );
+      case 'UNKNOWN':
+      case 'OUT_OF_SERVICE':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1 text-xs px-2 py-0.5 border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800">
+            <div className="h-2 w-2 rounded-full bg-yellow-500" />
+            <span>UNKNOWN</span>
+          </Badge>
+        );
+      case 'ERROR':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1 text-xs px-2 py-0.5 border-red-500 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300 dark:border-red-800">
+            <AlertTriangle className="h-3 w-3" />
+            <span>ERROR</span>
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-border/60 hover:border-border">
       <CardContent className="p-4">
@@ -84,7 +151,11 @@ export default function ComponentCard({
         <div className="space-y-2.5">
           {/* Component Name and Team Badge Row */}
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold text-base truncate leading-tight">{component.title || component.name}</h3>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <h3 className="font-semibold text-base truncate leading-tight">{component.title || component.name}</h3>
+              {/* MOVED: Health Status Badge now on same row as title */}
+              {getHealthStatusBadge()}
+            </div>
             {teamName && (
               <Badge
                 variant="secondary"
@@ -140,7 +211,6 @@ export default function ComponentCard({
                     </>
                   );
                 }
-
                 // Simple string version
                 return (
                   <Badge variant="outline" className="text-[11px] px-1.5 py-0 h-4 font-normal text-muted-foreground">
@@ -152,48 +222,11 @@ export default function ComponentCard({
                 <span className="text-[11px] text-muted-foreground">Loading...</span>
               )}
             </div>
-
-            <div className="flex items-center gap-1 flex-shrink-0">
-              {/* Quick action buttons */}
-              {component.github && component.github.trim() !== '' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-1.5 text-xs"
-                  onClick={(e) => openLink(e, component.github!)}>
-                  <Github className="h-3 w-3 mr-1" />
-                  GitHub
-                </Button>
-              )}
-              {component.sonar && component.sonar.trim() !== '' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-1.5 text-xs"
-                  onClick={(e) => openLink(e, component.sonar!)}>
-                  <Activity className="h-3 w-3 mr-1" />
-                  Sonar
-                </Button>
-              )}
-              {/* System Info Link - only when landscape is selected and URL is available */}
-              {selectedLandscape && systemInfoUrl && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-1.5 text-xs"
-                  onClick={(e) => openLink(e, systemInfoUrl)}
-                  title="Open System Information">
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  Version
-                </Button>
-              )}
-            </div>
           </div>
-          <Code className="h-4 w-4 text-muted-foreground ml-2 flex-shrink-0" />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 mb-3">
+         <div className="flex gap-2 justify-end pb-6">
           {component.github && component.github.trim() !== '' && (
             <Button
               variant="outline"
@@ -204,7 +237,7 @@ export default function ComponentCard({
                 openLink(component.github!);
               }}
             >
-              <Github className="h-3 w-3 mr-1" />
+              <GithubIcon className="h-3 w-3 mr-1" />
               GitHub
             </Button>
           )}
