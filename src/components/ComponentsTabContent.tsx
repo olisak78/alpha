@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, ReactNode } from "react";
 import { Search, RefreshCw, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { TeamComponents } from "@/components/Team/TeamComponents";
 import { Component } from "@/types/api";
-// NEW: Import health check type
 import type { ComponentHealthCheck } from "@/types/health";
 import {
   Select,
@@ -37,9 +36,9 @@ interface ComponentsTabContentProps {
   teamColorsMap?: Record<string, string>;
   sortOrder?: 'alphabetic' | 'team';
   onSortOrderChange?: (order: 'alphabetic' | 'team') => void;
-  // NEW: Health status props
   componentHealthMap?: Record<string, ComponentHealthCheck>;
   isLoadingHealth?: boolean;
+  viewSwitcher?: ReactNode;
 }
 
 export function ComponentsTabContent({
@@ -62,9 +61,9 @@ export function ComponentsTabContent({
   teamColorsMap = {},
   sortOrder = 'alphabetic',
   onSortOrderChange,
-  // NEW: Health status props with default values
   componentHealthMap = {},
   isLoadingHealth = false,
+  viewSwitcher,
 }: ComponentsTabContentProps) {
   const filteredAndSortedComponents = useMemo(() => {
     let filtered = components;
@@ -92,77 +91,94 @@ export function ComponentsTabContent({
     return sorted;
   }, [components, searchTerm, sortOrder, teamNamesMap]);
 
-  return (
-    <div className="space-y-6">
+  if (isLoading) {
+    return (
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">{title}</CardTitle>
-            <div className="flex items-center gap-3">
-              {onSortOrderChange && (
-                <Select value={sortOrder} onValueChange={(value: 'alphabetic' | 'team') => onSortOrderChange(value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alphabetic">Alphabetic</SelectItem>
-                    <SelectItem value="team">By Team</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-              {showRefreshButton && onRefresh && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onRefresh}
-                  disabled={isLoading}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-              )}
-            </div>
-          </div>
+          <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {onSearchTermChange && (
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search components..."
-                  value={searchTerm}
-                  onChange={(e) => onSearchTermChange(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            )}
+          <div className="flex items-center justify-center py-12">
+            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground">Loading components...</span>
           </div>
         </CardContent>
       </Card>
+    );
+  }
 
-      <div className="space-y-6">
-        {isLoading && (
-          <div className="flex items-center justify-center py-8">
-            <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-            <span>Loading {teamName} components...</span>
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Error loading components: {error.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <CardTitle>{title}</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              {filteredAndSortedComponents.length} component{filteredAndSortedComponents.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {viewSwitcher}
+            {showRefreshButton && onRefresh && (
+              <Button
+                onClick={onRefresh}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {onSearchTermChange && (
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search components..."
+                value={searchTerm}
+                onChange={(e) => onSearchTermChange(e.target.value)}
+                className="pl-10"
+                data-testid="search-input"
+              />
+            </div>
+            {onSortOrderChange && (
+              <Select value={sortOrder} onValueChange={onSortOrderChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="alphabetic">Alphabetic</SelectItem>
+                  <SelectItem value="team">By Team</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
         )}
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Failed to load {teamName} components: {error.message}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {!isLoading && !error && (
+        {filteredAndSortedComponents.length === 0 ? (
+          <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              {emptyStateMessage || "No components found"}
+            </p>
+          </div>
+        ) : (
           <TeamComponents
-            components={filteredAndSortedComponents}
             teamName={teamName}
+            components={filteredAndSortedComponents}
             teamComponentsExpanded={teamComponentsExpanded}
             onToggleExpanded={onToggleExpanded}
             system={system}
@@ -171,12 +187,11 @@ export function ComponentsTabContent({
             selectedLandscapeData={selectedLandscapeData}
             teamNamesMap={teamNamesMap}
             teamColorsMap={teamColorsMap}
-            // NEW: Pass health status map to TeamComponents
             componentHealthMap={componentHealthMap}
             isLoadingHealth={isLoadingHealth}
           />
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

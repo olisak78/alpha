@@ -54,7 +54,6 @@ export default function ComponentCard({
 }: ComponentCardProps) {
   const navigate = useNavigate();
   const [systemInfo, setSystemInfo] = useState<SystemInformation | null>(null);
-  const [systemInfoUrl, setSystemInfoUrl] = useState<string | null>(null);
   const [loadingSystemInfo, setLoadingSystemInfo] = useState(false);
 
   // Navigate to component view page
@@ -153,7 +152,6 @@ export default function ComponentCard({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <h3 className="font-semibold text-base truncate leading-tight">{component.title || component.name}</h3>
-              {/* MOVED: Health Status Badge now on same row as title */}
               {getHealthStatusBadge()}
             </div>
             {teamName && (
@@ -170,7 +168,6 @@ export default function ComponentCard({
           {/* Version Badges and Action Buttons Row */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 flex-wrap min-h-[20px]">
-              {/* Version badge(s) - only when landscape is selected */}
               {selectedLandscape && systemInfo && (() => {
                 // Check for direct app/sapui5 properties (from /version endpoint)
                 if (systemInfo.app || systemInfo.sapui5) {

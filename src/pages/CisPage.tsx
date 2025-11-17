@@ -14,32 +14,32 @@ import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useComponentManagement, useFeatureToggles, useLandscapeManagement, usePortalState } from "@/contexts/hooks";
 import { useTabRouting } from "@/hooks/useTabRouting";
 import { ComponentsTabContent } from "@/components/ComponentsTabContent";
-import { HealthDashboard } from "@/components/Health/HealthDashboard";
 import { filterComponentsByLandscape, getLibraryComponents } from "@/utils/componentFiltering";
 import AlertsPage from "./AlertsPage";
-// NEW: Import health hook for fetching component health statuses
 import { useHealth } from "@/hooks/api/useHealth";
 import type { ComponentHealthCheck } from "@/types/health";
+import { ViewSwitcher } from "@/components/ViewSwitcher";
+import { HealthOverview, HealthTable } from "@/components/Health";
 
 const TAB_VISIBILITY = {
   components: true,
-  health: true,             // Health dashboard
-  alerts: true,             // NEW: Alerts management
-  'feature-toggle': false,  // Hidden
-  delivery: false,          // Hidden
-  timelines: false,         // Hidden
-  askoc: false             // Hidden
+  health: false,              
+  alerts: true,             
+  'feature-toggle': false,   
+  delivery: false,           
+  timelines: false,        
+  askoc: false              
 } as const;
 
 export default function CisPage() {
   const [activeTab, setActiveTab] = useState("components");
+  const [componentView, setComponentView] = useState<'grid' | 'table'>('grid');
   const [teamComponentsExpanded, setTeamComponentsExpanded] = useState<Record<string, boolean>>({});
   const [componentSearchTerm, setComponentSearchTerm] = useState("");
   const [componentSortOrder, setComponentSortOrder] = useState<'alphabetic' | 'team'>('alphabetic');
   const { setTabs, activeTab: headerActiveTab, setActiveTab: setHeaderActiveTab } = useHeaderNavigation();
   const { currentTabFromUrl, syncTabWithUrl } = useTabRouting();
 
-  // Get all data from context
   const {
     selectedLandscape,
     setSelectedLandscape,
@@ -75,7 +75,6 @@ export default function CisPage() {
 
   const activeProject = "CIS@2.0";
   
-  // We need the organization context to make the API call work properly
   const {
     data: cisComponentsData,
     isLoading: cisComponentsLoading,
@@ -83,17 +82,14 @@ export default function CisPage() {
     refetch: refetchCisComponents
   } = useComponentsByProject('cis20');
 
-  // Fetch landscapes from API for Health Dashboard
   const {
     data: apiLandscapes,
     isLoading: isLoadingApiLandscapes,
   } = useLandscapesByProject('cis20');
 
-  // Fetch all teams to create team name mapping
   const { data: teamsData } = useTeams();
-
-  // cisComponentsData is already the components array directly
   const cisApiComponents = cisComponentsData || [];
+  
 
   // Create a mapping of team ID to team name
   const teamNamesMap = useMemo(() => {
@@ -137,10 +133,8 @@ export default function CisPage() {
 
   // Filter components based on landscape metadata
   const filteredComponents = useMemo(() => {
-    // If no landscape is selected, show all non-library components
     if (!selectedLandscape) {
       const allNonLibrary = cisApiComponents.filter(c => !c.metadata?.['isLibrary']);
-      // Sort alphabetically by name
       return allNonLibrary.sort((a, b) => a.name.localeCompare(b.name));
     }
 
@@ -149,10 +143,8 @@ export default function CisPage() {
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [cisApiComponents, selectedApiLandscape, selectedLandscape]);
 
-  // Get library components separately (always show all libraries)
   const libraryComponents = useMemo(() => {
     const libraries = getLibraryComponents(cisApiComponents);
-    // Sort alphabetically by name
     return libraries.sort((a, b) => a.name.localeCompare(b.name));
   }, [cisApiComponents]);
 
@@ -172,24 +164,13 @@ export default function CisPage() {
     return groups;
   }, [apiLandscapes]);
 
-  // NEW: Create landscape configuration for health checks
-  // FIXED: Use the same route property that HealthDashboard uses
   const landscapeConfig = useMemo(() => {
     if (!selectedApiLandscape) return null;
     
-    // IMPORTANT: Match the exact property access pattern from HealthDashboard
-    // Try metadata.route first, then fall back to landscape_url
     const route = selectedApiLandscape.metadata?.route || 
                   selectedApiLandscape.landscape_url || 
                   'sap.hana.ondemand.com';
     
-    console.log('🔍 Components Tab - Landscape Config:', {
-      landscapeId: selectedApiLandscape.id,
-      landscapeName: selectedApiLandscape.name,
-      route: route,
-      metadata: selectedApiLandscape.metadata,
-      landscape_url: selectedApiLandscape.landscape_url
-    });
     
     return {
       name: selectedApiLandscape.name,
@@ -197,47 +178,21 @@ export default function CisPage() {
     };
   }, [selectedApiLandscape]);
 
-  // NEW: Fetch health data for Components tab
-  // Only fetch health when on components tab, a landscape is selected, and we have valid config
   const {
     components: healthChecks,
     isLoading: isLoadingHealth,
+    summary,
   } = useHealth({
     components: filteredComponents,
     landscape: landscapeConfig || { name: '', route: '' },
     enabled: !!selectedLandscape && !!landscapeConfig && activeTab === 'components'
   });
 
-  // NEW: Debug logging for health checks
-  useEffect(() => {
-    if (activeTab === 'components' && healthChecks.length > 0) {
-      console.log('🏥 Components Tab - Health Checks:', {
-        total: healthChecks.length,
-        up: healthChecks.filter(h => h.status === 'UP').length,
-        down: healthChecks.filter(h => h.status === 'DOWN').length,
-        error: healthChecks.filter(h => h.status === 'ERROR').length,
-        sample: healthChecks.slice(0, 3).map(h => ({
-          componentId: h.componentId,
-          componentName: h.componentName,
-          status: h.status,
-          healthUrl: h.healthUrl,
-          error: h.error
-        }))
-      });
-    }
-  }, [activeTab, healthChecks]);
-
-  // NEW: Create a lookup map for component health status
-  // This allows ComponentCard to quickly find the health status for a specific component
   const componentHealthMap = useMemo(() => {
     const map: Record<string, ComponentHealthCheck> = {};
     healthChecks.forEach(check => {
       map[check.componentId] = check;
     });
-    
-    console.log('📊 Component Health Map Keys:', Object.keys(map).slice(0, 5));
-    console.log('📊 Sample Component IDs:', filteredComponents.slice(0, 5).map(c => c.id));
-    
     return map;
   }, [healthChecks, filteredComponents]);
 
@@ -252,7 +207,6 @@ export default function CisPage() {
     { id: "askoc", label: "AskOC" }
   ].filter(tab => TAB_VISIBILITY[tab.id as keyof typeof TAB_VISIBILITY]), []);
 
-  // Set up header tabs and sync with URL
   useEffect(() => {
     setTabs(headerTabs);
     syncTabWithUrl(headerTabs, "components");
@@ -284,7 +238,6 @@ export default function CisPage() {
       case "components":
         return (
           <>
-            {/* Landscape Links Section */}
             <LandscapeLinksSection
               selectedLandscape={selectedLandscape}
               selectedLandscapeData={selectedApiLandscape}
@@ -293,73 +246,95 @@ export default function CisPage() {
               onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
               hiddenButtons={['plutono']}
             />
-
-            {/* Regular Components Section - NOW WITH HEALTH STATUS */}
-            <ComponentsTabContent
-              title="CIS Cloud Foundry Components"
-              components={filteredComponents}
-              teamName="CIS Cloud Foundry"
-              isLoading={cisComponentsLoading}
-              error={cisComponentsError}
-              teamComponentsExpanded={teamComponentsExpanded}
-              onToggleExpanded={handleToggleComponentExpansion}
-              onRefresh={refetchCisComponents}
-              showRefreshButton={false}
-              emptyStateMessage="No CIS components found for this organization."
-              searchTerm={componentSearchTerm}
-              onSearchTermChange={setComponentSearchTerm}
-              system="cis"
-              showLandscapeFilter={true}
-              selectedLandscape={selectedLandscape}
-              selectedLandscapeData={selectedApiLandscape}
-              teamNamesMap={teamNamesMap}
-              teamColorsMap={teamColorsMap}
-              sortOrder={componentSortOrder}
-              onSortOrderChange={setComponentSortOrder}
-              // NEW: Pass health status map and loading state to components
-              componentHealthMap={componentHealthMap}
-              isLoadingHealth={isLoadingHealth}
-            />
-
-            {/* Library Components Section */}
-            {libraryComponents.length > 0 && (
-              <div className="mt-8">
+           {componentView === 'grid' ? (
+              <>
                 <ComponentsTabContent
-                  title="CIS Cloud Foundry Libraries"
-                  components={libraryComponents}
-                  teamName="CIS Cloud Foundry Libraries"
+                  title="CIS Cloud Foundry Components"
+                  components={filteredComponents}
+                  teamName="CIS Cloud Foundry"
                   isLoading={cisComponentsLoading}
                   error={cisComponentsError}
                   teamComponentsExpanded={teamComponentsExpanded}
                   onToggleExpanded={handleToggleComponentExpansion}
                   onRefresh={refetchCisComponents}
                   showRefreshButton={false}
-                  emptyStateMessage="No CIS library components found."
+                  emptyStateMessage="No CIS components found for this organization."
                   searchTerm={componentSearchTerm}
+                  onSearchTermChange={setComponentSearchTerm}
                   system="cis"
+                  showLandscapeFilter={true}
+                  selectedLandscape={selectedLandscape}
+                  selectedLandscapeData={selectedApiLandscape}
                   teamNamesMap={teamNamesMap}
                   teamColorsMap={teamColorsMap}
                   sortOrder={componentSortOrder}
                   onSortOrderChange={setComponentSortOrder}
-                  // NEW: Libraries typically don't have health endpoints, but pass empty map
-                  componentHealthMap={{}}
-                  isLoadingHealth={false}
+                  componentHealthMap={componentHealthMap}
+                  isLoadingHealth={isLoadingHealth}
+                  viewSwitcher={
+                    <ViewSwitcher view={componentView} onViewChange={setComponentView} />
+                  }
                 />
+
+                {libraryComponents.length > 0 && (
+                  <div className="mt-8">
+                    <ComponentsTabContent
+                      title="CIS Cloud Foundry Libraries"
+                      components={libraryComponents}
+                      teamName="CIS Cloud Foundry Libraries"
+                      isLoading={cisComponentsLoading}
+                      error={cisComponentsError}
+                      teamComponentsExpanded={teamComponentsExpanded}
+                      onToggleExpanded={handleToggleComponentExpansion}
+                      onRefresh={refetchCisComponents}
+                      showRefreshButton={false}
+                      emptyStateMessage="No CIS library components found."
+                      searchTerm={componentSearchTerm}
+                      system="cis"
+                      teamNamesMap={teamNamesMap}
+                      teamColorsMap={teamColorsMap}
+                      sortOrder={componentSortOrder}
+                      onSortOrderChange={setComponentSortOrder}
+                      componentHealthMap={{}}
+                      isLoadingHealth={false}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">Component Health</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Real-time health status of all components
+                      {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
+                    </p>
+                  </div>
+                  <ViewSwitcher view={componentView} onViewChange={setComponentView} />
+                </div>
+
+                {selectedLandscape && filteredComponents.length > 0 ? (
+                  <>
+                    <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+                    <HealthTable
+                      healthChecks={healthChecks}
+                      isLoading={isLoadingHealth}
+                      landscape={selectedApiLandscape?.name || ''}
+                    />
+                  </>
+                ) : (
+                  <div className="border-2 border-dashed rounded-lg p-12 text-center">
+                    <p className="text-muted-foreground">
+                      {!selectedLandscape 
+                        ? 'Select a landscape to view component health status'
+                        : 'No components found in this landscape'}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </>
-        );
-      case "health":
-        return (
-          <HealthDashboard
-            projectId="cis20"
-            components={filteredComponents}
-            landscapeGroups={apiLandscapeGroups}
-            selectedLandscape={selectedLandscape}
-            onLandscapeChange={setSelectedLandscape}
-            onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
-            isLoadingComponents={cisComponentsLoading || isLoadingApiLandscapes}
-          />
         );
       case "alerts":
         return <AlertsPage projectId="cis20" projectName="CIS@2.0" />;
