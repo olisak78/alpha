@@ -1,6 +1,5 @@
 import { useMemo, ReactNode } from "react";
 import { Search, RefreshCw, AlertCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -95,17 +94,12 @@ export function ComponentsTabContent({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-12">
-            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-            <span className="ml-3 text-muted-foreground">Loading components...</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-12 text-center bg-white dark:bg-[#0D0D0D]">
+        <div className="flex items-center justify-center">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="ml-3 text-muted-foreground">Loading components...</span>
+        </div>
+      </div>
     );
   }
 
@@ -121,80 +115,67 @@ export function ComponentsTabContent({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <CardTitle>{title}</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              {filteredAndSortedComponents.length} component{filteredAndSortedComponents.length !== 1 ? 's' : ''}
-            </p>
+    <div className="space-y-4">
+      {/* Search and Controls */}
+      {onSearchTermChange && (
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search components..."
+              value={searchTerm}
+              onChange={(e) => onSearchTermChange(e.target.value)}
+              className="pl-10"
+              data-testid="search-input"
+            />
           </div>
-          <div className="flex items-center gap-3">
-            {viewSwitcher}
-            {showRefreshButton && onRefresh && (
-              <Button
-                onClick={onRefresh}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          {onSortOrderChange && (
+            <Select value={sortOrder} onValueChange={onSortOrderChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="alphabetic">Alphabetic</SelectItem>
+                <SelectItem value="team">By Team</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          {showRefreshButton && onRefresh && (
+            <Button
+              onClick={onRefresh}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {onSearchTermChange && (
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search components..."
-                value={searchTerm}
-                onChange={(e) => onSearchTermChange(e.target.value)}
-                className="pl-10"
-                data-testid="search-input"
-              />
-            </div>
-            {onSortOrderChange && (
-              <Select value={sortOrder} onValueChange={onSortOrderChange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="alphabetic">Alphabetic</SelectItem>
-                  <SelectItem value="team">By Team</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-        )}
+      )}
 
-        {filteredAndSortedComponents.length === 0 ? (
-          <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              {emptyStateMessage || "No components found"}
-            </p>
-          </div>
-        ) : (
-          <TeamComponents
-            teamName={teamName}
-            components={filteredAndSortedComponents}
-            teamComponentsExpanded={teamComponentsExpanded}
-            onToggleExpanded={onToggleExpanded}
-            system={system}
-            showProjectGrouping={false}
-            selectedLandscape={selectedLandscape}
-            selectedLandscapeData={selectedLandscapeData}
-            teamNamesMap={teamNamesMap}
-            teamColorsMap={teamColorsMap}
-            componentHealthMap={componentHealthMap}
-            isLoadingHealth={isLoadingHealth}
-            onComponentClick={onComponentClick}
-          />
-        )}
-      </CardContent>
-    </Card>
+      {/* Components Content */}
+      {filteredAndSortedComponents.length === 0 ? (
+        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center bg-white dark:bg-[#0D0D0D]">
+          <p className="text-gray-500 dark:text-gray-400">
+            {emptyStateMessage || "No components found"}
+          </p>
+        </div>
+      ) : (
+        <TeamComponents
+          teamName={teamName}
+          components={filteredAndSortedComponents}
+          teamComponentsExpanded={teamComponentsExpanded}
+          onToggleExpanded={onToggleExpanded}
+          system={system}
+          showProjectGrouping={false}
+          selectedLandscape={selectedLandscape}
+          selectedLandscapeData={selectedLandscapeData}
+          teamNamesMap={teamNamesMap}
+          teamColorsMap={teamColorsMap}
+          componentHealthMap={componentHealthMap}
+          isLoadingHealth={isLoadingHealth}
+          onComponentClick={onComponentClick}
+        />
+      )}
+    </div>
   );
 }

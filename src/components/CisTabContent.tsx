@@ -134,6 +134,28 @@ export function CisTabContent({
           />
           {componentView === 'grid' ? (
             <>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">Component Health</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Real-time health status of all components
+                      {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
+                      {selectedLandscape && filteredComponents.length > 0 && (
+                        <span className="ml-1">
+                          ({filteredComponents.length} component{filteredComponents.length !== 1 ? 's' : ''})
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <ViewSwitcher view={componentView} onViewChange={onViewChange} />
+                </div>
+
+                {selectedLandscape && filteredComponents.length > 0 && (
+                  <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+                )}
+              </div>
+
               <ComponentsTabContent
                 title="CIS Cloud Foundry Components"
                 components={filteredComponents}
@@ -157,9 +179,6 @@ export function CisTabContent({
                 onSortOrderChange={onSortOrderChange}
                 componentHealthMap={componentHealthMap}
                 isLoadingHealth={isLoadingHealth}
-                viewSwitcher={
-                  <ViewSwitcher view={componentView} onViewChange={onViewChange} />
-                }
                 onComponentClick={onComponentClick}
               />
 
@@ -197,6 +216,11 @@ export function CisTabContent({
                   <p className="text-sm text-muted-foreground mt-1">
                     Real-time health status of all components
                     {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
+                    {selectedLandscape && filteredComponents.length > 0 && (
+                      <span className="ml-1">
+                        ({filteredComponents.length} component{filteredComponents.length !== 1 ? 's' : ''})
+                      </span>
+                    )}
                   </p>
                 </div>
                 <ViewSwitcher view={componentView} onViewChange={onViewChange} />

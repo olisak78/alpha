@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Activity, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock } from 'lucide-react';
 import type { HealthSummary } from '@/types/health';
 
 interface HealthOverviewProps {
@@ -14,13 +14,6 @@ interface HealthOverviewProps {
 
 export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
   const cards = [
-    {
-      label: 'Total Components',
-      value: summary.total,
-      icon: Activity,
-      color: 'text-gray-600 dark:text-gray-400',
-      bgColor: 'bg-gray-100 dark:bg-gray-800',
-    },
     {
       label: 'Healthy',
       value: summary.up,
@@ -48,7 +41,7 @@ export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
         return (

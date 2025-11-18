@@ -3,6 +3,13 @@ import type { ComponentHealthCheck } from '@/types/health';
 import { HealthRow } from './HealthRow';
 import { Input } from '@/components/ui/input';
 import { Search, Loader2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface HealthTableProps {
   healthChecks: ComponentHealthCheck[];
@@ -31,14 +38,32 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
   }, [components]);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState<'alphabetic' | 'team'>('alphabetic');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  const filteredHealthChecks = useMemo(() => {
-    if (!searchQuery) return healthChecks;
-    return healthChecks.filter(check =>
-      check.componentName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [healthChecks, searchQuery]);
+  const filteredAndSortedHealthChecks = useMemo(() => {
+    let filtered = healthChecks;
+    
+    if (searchQuery) {
+      filtered = filtered.filter(check =>
+        check.componentName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortOrder === 'team') {
+        const ownerIdA = componentOwnerMap[a.componentId];
+        const ownerIdB = componentOwnerMap[b.componentId];
+        const teamA = ownerIdA ? teamNamesMap[ownerIdA] || '' : '';
+        const teamB = ownerIdB ? teamNamesMap[ownerIdB] || '' : '';
+        const teamCompare = teamA.localeCompare(teamB);
+        if (teamCompare !== 0) return teamCompare;
+      }
+      return a.componentName.localeCompare(b.componentName);
+    });
+
+    return sorted;
+  }, [healthChecks, searchQuery, sortOrder, componentOwnerMap, teamNamesMap]);
 
   const toggleRow = (componentId: string) => {
     // No longer toggle expansion in table view
@@ -56,16 +81,28 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
 
   return (
     <div className="space-y-4">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          type="text"
-          placeholder="Search components..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      {/* Search and Sort */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search components..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+            data-testid="search-input"
+          />
+        </div>
+        <Select value={sortOrder} onValueChange={(value: 'alphabetic' | 'team') => setSortOrder(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="alphabetic">Alphabetic</SelectItem>
+            <SelectItem value="team">By Team</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -92,7 +129,7 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {filteredHealthChecks.map((check) => {
+              {filteredAndSortedHealthChecks.map((check) => {
                 const ownerId = componentOwnerMap[check.componentId];
                 const teamName = ownerId ? teamNamesMap[ownerId] : undefined;
                 const componentName = componentNameMap[check.componentId];
@@ -111,7 +148,7 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
             </tbody>
           </table>
 
-          {filteredHealthChecks.length === 0 && !isLoading && (
+          {filteredAndSortedHealthChecks.length === 0 && !isLoading && (
             <div className="p-12 text-center text-gray-500 dark:text-gray-400">
               {searchQuery ? (
                 <>No components found matching &quot;{searchQuery}&quot;</>
