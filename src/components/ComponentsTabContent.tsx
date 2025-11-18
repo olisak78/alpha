@@ -39,7 +39,6 @@ interface ComponentsTabContentProps {
   componentHealthMap?: Record<string, ComponentHealthCheck>;
   isLoadingHealth?: boolean;
   viewSwitcher?: ReactNode;
-  // NEW: Handler for component click navigation
   onComponentClick?: (componentId: string) => void;
 }
 
@@ -66,7 +65,6 @@ export function ComponentsTabContent({
   componentHealthMap = {},
   isLoadingHealth = false,
   viewSwitcher,
-  // NEW: Handler for component click navigation
   onComponentClick,
 }: ComponentsTabContentProps) {
   const filteredAndSortedComponents = useMemo(() => {
@@ -193,7 +191,6 @@ export function ComponentsTabContent({
             teamColorsMap={teamColorsMap}
             componentHealthMap={componentHealthMap}
             isLoadingHealth={isLoadingHealth}
-            // NEW: Pass click handler to TeamComponents
             onComponentClick={onComponentClick}
           />
         )}

@@ -182,20 +182,15 @@ export interface Team {
  * Supports both legacy and new structure fields
  */
 export interface Member {
-  // New structure fields
   name?: string; // Member identifier (e.g., "C5401691")
   team_name?: string; // Team name (e.g., "team-coe")
   team_domain?: string; // e.g., "developer"
   team_role?: string; // e.g., "member"
   phone_number?: string;
   portal_admin?: boolean;
-
-  // Common fields (used in both structures)
   first_name: string;
   last_name: string;
   email: string;
-  
-  // Legacy fields (kept for backward compatibility)
   id?: string; // UUID
   full_name?: string;
   role?: string; // e.g., "developer", "manager", "designer"
@@ -203,10 +198,7 @@ export interface Member {
   team_id?: string; // UUID (optional - member might not be on a team yet)
   created_at?: string; // ISO 8601 timestamp
   updated_at?: string; // ISO 8601 timestamp
-  
-  // Metadata (enhanced to support both structures)
   metadata?: {
-    // New metadata fields
     [key: string]: unknown;
   };
 }

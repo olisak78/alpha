@@ -1,10 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 import cisTimelines from "@/data/cis-timelines.json";
-import AskOCTab from "@/components/AskOCTab";
-import DeliveryTab from "@/components/DeliveryTab";
-import { LandscapeLinksSection } from "@/components/LandscapeLinksSection";
-import FeatureToggleTab from "@/components/tabs/FeatureToggleTab";
-import TimelinesTab from "@/components/tabs/TimelinesTab";
 import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
 import { useTeams } from "@/hooks/api/useTeams";
@@ -13,14 +8,11 @@ import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useComponentManagement, useFeatureToggles, useLandscapeManagement, usePortalState } from "@/contexts/hooks";
 import { useTabRouting } from "@/hooks/useTabRouting";
-import { ComponentsTabContent } from "@/components/ComponentsTabContent";
 import { filterComponentsByLandscape, getLibraryComponents } from "@/utils/componentFiltering";
-import AlertsPage from "./AlertsPage";
 import { useHealth } from "@/hooks/api/useHealth";
 import type { ComponentHealthCheck } from "@/types/health";
-import { ViewSwitcher } from "@/components/ViewSwitcher";
-import { HealthOverview, HealthTable } from "@/components/Health";
 import { useNavigate } from "react-router-dom";
+import { CisTabContent } from "@/components/CisTabContent";
 
 const TAB_VISIBILITY = {
   components: true,
@@ -239,165 +231,57 @@ export default function CisPage() {
     navigate(`/cis/component/${componentName}`);
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "components":
-        return (
-          <>
-            <LandscapeLinksSection
-              selectedLandscape={selectedLandscape}
-              selectedLandscapeData={selectedApiLandscape}
-              landscapeGroups={landscapeGroups}
-              onLandscapeChange={setSelectedLandscape}
-              onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
-              hiddenButtons={['plutono']}
-            />
-            {componentView === 'grid' ? (
-              <>
-                <ComponentsTabContent
-                  title="CIS Cloud Foundry Components"
-                  components={filteredComponents}
-                  teamName="CIS Cloud Foundry"
-                  isLoading={cisComponentsLoading}
-                  error={cisComponentsError}
-                  teamComponentsExpanded={teamComponentsExpanded}
-                  onToggleExpanded={handleToggleComponentExpansion}
-                  onRefresh={refetchCisComponents}
-                  showRefreshButton={false}
-                  emptyStateMessage="No CIS components found for this organization."
-                  searchTerm={componentSearchTerm}
-                  onSearchTermChange={setComponentSearchTerm}
-                  system="cis"
-                  showLandscapeFilter={true}
-                  selectedLandscape={selectedLandscape}
-                  selectedLandscapeData={selectedApiLandscape}
-                  teamNamesMap={teamNamesMap}
-                  teamColorsMap={teamColorsMap}
-                  sortOrder={componentSortOrder}
-                  onSortOrderChange={setComponentSortOrder}
-                  componentHealthMap={componentHealthMap}
-                  isLoadingHealth={isLoadingHealth}
-                  viewSwitcher={
-                    <ViewSwitcher view={componentView} onViewChange={setComponentView} />
-                  }
-                  onComponentClick={handleComponentClick}
-                />
-
-                {libraryComponents.length > 0 && (
-                  <div className="mt-8">
-                    <ComponentsTabContent
-                      title="CIS Cloud Foundry Libraries"
-                      components={libraryComponents}
-                      teamName="CIS Cloud Foundry Libraries"
-                      isLoading={cisComponentsLoading}
-                      error={cisComponentsError}
-                      teamComponentsExpanded={teamComponentsExpanded}
-                      onToggleExpanded={handleToggleComponentExpansion}
-                      onRefresh={refetchCisComponents}
-                      showRefreshButton={false}
-                      emptyStateMessage="No CIS library components found."
-                      searchTerm={componentSearchTerm}
-                      system="cis"
-                      teamNamesMap={teamNamesMap}
-                      teamColorsMap={teamColorsMap}
-                      sortOrder={componentSortOrder}
-                      onSortOrderChange={setComponentSortOrder}
-                      componentHealthMap={{}}
-                      isLoadingHealth={false}
-                      onComponentClick={handleComponentClick}
-                    />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold">Component Health</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Real-time health status of all components
-                      {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
-                    </p>
-                  </div>
-                  <ViewSwitcher view={componentView} onViewChange={setComponentView} />
-                </div>
-
-                {selectedLandscape && filteredComponents.length > 0 ? (
-                  <>
-                    <HealthOverview summary={summary} isLoading={isLoadingHealth} />
-                    <HealthTable
-                      healthChecks={healthChecks}
-                      isLoading={isLoadingHealth}
-                      landscape={selectedApiLandscape?.name || ''}
-                      teamNamesMap={teamNamesMap}
-                      onComponentClick={handleComponentClick}
-                      components={filteredComponents}
-                    />
-                  </>
-                ) : (
-                  <div className="border-2 border-dashed rounded-lg p-12 text-center">
-                    <p className="text-muted-foreground">
-                      {!selectedLandscape
-                        ? 'Select a landscape to view component health status'
-                        : 'No components found in this landscape'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        );
-      case "alerts":
-        return <AlertsPage projectId="cis20" projectName="CIS@2.0" />;
-      case "feature-toggle":
-        return (
-          <FeatureToggleTab
-            featureToggles={filteredToggles}
-            selectedLandscape={selectedLandscape}
-            selectedLandscapeName={currentProjectLandscapes.find(l => l.id === selectedLandscape)?.name}
-            landscapeGroups={landscapeGroups}
-            expandedToggles={expandedToggles}
-            toggleFilter={toggleFilter}
-            componentFilter={componentFilter}
-            availableComponents={availableComponents}
-            activeProject={activeProject}
-            onToggleFeature={toggleFeature}
-            onToggleExpanded={toggleExpanded}
-            onBulkToggle={bulkToggle}
-            onToggleFilterChange={setToggleFilter}
-            onComponentFilterChange={setComponentFilter}
-            getFilteredLandscapeIds={getFilteredLandscapeIds}
-            getProductionLandscapeIds={getProductionLandscapeIds}
-            getGroupStatus={getGroupStatus}
-          />
-        );
-      case "delivery":
-        return <DeliveryTab selectedLandscape={selectedLandscape}
-          landscapes={currentProjectLandscapes} />;
-      case "timelines":
-        return (
-          <TimelinesTab
-            selectedLandscape={selectedLandscape}
-            cisTimelines={cisTimelines}
-            componentVersions={componentVersions}
-            timelineViewMode={timelineViewMode}
-            onTimelineViewModeChange={setTimelineViewMode}
-          />
-        );
-      case "askoc":
-        return <AskOCTab />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
       <BreadcrumbPage>
-        {/* Tab Content */}
-        {renderTabContent()}
+        <CisTabContent
+          activeTab={activeTab}
+          componentView={componentView}
+          onViewChange={setComponentView}
+          selectedLandscape={selectedLandscape}
+          selectedApiLandscape={selectedApiLandscape}
+          landscapeGroups={landscapeGroups}
+          currentProjectLandscapes={currentProjectLandscapes}
+          onLandscapeChange={setSelectedLandscape}
+          onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
+          filteredComponents={filteredComponents}
+          libraryComponents={libraryComponents}
+          cisComponentsLoading={cisComponentsLoading}
+          cisComponentsError={cisComponentsError}
+          teamComponentsExpanded={teamComponentsExpanded}
+          onToggleExpanded={handleToggleComponentExpansion}
+          refetchCisComponents={refetchCisComponents}
+          onComponentClick={handleComponentClick}
+          componentSearchTerm={componentSearchTerm}
+          onSearchTermChange={setComponentSearchTerm}
+          componentSortOrder={componentSortOrder}
+          onSortOrderChange={setComponentSortOrder}
+          teamNamesMap={teamNamesMap}
+          teamColorsMap={teamColorsMap}
+          componentHealthMap={componentHealthMap}
+          isLoadingHealth={isLoadingHealth}
+          healthChecks={healthChecks}
+          summary={summary}
+          filteredToggles={filteredToggles}
+          expandedToggles={expandedToggles}
+          toggleFilter={toggleFilter}
+          componentFilter={componentFilter}
+          availableComponents={availableComponents}
+          activeProject={activeProject}
+          onToggleFeature={toggleFeature}
+          onToggleExpandedFeature={toggleExpanded}
+          onBulkToggle={bulkToggle}
+          onToggleFilterChange={setToggleFilter}
+          onComponentFilterChange={setComponentFilter}
+          getFilteredLandscapeIds={getFilteredLandscapeIds}
+          getProductionLandscapeIds={getProductionLandscapeIds}
+          getGroupStatus={getGroupStatus}
+          cisTimelines={cisTimelines}
+          componentVersions={componentVersions}
+          timelineViewMode={timelineViewMode}
+          onTimelineViewModeChange={setTimelineViewMode}
+        />
       </BreadcrumbPage>
-
     </>
   );
 }

@@ -34,7 +34,6 @@ export function TeamComponents({
   compactView = false,
   teamNamesMap = {},
   teamColorsMap = {},
-  // NEW: Health status props with default values
   componentHealthMap = {},
   isLoadingHealth = false,
   onComponentClick,

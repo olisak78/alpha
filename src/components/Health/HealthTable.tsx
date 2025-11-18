@@ -1,9 +1,4 @@
-/**
- * Health Table Component
- * Displays all component health statuses in a table
- */
-
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import type { ComponentHealthCheck } from '@/types/health';
 import { HealthRow } from './HealthRow';
 import { Input } from '@/components/ui/input';
@@ -98,7 +93,6 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {filteredHealthChecks.map((check) => {
-                // NEW: Look up owner_id for this component
                 const ownerId = componentOwnerMap[check.componentId];
                 const teamName = ownerId ? teamNamesMap[ownerId] : undefined;
                 const componentName = componentNameMap[check.componentId];
@@ -108,10 +102,8 @@ export function HealthTable({ healthChecks, isLoading, landscape, teamNamesMap =
                     healthCheck={check}
                     isExpanded={false}
                     onToggle={() => toggleRow(check.componentId)}
-                    // NEW: Pass team name for this component
                     teamName={teamName}
                     componentName={componentName}
-                    // NEW: Pass click handler for navigation
                     onComponentClick={onComponentClick}
                   />
                 );

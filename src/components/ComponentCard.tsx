@@ -1,14 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  Code,
-  ExternalLink,
   Activity,
   Shield,
   AlertTriangle,
   CheckCircle,
-  Github,
-  ChevronDown,
   Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Component } from "@/types/api";
 import { useSonarMeasures } from "@/hooks/api/useSonarMeasures";
-import { fetchSystemInfo, type SystemInformation } from "@/services/healthApi";
-import type { ComponentHealthCheck, HealthStatus } from "@/types/health";
+import { type SystemInformation } from "@/services/healthApi";
+import type { ComponentHealthCheck } from "@/types/health";
 import { GithubIcon } from "./icons/GithubIcon";
 
 interface ComponentCardProps {
@@ -46,7 +42,6 @@ export default function ComponentCard({
   selectedLandscapeData,
   teamName,
   teamColor,
-  // NEW: Destructure health check props
   healthCheck,
   isLoadingHealth = false,
   onClick,
