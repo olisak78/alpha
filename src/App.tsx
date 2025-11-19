@@ -25,8 +25,10 @@ import HomePage from "./pages/HomePage";
 import LinksPage from "./pages/LinksPage";
 import AIArenaPage from "./pages/AIArenaPage";
 import { DynamicProjectPage } from "./pages/DynamicProjectPage";
+import CisPage from "./pages/CisPage";
 
 import { QueryProvider } from './providers/QueryProvider';
+import ComponentViewPage from "./pages/ComponentViewPage";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +95,13 @@ const App = () => {
                         <Route path="links" element={<LinksPage />} />
                         <Route path="ai-arena" element={<AIArenaPage />} />
                         <Route path="ai-arena/:tabId" element={<AIArenaPage />} />
+
+                        {/* CIS specific routes - MUST come before dynamic projects */}
+                        <Route path="cis">
+                          <Route index element={<CisPage />} />
+                          <Route path="component/:componentId" element={<ComponentViewPage />} />
+                          <Route path="component/:componentId/:tabId" element={<ComponentViewPage />} />
+                        </Route>
 
                         {/* Dynamic projects */}
                         <Route path=":projectName">

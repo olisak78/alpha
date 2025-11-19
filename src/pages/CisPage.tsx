@@ -116,7 +116,21 @@ export default function CisPage() {
 
   // Get data from context functions
   const currentProjectLandscapes = getCurrentProjectLandscapes(activeProject);
-  const landscapeGroups = getLandscapeGroups(activeProject);
+  const landscapeGroupsRecord = getLandscapeGroups(activeProject);
+  
+  // Convert Record<string, Landscape[]> to array format for LandscapeLinksSection
+  const landscapeGroups = useMemo(() => {
+    return Object.entries(landscapeGroupsRecord).map(([groupName, landscapes]) => ({
+      id: groupName,
+      name: groupName,
+      landscapes: landscapes.map(l => ({
+        id: l.id,
+        name: l.name,
+        isCentral: l.isCentral || false
+      }))
+    }));
+  }, [landscapeGroupsRecord]);
+  
   const availableComponents = getAvailableComponents(activeProject, featureToggles);
   const filteredToggles = getFilteredToggles(activeProject, selectedLandscape, componentFilter, toggleFilter);
 
@@ -142,22 +156,6 @@ export default function CisPage() {
     return libraries.sort((a, b) => a.name.localeCompare(b.name));
   }, [cisApiComponents]);
 
-  // Create landscape groups from API data for Health Dashboard
-  const apiLandscapeGroups = useMemo(() => {
-    if (!apiLandscapes) return {};
-
-    const groups: Record<string, typeof apiLandscapes> = {};
-    apiLandscapes.forEach((landscape: any) => {
-      const env = landscape.environment || 'Other';
-      if (!groups[env]) {
-        groups[env] = [];
-      }
-      groups[env].push(landscape);
-    });
-
-    return groups;
-  }, [apiLandscapes]);
-
   const landscapeConfig = useMemo(() => {
     if (!selectedApiLandscape) return null;
 
@@ -179,7 +177,7 @@ export default function CisPage() {
   } = useHealth({
     components: filteredComponents,
     landscape: landscapeConfig || { name: '', route: '' },
-    enabled: !!selectedLandscape && !!landscapeConfig && activeTab === 'components'
+    enabled: !!selectedLandscape && !cisComponentsLoading && !isLoadingApiLandscapes && !!landscapeConfig && activeTab === 'components'
   });
 
   const componentHealthMap = useMemo(() => {

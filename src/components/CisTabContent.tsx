@@ -9,23 +9,36 @@ import TimelinesTab from "@/components/tabs/TimelinesTab";
 import AskOCTab from "@/components/AskOCTab";
 import type { ComponentHealthCheck, HealthSummary } from "@/types/health";
 import type { Landscape } from "@/types/developer-portal";
+import { useMemo } from "react";
+import { Badge } from "./ui/badge";
+
+
+interface LandscapeGroup {
+  id: string;
+  name: string;
+  landscapes: Array<{
+    id: string;
+    name: string;
+    isCentral: boolean;
+  }>;
+}
 
 interface CisTabContentProps {
   // Active tab
   activeTab: string;
-  
+
   // Component view
   componentView: 'grid' | 'table';
   onViewChange: (view: 'grid' | 'table') => void;
-  
+
   // Landscape data
   selectedLandscape: string | null;
   selectedApiLandscape: any;
-  landscapeGroups: Record<string, any[]>;
+  landscapeGroups: LandscapeGroup[];
   currentProjectLandscapes: any[];
   onLandscapeChange: (landscapeId: string | null) => void;
   onShowLandscapeDetails: () => void;
-  
+
   // Components data
   filteredComponents: any[];
   libraryComponents: any[];
@@ -39,17 +52,17 @@ interface CisTabContentProps {
   componentSortOrder: 'alphabetic' | 'team';
   onSortOrderChange: (order: 'alphabetic' | 'team') => void;
   onComponentClick: (componentName: string) => void;
-  
+
   // Health data
   healthChecks: ComponentHealthCheck[];
   isLoadingHealth: boolean;
   summary: HealthSummary;
   componentHealthMap: Record<string, ComponentHealthCheck>;
-  
+
   // Team data
   teamNamesMap: Record<string, string>;
   teamColorsMap: Record<string, string>;
-  
+
   // Feature toggle data - matching FeatureToggleTab interface
   filteredToggles: any[];
   expandedToggles: Set<string>;
@@ -65,7 +78,7 @@ interface CisTabContentProps {
   getFilteredLandscapeIds: (activeProject: string, selectedLandscape: string | null) => string[];
   getProductionLandscapeIds: (activeProject: string) => string[];
   getGroupStatus: (toggle: any, group: string, landscapeGroups: Record<string, Landscape[]>) => { status: string; color: string };
-  
+
   // Timeline data
   cisTimelines: any[];
   componentVersions: any;
@@ -84,7 +97,6 @@ export function CisTabContent({
   onLandscapeChange,
   onShowLandscapeDetails,
   filteredComponents,
-  libraryComponents,
   cisComponentsLoading,
   cisComponentsError,
   teamComponentsExpanded,
@@ -120,6 +132,18 @@ export function CisTabContent({
   timelineViewMode,
   onTimelineViewModeChange,
 }: CisTabContentProps) {
+  // Convert LandscapeGroup[] back to Record<string, Landscape[]> for Feature Toggle tab
+  const landscapeGroupsRecord = useMemo(() => {
+    return landscapeGroups.reduce((acc, group) => {
+      acc[group.name] = group.landscapes.map(l => ({
+        id: l.id,
+        name: l.name,
+        isCentral: l.isCentral
+      })) as Landscape[];
+      return acc;
+    }, {} as Record<string, Landscape[]>);
+  }, [landscapeGroups]);
+
   switch (activeTab) {
     case "components":
       return (
@@ -130,99 +154,73 @@ export function CisTabContent({
             landscapeGroups={landscapeGroups}
             onLandscapeChange={onLandscapeChange}
             onShowLandscapeDetails={onShowLandscapeDetails}
-            hiddenButtons={['plutono']}
           />
           {componentView === 'grid' ? (
             <>
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold">Component Health</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Real-time health status of all components
-                      {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
-                      {selectedLandscape && filteredComponents.length > 0 && (
-                        <span className="ml-1">
-                          ({filteredComponents.length} component{filteredComponents.length !== 1 ? 's' : ''})
-                        </span>
-                      )}
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold">Components</h2>
+                    {selectedLandscape && filteredComponents.length > 0 && (
+                      <Badge variant="secondary" className="text-sm">
+                        {filteredComponents.length}
+                      </Badge>
+                    )}
                   </div>
                   <ViewSwitcher view={componentView} onViewChange={onViewChange} />
                 </div>
 
-                {selectedLandscape && filteredComponents.length > 0 && (
-                  <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+                {selectedLandscape && filteredComponents.length > 0 ? (
+                  <>
+                    <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+                    <ComponentsTabContent
+                      title=""
+                      components={filteredComponents}
+                      teamName="CIS"
+                      isLoading={cisComponentsLoading}
+                      error={cisComponentsError}
+                      teamComponentsExpanded={teamComponentsExpanded}
+                      onToggleExpanded={onToggleExpanded}
+                      onRefresh={refetchCisComponents}
+                      showRefreshButton={false}
+                      emptyStateMessage="No components found."
+                      searchTerm={componentSearchTerm}
+                      onSearchTermChange={onSearchTermChange}
+                      system="cis"
+                      showLandscapeFilter={false}
+                      selectedLandscape={selectedLandscape}
+                      selectedLandscapeData={selectedApiLandscape}
+                      teamNamesMap={teamNamesMap}
+                      teamColorsMap={teamColorsMap}
+                      sortOrder={componentSortOrder}
+                      onSortOrderChange={onSortOrderChange}
+                      componentHealthMap={componentHealthMap}
+                      isLoadingHealth={isLoadingHealth}
+                      onComponentClick={onComponentClick}
+                    />
+                  </>
+                ) : (
+                  <div className="border-2 border-dashed rounded-lg p-12 text-center">
+                    <p className="text-muted-foreground">
+                      {!selectedLandscape
+                        ? 'Select a landscape to view components and their health status'
+                        : 'No components found in this landscape'}
+                    </p>
+                  </div>
                 )}
               </div>
-
-              <ComponentsTabContent
-                title="CIS Cloud Foundry Components"
-                components={filteredComponents}
-                teamName="CIS Cloud Foundry"
-                isLoading={cisComponentsLoading}
-                error={cisComponentsError}
-                teamComponentsExpanded={teamComponentsExpanded}
-                onToggleExpanded={onToggleExpanded}
-                onRefresh={refetchCisComponents}
-                showRefreshButton={false}
-                emptyStateMessage="No CIS components found for this organization."
-                searchTerm={componentSearchTerm}
-                onSearchTermChange={onSearchTermChange}
-                system="cis"
-                showLandscapeFilter={true}
-                selectedLandscape={selectedLandscape}
-                selectedLandscapeData={selectedApiLandscape}
-                teamNamesMap={teamNamesMap}
-                teamColorsMap={teamColorsMap}
-                sortOrder={componentSortOrder}
-                onSortOrderChange={onSortOrderChange}
-                componentHealthMap={componentHealthMap}
-                isLoadingHealth={isLoadingHealth}
-                onComponentClick={onComponentClick}
-              />
-
-              {libraryComponents.length > 0 && (
-                <div className="mt-8">
-                  <ComponentsTabContent
-                    title="CIS Cloud Foundry Libraries"
-                    components={libraryComponents}
-                    teamName="CIS Cloud Foundry Libraries"
-                    isLoading={cisComponentsLoading}
-                    error={cisComponentsError}
-                    teamComponentsExpanded={teamComponentsExpanded}
-                    onToggleExpanded={onToggleExpanded}
-                    onRefresh={refetchCisComponents}
-                    showRefreshButton={false}
-                    emptyStateMessage="No CIS library components found."
-                    searchTerm={componentSearchTerm}
-                    system="cis"
-                    teamNamesMap={teamNamesMap}
-                    teamColorsMap={teamColorsMap}
-                    sortOrder={componentSortOrder}
-                    onSortOrderChange={onSortOrderChange}
-                    componentHealthMap={{}}
-                    isLoadingHealth={false}
-                    onComponentClick={onComponentClick}
-                  />
-                </div>
-              )}
             </>
           ) : (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold">Component Health</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Real-time health status of all components
-                    {selectedApiLandscape && ` in ${selectedApiLandscape.name}`}
+                <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold">Components</h2>
                     {selectedLandscape && filteredComponents.length > 0 && (
-                      <span className="ml-1">
-                        ({filteredComponents.length} component{filteredComponents.length !== 1 ? 's' : ''})
-                      </span>
+                      <Badge variant="secondary" className="text-sm">
+                        {filteredComponents.length}
+                      </Badge>
                     )}
-                  </p>
-                </div>
+                  </div>
                 <ViewSwitcher view={componentView} onViewChange={onViewChange} />
               </div>
 
@@ -259,7 +257,7 @@ export function CisTabContent({
           featureToggles={filteredToggles}
           selectedLandscape={selectedLandscape}
           selectedLandscapeName={currentProjectLandscapes.find(l => l.id === selectedLandscape)?.name}
-          landscapeGroups={landscapeGroups}
+          landscapeGroups={landscapeGroupsRecord}
           expandedToggles={expandedToggles}
           toggleFilter={toggleFilter}
           componentFilter={componentFilter}

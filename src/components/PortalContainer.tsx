@@ -42,7 +42,7 @@ export const PortalContainer: React.FC = () => {
   const projectToRouteMap: Record<string, string> = { ...staticProjectToRouteMap };
 
   projects.forEach(project => {
-    const route = `/${project.name}`;
+    const route = project.name === 'cis20' ? '/cis' : `/${project.name}`;
     routeToProjectMap[route] = project.title || project.name;
     projectToRouteMap[project.title || project.name] = route;
   });
@@ -51,7 +51,7 @@ export const PortalContainer: React.FC = () => {
   const getProjectFromPath = (pathname: string): string => {
     // Dynamic projects - check first for exact matches and sub-routes
     for (const project of projects) {
-      const route = `/${project.name}`;
+      const route = project.name === 'cis20' ? '/cis' : `/${project.name}`;
       if (pathname === route || pathname.startsWith(`${route}/`)) {
         return project.title || project.name;
       }
@@ -61,7 +61,7 @@ export const PortalContainer: React.FC = () => {
     if (pathname === "/") {
       return "Home";
     }
-    
+
     // Check other static routes
     for (const route in staticRouteToProjectMap) {
       if (route !== "/" && (pathname === route || pathname.startsWith(`${route}/`))) {
