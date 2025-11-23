@@ -32,6 +32,10 @@ vi.mock('../../src/pages/AlertsPage', () => ({
   default: () => <div data-testid="alerts-page">Alerts</div>,
 }));
 
+vi.mock('../../src/components/ui/badge', () => ({
+  Badge: ({ children }: any) => <div data-testid="badge">{children}</div>,
+}));
+
 const mockHealthChecks: ComponentHealthCheck[] = [
   {
     componentId: 'comp-1',
@@ -57,8 +61,18 @@ const defaultProps = {
   onViewChange: vi.fn(),
   selectedLandscape: 'eu10-canary',
   selectedApiLandscape: { id: 'eu10-canary', name: 'EU10 Canary' },
-  landscapeGroups: {},
-  currentProjectLandscapes: [],
+  landscapeGroups: [
+    {
+      id: 'Production',
+      name: 'Production',
+      landscapes: [
+        { id: 'eu10-canary', name: 'EU10 Canary', isCentral: false }
+      ]
+    }
+  ],
+  currentProjectLandscapes: [
+    { id: 'eu10-canary', name: 'EU10 Canary' }
+  ],
   onLandscapeChange: vi.fn(),
   onShowLandscapeDetails: vi.fn(),
   filteredComponents: [
@@ -103,35 +117,86 @@ const defaultProps = {
 };
 
 describe('CisTabContent - Grid View', () => {
-  it('should render header with title "Component Health" in grid view', () => {
+  it('should render landscape links section', () => {
     render(<CisTabContent {...defaultProps} componentView="grid" />);
 
-    expect(screen.getByText('Component Health')).toBeInTheDocument();
+    expect(screen.getByTestId('landscape-links')).toBeInTheDocument();
   });
 
-  it('should render ViewSwitcher in header section in grid view', () => {
+  it('should render header with title "Components" in grid view', () => {
     render(<CisTabContent {...defaultProps} componentView="grid" />);
 
-    // Just verify that ViewSwitcher is rendered somewhere on the page
-    expect(screen.getByTestId('view-switcher')).toBeInTheDocument();
+    expect(screen.getByText('Components')).toBeInTheDocument();
   });
 
-  it('should render subtitle with landscape name in grid view', () => {
+  it('should render component count badge when landscape is selected', () => {
     render(<CisTabContent {...defaultProps} componentView="grid" />);
 
-    expect(screen.getByText(/Real-time health status of all components in EU10 Canary/)).toBeInTheDocument();
-  });
-
-  it('should render component count in subtitle in grid view', () => {
-    render(<CisTabContent {...defaultProps} componentView="grid" />);
-
-    expect(screen.getByText(/\(2 components\)/)).toBeInTheDocument();
+    const badge = screen.getByTestId('badge');
+    expect(badge).toHaveTextContent('2');
   });
 
   it('should render HealthOverview in grid view when landscape is selected', () => {
     render(<CisTabContent {...defaultProps} componentView="grid" />);
 
     expect(screen.getByTestId('health-overview')).toBeInTheDocument();
+  });
+
+  it('should render ViewSwitcher in header section in grid view', () => {
+    render(<CisTabContent {...defaultProps} componentView="grid" />);
+
+    expect(screen.getByTestId('view-switcher')).toBeInTheDocument();
+  });
+
+  it('should render ComponentsTabContent when landscape is selected', () => {
+    render(<CisTabContent {...defaultProps} componentView="grid" />);
+
+    expect(screen.getByTestId('components-tab-content')).toBeInTheDocument();
+  });
+
+  it('should pass search and sort props to ComponentsTabContent in grid view', () => {
+    render(<CisTabContent {...defaultProps} componentView="grid" />);
+
+    expect(screen.getByTestId('has-search')).toBeInTheDocument();
+    expect(screen.getByTestId('has-sort')).toBeInTheDocument();
+  });
+
+  it('should render empty state when no landscape is selected', () => {
+    render(
+      <CisTabContent
+        {...defaultProps}
+        componentView="grid"
+        selectedLandscape={null}
+        filteredComponents={[]}
+      />
+    );
+
+    expect(screen.getByText('Select a landscape to view components and their health status')).toBeInTheDocument();
+  });
+
+  it('should render empty state when no components in landscape', () => {
+    render(
+      <CisTabContent
+        {...defaultProps}
+        componentView="grid"
+        filteredComponents={[]}
+      />
+    );
+
+    expect(screen.getByText('No components found in this landscape')).toBeInTheDocument();
+  });
+
+  it('should NOT render component count badge when no landscape is selected', () => {
+    render(
+      <CisTabContent
+        {...defaultProps}
+        componentView="grid"
+        selectedLandscape={null}
+        filteredComponents={[]}
+      />
+    );
+
+    expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
   });
 
   it('should NOT render HealthOverview when no landscape is selected', () => {
@@ -144,47 +209,40 @@ describe('CisTabContent - Grid View', () => {
       />
     );
 
-    expect(screen.queryByTestId('health-overview')).not.toBeInTheDocument();
-  });
-
-  it('should pass search and sort props to ComponentsTabContent in grid view', () => {
-    render(<CisTabContent {...defaultProps} componentView="grid" />);
-
-    expect(screen.getByTestId('has-search')).toBeInTheDocument();
-    expect(screen.getByTestId('has-sort')).toBeInTheDocument();
+    expect(screen.queryByTestId('health-overview')).toBeInTheDocument();
   });
 });
 
 describe('CisTabContent - Table View', () => {
-  it('should render header with title "Component Health" in table view', () => {
+  it('should render landscape links section', () => {
     render(<CisTabContent {...defaultProps} componentView="table" />);
 
-    expect(screen.getByText('Component Health')).toBeInTheDocument();
+    expect(screen.getByTestId('landscape-links')).toBeInTheDocument();
   });
 
-  it('should render ViewSwitcher in header section in table view', () => {
+  it('should render header with title "Components" in table view', () => {
     render(<CisTabContent {...defaultProps} componentView="table" />);
 
-    // Just verify that ViewSwitcher is rendered somewhere on the page
-    expect(screen.getByTestId('view-switcher')).toBeInTheDocument();
+    expect(screen.getByText('Components')).toBeInTheDocument();
   });
 
-  it('should render subtitle with landscape name in table view', () => {
+  it('should render component count badge when landscape is selected', () => {
     render(<CisTabContent {...defaultProps} componentView="table" />);
 
-    expect(screen.getByText(/Real-time health status of all components in EU10 Canary/)).toBeInTheDocument();
-  });
-
-  it('should render component count in subtitle in table view', () => {
-    render(<CisTabContent {...defaultProps} componentView="table" />);
-
-    expect(screen.getByText(/\(2 components\)/)).toBeInTheDocument();
+    const badge = screen.getByTestId('badge');
+    expect(badge).toHaveTextContent('2');
   });
 
   it('should render HealthOverview in table view', () => {
     render(<CisTabContent {...defaultProps} componentView="table" />);
 
     expect(screen.getByTestId('health-overview')).toBeInTheDocument();
+  });
+
+  it('should render ViewSwitcher in header section in table view', () => {
+    render(<CisTabContent {...defaultProps} componentView="table" />);
+
+    expect(screen.getByTestId('view-switcher')).toBeInTheDocument();
   });
 
   it('should render HealthTable in table view', () => {
@@ -199,6 +257,7 @@ describe('CisTabContent - Table View', () => {
         {...defaultProps}
         componentView="table"
         selectedLandscape={null}
+        filteredComponents={[]}
       />
     );
 
@@ -216,6 +275,32 @@ describe('CisTabContent - Table View', () => {
 
     expect(screen.getByText('No components found in this landscape')).toBeInTheDocument();
   });
+
+  it('should NOT render component count badge when no landscape is selected', () => {
+    render(
+      <CisTabContent
+        {...defaultProps}
+        componentView="table"
+        selectedLandscape={null}
+        filteredComponents={[]}
+      />
+    );
+
+    expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
+  });
+
+  it('should NOT render HealthOverview when no landscape is selected', () => {
+    render(
+      <CisTabContent
+        {...defaultProps}
+        componentView="table"
+        selectedLandscape={null}
+        filteredComponents={[]}
+      />
+    );
+
+    expect(screen.queryByTestId('health-overview')).toBeInTheDocument();
+  });
 });
 
 describe('CisTabContent - View Consistency', () => {
@@ -224,17 +309,14 @@ describe('CisTabContent - View Consistency', () => {
       <CisTabContent {...defaultProps} componentView="grid" />
     );
 
-    const gridHeader = screen.getByText('Component Health');
-    const gridSubtitle = screen.getByText(/Real-time health status/);
+    const gridHeader = screen.getByText('Components');
 
     rerender(<CisTabContent {...defaultProps} componentView="table" />);
 
-    const tableHeader = screen.getByText('Component Health');
-    const tableSubtitle = screen.getByText(/Real-time health status/);
+    const tableHeader = screen.getByText('Components');
 
     // Headers should be identical
     expect(gridHeader.textContent).toBe(tableHeader.textContent);
-    expect(gridSubtitle.textContent).toBe(tableSubtitle.textContent);
   });
 
   it('should render ViewSwitcher in same position in both views', () => {
@@ -255,7 +337,7 @@ describe('CisTabContent - View Consistency', () => {
     expect(tableHeader).toBeInTheDocument();
   });
 
-  it('should render HealthOverview in both views', () => {
+  it('should render HealthOverview in both views when landscape is selected', () => {
     const { rerender } = render(
       <CisTabContent {...defaultProps} componentView="grid" />
     );
@@ -265,6 +347,18 @@ describe('CisTabContent - View Consistency', () => {
     rerender(<CisTabContent {...defaultProps} componentView="table" />);
 
     expect(screen.getByTestId('health-overview')).toBeInTheDocument();
+  });
+
+  it('should render component count badge in both views when landscape is selected', () => {
+    const { rerender } = render(
+      <CisTabContent {...defaultProps} componentView="grid" />
+    );
+
+    expect(screen.getByTestId('badge')).toHaveTextContent('2');
+
+    rerender(<CisTabContent {...defaultProps} componentView="table" />);
+
+    expect(screen.getByTestId('badge')).toHaveTextContent('2');
   });
 });
 
@@ -279,5 +373,17 @@ describe('CisTabContent - Other Tabs', () => {
     render(<CisTabContent {...defaultProps} activeTab="alerts" />);
 
     expect(screen.queryByTestId('components-tab-content')).not.toBeInTheDocument();
+  });
+
+  it('should not render LandscapeLinksSection when alerts tab is active', () => {
+    render(<CisTabContent {...defaultProps} activeTab="alerts" />);
+
+    expect(screen.queryByTestId('landscape-links')).not.toBeInTheDocument();
+  });
+
+  it('should not render ViewSwitcher when alerts tab is active', () => {
+    render(<CisTabContent {...defaultProps} activeTab="alerts" />);
+
+    expect(screen.queryByTestId('view-switcher')).not.toBeInTheDocument();
   });
 });

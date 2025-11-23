@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useNavigate, useLocation} from "react-router-dom";
 import { PortalProviders } from "@/contexts/PortalProviders";
 import { PortalContent } from "./PortalContent";
 import { useProjectsContext } from "@/contexts/ProjectsContext";
@@ -22,7 +22,7 @@ const staticProjectToRouteMap: Record<string, string> = {
 };
 
 export const PortalContainer: React.FC = () => {
-  const { projects } = useProjectsContext(); // ✅ Hook inside component
+  const { projects } = useProjectsContext(); 
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProject, setActiveProject] = useState("");
@@ -42,7 +42,7 @@ export const PortalContainer: React.FC = () => {
   const projectToRouteMap: Record<string, string> = { ...staticProjectToRouteMap };
 
   projects.forEach(project => {
-    const route = project.name === 'cis20' ? '/cis' : `/${project.name}`;
+    const route = `/${project.name}`;
     routeToProjectMap[route] = project.title || project.name;
     projectToRouteMap[project.title || project.name] = route;
   });

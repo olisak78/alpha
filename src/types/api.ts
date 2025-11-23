@@ -254,6 +254,7 @@ export interface Project {
   name: string;
   title: string;
   description: string;
+  isVisible?: boolean; // Controls visibility in sidebar
   alerts?: {
     repo?: string;
   };

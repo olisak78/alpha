@@ -11,9 +11,11 @@ import { useGitHubContributions } from '../../../src/hooks/api/useGitHubContribu
 import { useGitHubAveragePRTime } from '../../../src/hooks/api/useGitHubAveragePRtime';
 import { useGitHubPRs } from '../../../src/hooks/api/useGitHubPRs';
 import { useGitHubPRReviewComments } from '../../../src/hooks/api/useGitHubPRReviewComments';
+import { useHeaderNavigation } from '../../../src/contexts/HeaderNavigationContext';
 
 // Mock all the hooks
 vi.mock('../../../src/contexts/AuthContext');
+vi.mock('../../../src/contexts/HeaderNavigationContext');
 vi.mock('../../../src/hooks/api/useMembers');
 vi.mock('../../../src/hooks/api/useJira');
 vi.mock('../../../src/hooks/api/useGitHubContributions');
@@ -47,6 +49,14 @@ vi.mock('../../../src/components/tabs/MePageTabs/JiraIssuesTab', () => ({
 const defaultMocks = {
     useAuth: {
         user: { name: 'testuser', memberId: 'member-123' },
+    },
+    useHeaderNavigation: {
+        tabs: [],
+        activeTab: null,
+        setTabs: vi.fn(),
+        setActiveTab: vi.fn(),
+        isDropdown: false,
+        setIsDropdown: vi.fn(),
     },
     useCurrentUser: {
         data: { first_name: 'John', last_name: 'Doe', email: 'john@example.com' },
@@ -122,6 +132,7 @@ describe('HomePage', () => {
 
         // Set up default mocks
         vi.mocked(useAuth).mockReturnValue(defaultMocks.useAuth as any);
+        vi.mocked(useHeaderNavigation).mockReturnValue(defaultMocks.useHeaderNavigation as any);
         vi.mocked(useCurrentUser).mockReturnValue(defaultMocks.useCurrentUser as any);
         vi.mocked(useMyJiraIssuesCount).mockReturnValue(defaultMocks.useMyJiraIssuesCount as any);
         vi.mocked(useMyJiraIssues).mockReturnValue(defaultMocks.useMyJiraIssues as any);
@@ -129,6 +140,24 @@ describe('HomePage', () => {
         vi.mocked(useGitHubAveragePRTime).mockReturnValue(defaultMocks.useGitHubAveragePRTime as any);
         vi.mocked(useGitHubPRs).mockReturnValue(defaultMocks.useGitHubPRs as any);
         vi.mocked(useGitHubPRReviewComments).mockReturnValue(defaultMocks.useGitHubPRReviewComments as any);
+    });
+
+    // =========================================
+    // HEADER NAVIGATION TESTS
+    // =========================================
+
+    describe('Header Navigation', () => {
+        it('clears header tabs on mount', () => {
+            const setTabsMock = vi.fn();
+            vi.mocked(useHeaderNavigation).mockReturnValue({
+                ...defaultMocks.useHeaderNavigation,
+                setTabs: setTabsMock,
+            } as any);
+
+            renderWithProviders(<HomePage />);
+
+            expect(setTabsMock).toHaveBeenCalledWith([]);
+        });
     });
 
     // =========================================

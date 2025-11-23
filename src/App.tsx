@@ -99,6 +99,7 @@ const App = () => {
                         {/* CIS specific routes - MUST come before dynamic projects */}
                         <Route path="cis">
                           <Route index element={<CisPage />} />
+                          <Route path=":tabId" element={<CisPage />} /> 
                           <Route path="component/:componentId" element={<ComponentViewPage />} />
                           <Route path="component/:componentId/:tabId" element={<ComponentViewPage />} />
                         </Route>

@@ -199,8 +199,8 @@ export class ApiClient {
 
         // Store the access token
         this.accessToken = data.accessToken;
-        
-        
+
+
         return data.accessToken;
       } catch (error) {
         console.error('❌ Failed to refresh token:', error);
@@ -276,22 +276,32 @@ export class ApiClient {
 
     try {
       // Make the request
-      let response = await fetch(url, fetchOptions);
+      // let response = await fetch(url, fetchOptions);
+      let response: Response;
+
+      try {
+        response = await fetch(url, fetchOptions);
+      } catch (err) {
+        throw new Error("Network error");
+      }
+      if (response.status === 502) {
+        throw new Error("Found 502 error");
+      }
 
       // Handle 401 Unauthorized - token expired or invalid
       if (response.status === 401) {
         console.log('Received 401, attempting token refresh...');
-        
+
         try {
           // Force refresh the token
           await this.getAccessToken();
-          
+
           // Retry the original request with new token
           const newHeaders = this.buildHeaders(customHeaders);
           fetchOptions.headers = newHeaders;
-          
+
           response = await fetch(url, fetchOptions);
-          
+
           if (response.status === 401) {
             // Still 401 after refresh - authentication truly failed
             throw new Error('Authentication failed after token refresh. Please login again.');
@@ -344,7 +354,7 @@ export class ApiClient {
    */
   private async createApiError(response: Response): Promise<ApiError> {
     let errorBody: any = {};
-    
+
     try {
       errorBody = await response.json();
     } catch {

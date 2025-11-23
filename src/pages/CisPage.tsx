@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import cisTimelines from "@/data/cis-timelines.json";
 import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
@@ -7,12 +7,12 @@ import { componentVersions } from "@/types/developer-portal";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useComponentManagement, useFeatureToggles, useLandscapeManagement, usePortalState } from "@/contexts/hooks";
-import { useTabRouting } from "@/hooks/useTabRouting";
 import { filterComponentsByLandscape, getLibraryComponents } from "@/utils/componentFiltering";
 import { useHealth } from "@/hooks/api/useHealth";
 import type { ComponentHealthCheck } from "@/types/health";
 import { useNavigate } from "react-router-dom";
 import { CisTabContent } from "@/components/CisTabContent";
+import type { Landscape } from "@/types/developer-portal";
 
 const TAB_VISIBILITY = {
   components: true,
@@ -26,14 +26,14 @@ const TAB_VISIBILITY = {
 
 export default function CisPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("components");
   const [componentView, setComponentView] = useState<'grid' | 'table'>('grid');
   const [teamComponentsExpanded, setTeamComponentsExpanded] = useState<Record<string, boolean>>({});
   const [componentSearchTerm, setComponentSearchTerm] = useState("");
   const [componentSortOrder, setComponentSortOrder] = useState<'alphabetic' | 'team'>('alphabetic');
   const { setTabs, activeTab: headerActiveTab, setActiveTab: setHeaderActiveTab } = useHeaderNavigation();
-  const { currentTabFromUrl, syncTabWithUrl } = useTabRouting();
 
+  const hasInitializedLandscape = useRef(false);
+  
   const {
     selectedLandscape,
     setSelectedLandscape,
@@ -41,8 +41,6 @@ export default function CisPage() {
   } = usePortalState();
 
   const {
-    getCurrentProjectLandscapes,
-    getLandscapeGroups,
     getFilteredLandscapeIds,
     getProductionLandscapeIds,
   } = useLandscapeManagement();
@@ -69,6 +67,41 @@ export default function CisPage() {
 
   const activeProject = "CIS@2.0";
 
+  // Helper function to get default landscape
+  const getDefaultLandscape = useMemo(() => {
+    return (landscapes: any[]): string | null => {
+      if (!landscapes || landscapes.length === 0) {
+        return null;
+      }
+
+      // Priority 1: Find DEFAULT landscape
+      const defaultLandscape = landscapes.find(
+        (l: any) => l.name?.toLowerCase() === 'default'
+      );
+      if (defaultLandscape) {
+        return defaultLandscape.id;
+      }
+
+      // Priority 2: Find central landscape
+      const centralLandscape = landscapes.find((l: any) => l.isCentral);
+      if (centralLandscape) {
+        return centralLandscape.id;
+      }
+
+      // Priority 3: First production landscape
+      const devPatterns = ['dev', 'staging', 'int', 'canary', 'hotfix', 'perf'];
+      const prodLandscape = landscapes.find(
+        (l: any) => !devPatterns.some(pattern => l.id?.toLowerCase().includes(pattern))
+      );
+      if (prodLandscape) {
+        return prodLandscape.id;
+      }
+
+      // Priority 4: First landscape
+      return landscapes[0].id;
+    };
+  }, []);
+
   const {
     data: cisComponentsData,
     isLoading: cisComponentsLoading,
@@ -83,7 +116,6 @@ export default function CisPage() {
 
   const { data: teamsData } = useTeams();
   const cisApiComponents = cisComponentsData || [];
-
 
   // Create a mapping of team ID to team name
   const teamNamesMap = useMemo(() => {
@@ -114,10 +146,32 @@ export default function CisPage() {
     }, {} as Record<string, string>);
   }, [teamsData]);
 
-  // Get data from context functions
-  const currentProjectLandscapes = getCurrentProjectLandscapes(activeProject);
-  const landscapeGroupsRecord = getLandscapeGroups(activeProject);
-  
+  const currentProjectLandscapes = useMemo(() => {
+    return apiLandscapes || [];
+  }, [apiLandscapes]);
+
+
+  const landscapeGroupsRecord = useMemo(() => {
+    if (!apiLandscapes || apiLandscapes.length === 0) return {};
+
+    // Group by environment field from API response
+    const groupedByEnvironment: Record<string, Landscape[]> = {};
+
+    apiLandscapes.forEach((landscape: any) => {
+      const environment = landscape.environment || 'Unknown';
+
+      // Capitalize first letter for display
+      const groupName = environment.charAt(0).toUpperCase() + environment.slice(1);
+
+      if (!groupedByEnvironment[groupName]) {
+        groupedByEnvironment[groupName] = [];
+      }
+      groupedByEnvironment[groupName].push(landscape);
+    });
+
+    return groupedByEnvironment;
+  }, [apiLandscapes]);
+
   // Convert Record<string, Landscape[]> to array format for LandscapeLinksSection
   const landscapeGroups = useMemo(() => {
     return Object.entries(landscapeGroupsRecord).map(([groupName, landscapes]) => ({
@@ -130,7 +184,7 @@ export default function CisPage() {
       }))
     }));
   }, [landscapeGroupsRecord]);
-  
+
   const availableComponents = getAvailableComponents(activeProject, featureToggles);
   const filteredToggles = getFilteredToggles(activeProject, selectedLandscape, componentFilter, toggleFilter);
 
@@ -163,7 +217,6 @@ export default function CisPage() {
       selectedApiLandscape.landscape_url ||
       'sap.hana.ondemand.com';
 
-
     return {
       name: selectedApiLandscape.name,
       route: route
@@ -177,46 +230,62 @@ export default function CisPage() {
   } = useHealth({
     components: filteredComponents,
     landscape: landscapeConfig || { name: '', route: '' },
-    enabled: !!selectedLandscape && !cisComponentsLoading && !isLoadingApiLandscapes && !!landscapeConfig && activeTab === 'components'
+    enabled: !!selectedLandscape && !cisComponentsLoading && !isLoadingApiLandscapes && filteredComponents.length > 0,
   });
 
+  // Create a map of component health by component ID
   const componentHealthMap = useMemo(() => {
-    const map: Record<string, ComponentHealthCheck> = {};
-    healthChecks.forEach(check => {
-      map[check.componentId] = check;
-    });
-    return map;
-  }, [healthChecks, filteredComponents]);
+    return healthChecks.reduce((acc: Record<string, ComponentHealthCheck>, check) => {
+      acc[check.componentId] = check;
+      return acc;
+    }, {});
+  }, [healthChecks]);
 
-  // Memoize header tabs
-  const headerTabs = useMemo(() => [
-    { id: "components", label: "Components" },
-    { id: "health", label: "Health" },
-    { id: "alerts", label: "Alerts" },
-    { id: "feature-toggle", label: "Feature Toggle" },
-    { id: "delivery", label: "Delivery" },
-    { id: "timelines", label: "Timelines" },
-    { id: "askoc", label: "AskOC" }
-  ].filter(tab => TAB_VISIBILITY[tab.id as keyof typeof TAB_VISIBILITY]), []);
-
+  // Set up tabs on mount
   useEffect(() => {
-    setTabs(headerTabs);
-    syncTabWithUrl(headerTabs, "components");
-  }, [setTabs, headerTabs, syncTabWithUrl]);
+    const tabs = Object.entries(TAB_VISIBILITY)
+      .filter(([_, isVisible]) => isVisible)
+      .map(([key, _]) => ({
+        id: key,
+        label: key.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+      }));
 
-  // Update local activeTab when URL tab changes
+    setTabs(tabs);
+  }, []);
+
+   // Effect to handle landscape initialization and validation
   useEffect(() => {
-    if (currentTabFromUrl && currentTabFromUrl !== activeTab) {
-      setActiveTab(currentTabFromUrl);
+    // Only run when landscapes are loaded
+    if (!apiLandscapes || apiLandscapes.length === 0 || isLoadingApiLandscapes) {
+      return;
     }
-  }, [currentTabFromUrl]);
 
-  // Sync local activeTab with header activeTab when header tab is clicked
-  useEffect(() => {
-    if (headerActiveTab && headerActiveTab !== activeTab) {
-      setActiveTab(headerActiveTab);
+    const availableLandscapeIds = apiLandscapes.map((l: any) => l.id);
+    const isSelectedValid = selectedLandscape && availableLandscapeIds.includes(selectedLandscape);
+
+    // If no landscape selected OR selected landscape is invalid for CIS
+    if (!isSelectedValid) {
+      // Only update if we haven't already initialized or if the landscape changed externally
+      if (!hasInitializedLandscape.current || selectedLandscape !== null) {
+        const defaultLandscapeId = getDefaultLandscape(apiLandscapes);
+        if (defaultLandscapeId && defaultLandscapeId !== selectedLandscape) {
+          console.log('[CisPage] Setting default landscape:', defaultLandscapeId);
+          setSelectedLandscape(defaultLandscapeId);
+          hasInitializedLandscape.current = true;
+        }
+      }
+    } else {
+      // Valid landscape is selected
+      hasInitializedLandscape.current = true;
     }
-  }, [headerActiveTab, activeTab]);
+  }, [apiLandscapes, selectedLandscape, isLoadingApiLandscapes, setSelectedLandscape, getDefaultLandscape]);
+
+  // Reset initialization flag when component unmounts
+  useEffect(() => {
+    return () => {
+      hasInitializedLandscape.current = false;
+    };
+  }, []);
 
   const handleToggleComponentExpansion = (componentId: string) => {
     setTeamComponentsExpanded(prev => ({
@@ -233,7 +302,7 @@ export default function CisPage() {
     <>
       <BreadcrumbPage>
         <CisTabContent
-          activeTab={activeTab}
+          activeTab={headerActiveTab || "components"}
           componentView={componentView}
           onViewChange={setComponentView}
           selectedLandscape={selectedLandscape}

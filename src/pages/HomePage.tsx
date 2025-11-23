@@ -30,10 +30,17 @@ import { StatItem } from '@/types/api';
 import { Area, AreaChart, ResponsiveContainer} from 'recharts';
 import { useGitHubAveragePRTime } from '@/hooks/api/useGitHubAveragePRtime';
 import { QUICK_ACCESS_TAB_KEY } from '@/constants/developer-portal';
+import { useHeaderNavigation } from '@/contexts/HeaderNavigationContext';
 
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { setTabs } = useHeaderNavigation();
+  
+  // Clear header tabs on mount since HomePage doesn't use them
+  useEffect(() => {
+    setTabs([]);
+  }, [setTabs]);
 
   const members = teamData.members;
   const currentId = user?.name || members[0].id;

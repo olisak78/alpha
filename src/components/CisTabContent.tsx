@@ -132,6 +132,7 @@ export function CisTabContent({
   timelineViewMode,
   onTimelineViewModeChange,
 }: CisTabContentProps) {
+
   // Convert LandscapeGroup[] back to Record<string, Landscape[]> for Feature Toggle tab
   const landscapeGroupsRecord = useMemo(() => {
     return landscapeGroups.reduce((acc, group) => {
@@ -166,13 +167,14 @@ export function CisTabContent({
                         {filteredComponents.length}
                       </Badge>
                     )}
+                    <HealthOverview summary={summary} isLoading={isLoadingHealth} />
                   </div>
                   <ViewSwitcher view={componentView} onViewChange={onViewChange} />
                 </div>
 
                 {selectedLandscape && filteredComponents.length > 0 ? (
                   <>
-                    <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+
                     <ComponentsTabContent
                       title=""
                       components={filteredComponents}
@@ -214,19 +216,21 @@ export function CisTabContent({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-bold">Components</h2>
-                    {selectedLandscape && filteredComponents.length > 0 && (
-                      <Badge variant="secondary" className="text-sm">
-                        {filteredComponents.length}
-                      </Badge>
-                    )}
-                  </div>
+                  <h2 className="text-2xl font-bold">Components</h2>
+                  {selectedLandscape && filteredComponents.length > 0 && (
+                    <Badge variant="secondary" className="text-sm">
+                      {filteredComponents.length}
+                    </Badge>
+                  )}
+                  <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+                </div>
+
                 <ViewSwitcher view={componentView} onViewChange={onViewChange} />
               </div>
 
               {selectedLandscape && filteredComponents.length > 0 ? (
                 <>
-                  <HealthOverview summary={summary} isLoading={isLoadingHealth} />
+
                   <HealthTable
                     healthChecks={healthChecks}
                     isLoading={isLoadingHealth}

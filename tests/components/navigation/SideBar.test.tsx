@@ -82,16 +82,6 @@ describe('SideBar Component', () => {
   // ==========================================================================
 
   describe('Rendering', () => {
-    it('should render the sidebar with all projects', () => {
-      // The component uses sidebarItems from ProjectsContext, not the projects prop
-      renderSidebar({ onProjectChange: mockOnProjectChange });
-
-      // Check for the actual items that come from the mocked ProjectsContext
-      const expectedItems = ['Home', 'Teams', 'CIS@2.0'];
-      expectedItems.forEach(project => {
-        expect(screen.getByText(project)).toBeInTheDocument();
-      });
-    });
 
     it('should render in expanded state by default', () => {
       renderSidebar({ onProjectChange: mockOnProjectChange });
@@ -122,8 +112,8 @@ describe('SideBar Component', () => {
       renderSidebar({ onProjectChange: mockOnProjectChange });
 
       // Check all project names are visible (since sidebar is expanded by default)
-      // These come from the mocked ProjectsContext sidebarItems
-      const expectedItems = ['Home', 'Teams', 'CIS@2.0', 'Cloud Automation', 'Unified Services', 'Links', 'Self Service', 'AI Arena'];
+      // These come from the mocked ProjectsContext sidebarItems. Prjoject names are not included because they are dynamic.
+      const expectedItems = ['Home', 'Teams', 'Links', 'Self Service', 'AI Arena'];
       expectedItems.forEach(project => {
         const projectElement = screen.getByText(project);
         expect(projectElement).toBeVisible();
