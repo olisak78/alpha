@@ -1,6 +1,7 @@
 /**
  * Health API Service
  * Utilities for fetching component health statuses
+ * Now integrated with React Query system for caching
  */
 
 import { apiClient } from './ApiClient';
@@ -37,8 +38,6 @@ export function buildHealthEndpoint(
   const componentName = component.name.toLowerCase();
   const domain = landscape.route;
   const url = `https://${componentName}.cfapps.${domain}/health`;
-
-
   return url;
 }
 
@@ -55,8 +54,6 @@ export function buildHealthEndpointWithSubdomain(
   const componentName = component.name.toLowerCase();
   const domain = landscape.route;
   const url = `https://${subdomain}.${componentName}.cfapps.${domain}/health`;
-
-
   return url;
 }
 
@@ -73,8 +70,6 @@ export function buildSystemInfoEndpoint(
   const componentName = component.name.toLowerCase();
   const domain = landscape.route;
   const url = `https://${componentName}.cfapps.${domain}${endpoint}`;
-
-
   return url;
 }
 
@@ -90,8 +85,6 @@ export function buildSystemInfoEndpointWithSubdomain(
   const componentName = component.name.toLowerCase();
   const domain = landscape.route;
   const url = `https://${subdomain}.${componentName}.cfapps.${domain}${endpoint}`;
-
-
   return url;
 }
 
@@ -102,28 +95,27 @@ export function buildSystemInfoEndpointWithSubdomain(
 export async function fetchHealthStatus(
   url: string,
   signal?: AbortSignal
-): Promise<{
-  status: 'success' | 'error';
-  data?: HealthResponse;
+): Promise<{ 
+  status: 'success' | 'error'; 
+  data?: HealthResponse; 
   error?: string;
-  responseTime: number;
+  responseTime?: number;
 }> {
-  const startTime = performance.now();
+  const startTime = Date.now();
 
   try {
-    // Use backend proxy endpoint via apiClient (handles auth automatically)
     const data = await apiClient.get<HealthResponse & { componentSuccess?: boolean; statusCode?: number }>('/cis-public/proxy', {
       params: { url },
       signal,
     });
 
-    const responseTime = performance.now() - startTime;
+    const responseTime = Date.now() - startTime;
 
-    // Check if the component endpoint returned success (200-299)
+    // Check if the response indicates failure
     if (data.componentSuccess === false) {
       return {
         status: 'error',
-        error: `Component returned status ${data.statusCode}`,
+        error: `Health check failed with status ${data.statusCode || 'unknown'}`,
         responseTime,
       };
     }
@@ -134,17 +126,7 @@ export async function fetchHealthStatus(
       responseTime,
     };
   } catch (error) {
-    const responseTime = performance.now() - startTime;
-
-    // Don't treat AbortError as a real error
-    if (error instanceof Error && error.name === 'AbortError') {
-      return {
-        status: 'error',
-        error: 'Request aborted',
-        responseTime,
-      };
-    }
-
+    const responseTime = Date.now() - startTime;
     return {
       status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -154,58 +136,50 @@ export async function fetchHealthStatus(
 }
 
 /**
- * Fetch system information from component with multiple fallbacks
- * Tries in order:
- * 1. /systemInformation/public
- * 2. {subdomain}.{component}/systemInformation/public (if subdomain available)
- * 3. /version
- * 4. {subdomain}.{component}/version (if subdomain available)
+ * Fetch system information from multiple fallback endpoints
+ * Tries /systemInformation/public, then /version with various combinations
  */
-export async function fetchSystemInfo(
+export async function fetchSystemInformation(
   component: Component,
   landscape: LandscapeConfig,
   signal?: AbortSignal
 ): Promise<{
   status: 'success' | 'error';
   data?: SystemInformation;
-  url?: string;
   error?: string;
+  url?: string;
 }> {
   const subdomain = component.metadata?.subdomain;
 
   // Attempt 1: Try /systemInformation/public
   try {
-    const primaryUrl = buildSystemInfoEndpoint(component, landscape, '/systemInformation/public');
+    const sysInfoUrl = buildSystemInfoEndpoint(component, landscape);
     const data = await apiClient.get<SystemInformation & { componentSuccess?: boolean; statusCode?: number }>('/cis-public/proxy', {
-      params: { url: primaryUrl },
+      params: { url: sysInfoUrl },
       signal,
     });
 
-    // Check if the component endpoint returned success (200-299)
     if (data.componentSuccess !== false) {
-      return { status: 'success', data, url: primaryUrl };
+      return { status: 'success', data, url: sysInfoUrl };
     }
-
   } catch (error1) {
-
+    // Continue to next attempt
   }
 
-  // Attempt 2: Try with subdomain prefix if available
+  // Attempt 2: Try /systemInformation/public with subdomain if available
   if (subdomain && typeof subdomain === 'string') {
     try {
-      const fallbackUrl = buildSystemInfoEndpointWithSubdomain(component, landscape, subdomain, '/systemInformation/public');
+      const fallbackUrl = buildSystemInfoEndpointWithSubdomain(component, landscape, subdomain);
       const data = await apiClient.get<SystemInformation & { componentSuccess?: boolean; statusCode?: number }>('/cis-public/proxy', {
         params: { url: fallbackUrl },
         signal,
       });
 
       if (data.componentSuccess !== false) {
-
         return { status: 'success', data, url: fallbackUrl };
       }
-
     } catch (error2) {
-
+      // Continue to next attempt
     }
   }
 
@@ -218,12 +192,10 @@ export async function fetchSystemInfo(
     });
 
     if (data.componentSuccess !== false) {
-
       return { status: 'success', data, url: versionUrl };
     }
-
   } catch (error3) {
-
+    // Continue to next attempt
   }
 
   // Attempt 4: Try /version with subdomain prefix if available
@@ -236,16 +208,12 @@ export async function fetchSystemInfo(
       });
 
       if (data.componentSuccess !== false) {
-
         return { status: 'success', data, url: versionSubdomainUrl };
       }
-
     } catch (error4) {
-
+      // All attempts failed
     }
   }
-
-  // All attempts failed
 
   return {
     status: 'error',
@@ -255,17 +223,17 @@ export async function fetchSystemInfo(
 
 /**
  * Fetch health for all components in parallel
+ * This function is now used by the React Query hook for caching
  */
 export async function fetchAllHealthStatuses(
   components: Component[],
   landscape: LandscapeConfig,
-  signal?: AbortSignal,
-  onProgress?: (completed: number, total: number) => void
+  signal?: AbortSignal
 ): Promise<ComponentHealthCheck[]> {
   const healthChecks: ComponentHealthCheck[] = [];
 
   // Create all health check promises
-  const promises = components.map(async (component, index) => {
+  const promises = components.map(async (component) => {
     const healthUrl = buildHealthEndpoint(component, landscape);
 
     const healthCheck: ComponentHealthCheck = {
@@ -285,19 +253,12 @@ export async function fetchAllHealthStatuses(
         healthCheck.response = result.data;
         healthCheck.responseTime = result.responseTime;
         healthCheck.lastChecked = new Date();
-
-        if (onProgress) {
-          onProgress(index + 1, components.length);
-        }
-
         return healthCheck;
       }
 
       // Attempt 2: Try fallback with subdomain if available
       const subdomain = component.metadata?.subdomain;
       if (subdomain && typeof subdomain === 'string') {
-
-
         const fallbackUrl = buildHealthEndpointWithSubdomain(component, landscape, subdomain);
         const fallbackResult = await fetchHealthStatus(fallbackUrl, signal);
 
@@ -307,17 +268,8 @@ export async function fetchAllHealthStatuses(
           healthCheck.response = fallbackResult.data;
           healthCheck.responseTime = fallbackResult.responseTime;
           healthCheck.lastChecked = new Date();
-
-
-
-          if (onProgress) {
-            onProgress(index + 1, components.length);
-          }
-
           return healthCheck;
         }
-
-
       }
 
       // Both primary and fallback /health attempts failed
@@ -325,22 +277,12 @@ export async function fetchAllHealthStatuses(
       healthCheck.error = result.error;
       healthCheck.responseTime = result.responseTime;
       healthCheck.lastChecked = new Date();
-
-      if (onProgress) {
-        onProgress(index + 1, components.length);
-      }
-
       return healthCheck;
     } catch (error) {
       // Handle any unexpected errors
       healthCheck.status = 'ERROR';
       healthCheck.error = error instanceof Error ? error.message : 'Unknown error';
       healthCheck.lastChecked = new Date();
-
-      if (onProgress) {
-        onProgress(index + 1, components.length);
-      }
-
       return healthCheck;
     }
   });

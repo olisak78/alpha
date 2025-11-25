@@ -193,7 +193,7 @@ export function useUserManagement({
 
   // Update members when initialMembers prop changes
   useEffect(() => {
-    if (initialMembers) {
+    if (initialMembers && initialMembers.length > 0) {
       setMembers(initialMembers);
     }
   }, [initialMembers]);

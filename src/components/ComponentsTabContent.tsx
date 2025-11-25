@@ -66,7 +66,7 @@ export function ComponentsTabContent({
   viewSwitcher,
   onComponentClick,
 }: ComponentsTabContentProps) {
-  const filteredAndSortedComponents = useMemo(() => {
+  const { libraryComponents, nonLibraryComponents } = useMemo(() => {
     let filtered = components;
 
     if (searchTerm) {
@@ -79,17 +79,35 @@ export function ComponentsTabContent({
       );
     }
 
-    const sorted = [...filtered].sort((a, b) => {
-      if (sortOrder === 'team') {
-        const teamA = a.owner_id ? teamNamesMap[a.owner_id] || '' : '';
-        const teamB = b.owner_id ? teamNamesMap[b.owner_id] || '' : '';
-        const teamCompare = teamA.localeCompare(teamB);
-        if (teamCompare !== 0) return teamCompare;
+    // Separate library and non-library components
+    const libraries: Component[] = [];
+    const nonLibraries: Component[] = [];
+
+    filtered.forEach((component) => {
+      if (component['is-library']) {
+        libraries.push(component);
+      } else {
+        nonLibraries.push(component);
       }
-      return (a.title || a.name).localeCompare(b.title || b.name);
     });
 
-    return sorted;
+    // Sort both arrays
+    const sortComponents = (componentsArray: Component[]) => {
+      return [...componentsArray].sort((a, b) => {
+        if (sortOrder === 'team') {
+          const teamA = a.owner_id ? teamNamesMap[a.owner_id] || '' : '';
+          const teamB = b.owner_id ? teamNamesMap[b.owner_id] || '' : '';
+          const teamCompare = teamA.localeCompare(teamB);
+          if (teamCompare !== 0) return teamCompare;
+        }
+        return (a.title || a.name).localeCompare(b.title || b.name);
+      });
+    };
+
+    return {
+      libraryComponents: sortComponents(libraries),
+      nonLibraryComponents: sortComponents(nonLibraries),
+    };
   }, [components, searchTerm, sortOrder, teamNamesMap]);
 
   if (isLoading) {
@@ -153,28 +171,59 @@ export function ComponentsTabContent({
       )}
 
       {/* Components Content */}
-      {filteredAndSortedComponents.length === 0 ? (
+      {libraryComponents.length === 0 && nonLibraryComponents.length === 0 ? (
         <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center bg-white dark:bg-[#0D0D0D]">
           <p className="text-gray-500 dark:text-gray-400">
             {emptyStateMessage || "No components found"}
           </p>
         </div>
       ) : (
-        <TeamComponents
-          teamName={teamName}
-          components={filteredAndSortedComponents}
-          teamComponentsExpanded={teamComponentsExpanded}
-          onToggleExpanded={onToggleExpanded}
-          system={system}
-          showProjectGrouping={false}
-          selectedLandscape={selectedLandscape}
-          selectedLandscapeData={selectedLandscapeData}
-          teamNamesMap={teamNamesMap}
-          teamColorsMap={teamColorsMap}
-          componentHealthMap={componentHealthMap}
-          isLoadingHealth={isLoadingHealth}
-          onComponentClick={onComponentClick}
-        />
+        <div className="space-y-6">
+          {/* Non-Library Components Section */}
+          {nonLibraryComponents.length > 0 && (
+            <div>
+              <TeamComponents
+                teamName={teamName}
+                components={nonLibraryComponents}
+                teamComponentsExpanded={teamComponentsExpanded}
+                onToggleExpanded={onToggleExpanded}
+                system={system}
+                showProjectGrouping={false}
+                selectedLandscape={selectedLandscape}
+                selectedLandscapeData={selectedLandscapeData}
+                teamNamesMap={teamNamesMap}
+                teamColorsMap={teamColorsMap}
+                componentHealthMap={componentHealthMap}
+                isLoadingHealth={isLoadingHealth}
+                onComponentClick={onComponentClick}
+              />
+            </div>
+          )}
+
+          {/* Library Components Section */}
+          {libraryComponents.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                Library Components
+              </h3>
+              <TeamComponents
+                teamName={teamName}
+                components={libraryComponents}
+                teamComponentsExpanded={teamComponentsExpanded}
+                onToggleExpanded={onToggleExpanded}
+                system={system}
+                showProjectGrouping={false}
+                selectedLandscape={selectedLandscape}
+                selectedLandscapeData={selectedLandscapeData}
+                teamNamesMap={teamNamesMap}
+                teamColorsMap={teamColorsMap}
+                componentHealthMap={componentHealthMap}
+                isLoadingHealth={isLoadingHealth}
+                onComponentClick={onComponentClick}
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

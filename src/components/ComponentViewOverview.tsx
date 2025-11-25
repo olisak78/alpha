@@ -172,17 +172,11 @@ export function ComponentViewOverview({
                         <h1 className="text-3xl font-bold">{component.title || component.name}</h1>
                         <p className="text-muted-foreground mt-1">{component.description}</p>
 
-                        {/* Component Type based on metadata */}
+                        {/* Component Type based on is-library property */}
                         <div className="mt-2">
-                            {component.metadata?.isLibrary === true ? (
-                                <Badge variant="secondary" className="text-xs">
-                                    Library
-                                </Badge>
-                            ) : component.metadata?.isLibrary === false ? (
-                                <Badge variant="secondary" className="text-xs">
-                                    API Service
-                                </Badge>
-                            ) : null}
+                            <Badge variant="secondary" className="text-xs">
+                                {component['is-library'] ? 'Library' : 'API Service'}
+                            </Badge>
                         </div>
                     </div>
                     <div className="flex gap-2">

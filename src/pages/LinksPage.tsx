@@ -31,7 +31,7 @@ const LinksPageContent = () => {
       {/* Links Grid */}
       <LinksGrid />
 
-      {filteredLinks.length === 0 && <NoLinksFound />}
+      {filteredLinks?.length === 0 && <NoLinksFound />}
     </BreadcrumbPage>
   );
 };

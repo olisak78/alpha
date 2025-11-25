@@ -4,6 +4,7 @@ import { Search, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useQuickLinksContext } from "@/contexts/QuickLinksContext";
+import { ViewLinksToggleButton } from "@/components/Links/ViewLinksToggleButton";
 
 interface QuickLinksSearchFilterProps {
   onAddLinkClick?: () => void;
@@ -111,6 +112,7 @@ export const QuickLinksSearchFilter = ({ onAddLinkClick }: QuickLinksSearchFilte
             Add Link
           </Button>
         )}
+        <ViewLinksToggleButton context="quicklinks" />
       </div>
 
       {/* Scrollable Category Pills Container */}

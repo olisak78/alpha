@@ -308,6 +308,7 @@ export interface Component {
   owner_id: string; // UUID
   project_title?: string;
   metadata?:ComponentMetadata;
+  'is-library'?: boolean; // Indicates if component is a library
 }
 
 

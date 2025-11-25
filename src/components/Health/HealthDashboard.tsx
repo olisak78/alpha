@@ -1,9 +1,10 @@
 /**
  * Health Dashboard Component
  * Main container for component health monitoring
+ * Now uses React Query for caching with 1-minute cache
  */
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useHealth } from '@/hooks/api/useHealth';
 import { HealthOverview } from './HealthOverview';
 import { HealthTable } from './HealthTable';
@@ -51,107 +52,114 @@ export function HealthDashboard({
 
   // Components are NOT landscape-specific in the database
   // All components exist in all landscapes - we just check their health in the selected landscape
-  const landscapeComponents = useMemo(() => {
-    return components;
-  }, [components, selectedLandscapeObj]);
 
-  // Fetch health statuses (NO CACHE)
+  // Fetch health statuses with React Query (1-minute cache)
   const {
-    components: healthChecks,
+    healthChecks,
     isLoading: isLoadingHealth,
     summary,
-    progress,
     refetch,
+    isFetching,
   } = useHealth({
-    components: landscapeComponents || [],
+    components: components || [],
     landscape: landscapeConfig || { name: '', route: '' },
-    enabled: !!landscapeConfig && landscapeComponents.length > 0,
+    enabled: !isLoadingComponents && !!selectedLandscape && !!landscapeConfig,
   });
 
   const handleRefresh = () => {
     refetch();
   };
 
-  const isLoading = isLoadingComponents || isLoadingHealth;
+  if (isLoadingComponents) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+        <p className="mt-4 text-muted-foreground">Loading components...</p>
+      </div>
+    );
+  }
+
+  if (!selectedLandscape) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold">Component Health</h2>
+            <p className="text-muted-foreground mt-1">
+              Monitor the health status of all components in real-time
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Landscape Filter */}
+            <LandscapeFilter
+              landscapeGroups={landscapeGroups}
+              selectedLandscape={selectedLandscape}
+              onLandscapeChange={onLandscapeChange}
+              onShowLandscapeDetails={onShowLandscapeDetails}
+              showViewAllButton={false}
+              showClearButton={false}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg">
+          <p className="text-lg font-medium">Select a landscape to view component health</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Choose from the landscape groups above
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
+    <div className="space-y-6">
+      {/* Header with landscape filter and refresh button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Component Health Dashboard
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Real-time health status of all components
-            {selectedLandscapeObj && ` in ${selectedLandscapeObj.name}`}
+          <h2 className="text-2xl font-bold">Component Health</h2>
+          <p className="text-muted-foreground mt-1">
+            Monitor the health status of all components in real-time
+            {isFetching && ' • Refreshing...'}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Landscape Filter - Same as Components tab */}
+          {/* Landscape Filter */}
           <LandscapeFilter
-            selectedLandscape={selectedLandscape}
             landscapeGroups={landscapeGroups}
+            selectedLandscape={selectedLandscape}
             onLandscapeChange={onLandscapeChange}
             onShowLandscapeDetails={onShowLandscapeDetails}
-            showClearButton={false}
             showViewAllButton={false}
+            showClearButton={false}
           />
 
           {/* Refresh Button */}
           <Button
-            onClick={handleRefresh}
-            disabled={isLoading || landscapeComponents.length === 0}
             variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoadingHealth || isFetching}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-2 ${(isLoadingHealth || isFetching) ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
       </div>
 
-      {/* Loading Progress */}
-      {isLoading && progress.total > 0 && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-              Checking component health...
-            </span>
-            <span className="text-sm text-blue-700 dark:text-blue-300">
-              {progress.completed} / {progress.total}
-            </span>
-          </div>
-          <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
-            <div
-              className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(progress.completed / progress.total) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Overview Cards */}
+      <HealthOverview
+        summary={summary}
+        isLoading={isLoadingHealth}
+      />
 
-      {/* Empty State */}
-      {!isLoadingComponents && landscapeComponents.length === 0 && (
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            No components found in {selectedLandscapeObj?.name || 'this landscape'}
-          </p>
-        </div>
-      )}
-
-      {/* Summary Cards */}
-      {landscapeComponents.length > 0 && (
-        <>
-          <HealthOverview summary={summary} isLoading={isLoading} />
-
-          {/* Health Table */}
-          <HealthTable
-            healthChecks={healthChecks}
-            isLoading={isLoading}
-            landscape={selectedLandscapeObj?.name || ''}
-          />
-        </>
-      )}
+      {/* Health Table */}
+      <HealthTable
+        healthChecks={healthChecks}
+        isLoading={isLoadingHealth}
+        landscape={selectedLandscapeObj?.name || ''}
+        components={components}
+      />
     </div>
   );
 }

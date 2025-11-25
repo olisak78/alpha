@@ -5,7 +5,7 @@ import { useCurrentUser } from '@/hooks/api/useMembers';
 import { useRemoveFavorite } from '@/hooks/api/mutations/useFavoriteMutations';
 import { useDeleteLink } from '@/hooks/api/mutations/useDeleteLinkMutation';
 import { useToast } from '@/hooks/use-toast';
-import { LinkCategory } from '@/types/developer-portal';
+import { LinkCategory, ViewLinksType } from '@/types/developer-portal';
 import { HelpCircle } from 'lucide-react';
 import { SHARED_ICON_MAP } from './LinksPageContext';
 
@@ -37,6 +37,10 @@ export interface QuickLinksContextValue {
   setSearchTerm: (term: string) => void;
   selectedCategoryId: string;
   setSelectedCategoryId: (categoryId: string) => void;
+  
+  // View state
+  viewMode: ViewLinksType;
+  setViewMode: (mode: ViewLinksType) => void;
   
   // Actions
   handleToggleFavorite: (linkId: string) => void;
@@ -100,6 +104,26 @@ export const QuickLinksProvider: React.FC<QuickLinksProviderProps> = ({
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
+  
+  // Initialize viewMode from localStorage or default to 'collapsed'
+  const [viewMode, setViewModeState] = useState<ViewLinksType>(() => {
+    try {
+      const saved = localStorage.getItem('links-view-mode');
+      return (saved === 'collapsed' || saved === 'expanded') ? saved : 'collapsed';
+    } catch {
+      return 'collapsed';
+    }
+  });
+
+  // Wrapper function to save to localStorage when viewMode changes
+  const setViewMode = (mode: ViewLinksType) => {
+    setViewModeState(mode);
+    try {
+      localStorage.setItem('links-view-mode', mode);
+    } catch (error) {
+      console.warn('Failed to save view mode to localStorage:', error);
+    }
+  };
 
   // Create category map
   const categoryMap = useMemo(() => {
@@ -274,6 +298,8 @@ export const QuickLinksProvider: React.FC<QuickLinksProviderProps> = ({
     setSearchTerm,
     selectedCategoryId,
     setSelectedCategoryId,
+    viewMode,
+    setViewMode,
     handleToggleFavorite,
     handleDeleteClick,
     handleDeleteConfirm,

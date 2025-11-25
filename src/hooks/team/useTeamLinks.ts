@@ -60,17 +60,19 @@ export function useTeamLinks({ teamId, initialLinks = [], teamOwner }: UseTeamLi
 
   // Update links when team data is loaded from API (prioritize server data)
   useEffect(() => {
-    if (teamData?.links) {
+    if (teamId && teamData?.links) {
       setLinks(convertApiLinksToLocal(teamData.links));
+    } else if (!teamId) {
+      setLinks([]);
     }
   }, [teamData?.links, teamId]);
 
-  // Initialize with initialLinks only once when teamId changes and no server data exists
+  // Initialize with initialLinks when provided and no team data exists yet
   useEffect(() => {
-    if (!teamData?.links && initialLinks && initialLinks.length > 0) {
+    if (initialLinks && initialLinks.length > 0 && !teamData?.links) {
       setLinks(initialLinks);
     }
-  }, [teamId]); // Only depend on teamId, not initialLinks
+  }, [initialLinks, teamData?.links]);
 
   // Delete link mutation
   const deleteLinkMutation = useDeleteLink({
@@ -255,10 +257,16 @@ export function useTeamLinks({ teamId, initialLinks = [], teamOwner }: UseTeamLi
       await updateLinksFromTeamData();
     } catch (error) {
       console.error('Failed to remove team link:', error);
+      
+      // Check if this is a case where the link doesn't have a valid ID
+      const hasInvalidId = !linkToRemove.id || linkToRemove.id.startsWith('temp-');
+      
       toast({
         variant: "destructive",
         title: "Failed to remove link",
-        description: "There was an error removing the link. Please try again.",
+        description: hasInvalidId 
+          ? "This link doesn't have a valid ID."
+          : "There was an error removing the link. Please try again.",
       });
     }
   };
@@ -327,7 +335,9 @@ export function useTeamLinks({ teamId, initialLinks = [], teamOwner }: UseTeamLi
 
   // Get existing categories used by current links as category IDs
   const existingCategories: string[] = useMemo(() => {
-    if (!categoriesData?.categories) return [];
+    if (!categoriesData?.categories || categoriesData.categories.length === 0) {
+      return [];
+    }
     
     // Get unique category IDs from current links
     const usedCategoryIds = new Set(

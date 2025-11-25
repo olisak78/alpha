@@ -241,6 +241,8 @@ export const componentVersions = {
 export type LayoutDirection = 'horizontal' | 'vertical'
 export const DEFAULT_LANDSCAPE = 'cf-us10-staging'
 
+export type ViewLinksType = 'collapsed' | 'expanded';
+
 // Types for authentication
 export interface User {
   id: string;

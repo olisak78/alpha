@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useCallback, useMemo, useState } from 'react';
-import { Link, LinkCategory } from '@/types/developer-portal';
+import { Link, LinkCategory, ViewLinksType } from '@/types/developer-portal';
 import { useLinks, useCategories } from '@/hooks/api/useLinks';
 import { useCurrentUser } from '@/hooks/api/useMembers';
 import { useAddFavorite, useRemoveFavorite } from '@/hooks/api/mutations/useFavoriteMutations';
@@ -32,6 +32,10 @@ export interface LinksPageContextValue {
   setSearchTerm: (term: string) => void;
   setSelectedCategoryId: (categoryId: string) => void;
   
+  // View state
+  viewMode: ViewLinksType
+  setViewMode: (mode:ViewLinksType) => void;
+  
   // Computed data
   filteredLinks: Link[];
   linksByCategory: Record<string, Link[]>;
@@ -61,10 +65,38 @@ interface LinksProviderProps {
   children: React.ReactNode;
 }
 
+// Helper function to get initial view mode from localStorage
+const getInitialViewMode = (): ViewLinksType => {
+  try {
+    const saved = localStorage.getItem('links-view-mode');
+    return (saved === 'collapsed' || saved === 'expanded') ? saved : 'collapsed';
+  } catch {
+    return 'collapsed';
+  }
+};
+
+// Helper function to save view mode to localStorage
+const saveViewModeToStorage = (mode: ViewLinksType): void => {
+  try {
+    localStorage.setItem('links-view-mode', mode);
+  } catch (error) {
+    console.warn('Failed to save view mode to localStorage:', error);
+  }
+};
+
 export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
+  
+  // Initialize viewMode from localStorage or default to 'collapsed'
+  const [viewMode, setViewModeState] = useState<ViewLinksType>(getInitialViewMode);
+  
+  // Wrapper function to save to localStorage when viewMode changes
+  const setViewMode = (mode: ViewLinksType) => {
+    setViewModeState(mode);
+    saveViewModeToStorage(mode);
+  };
   
   // API hooks
   const { data: currentUser } = useCurrentUser();
@@ -74,7 +106,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
   // Mutations
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
-
+  
   // Transform API categories to LinkCategory format with icon components
   const linkCategories: LinkCategory[] = useMemo(() => {
     if (!categoriesData?.categories) return [];
@@ -86,13 +118,13 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       color: category.color,
     }));
   }, [categoriesData]);
-
+  
   // Get favorite link IDs from currentUser
   const favoriteLinkIds = useMemo(() => {
     if (!currentUser?.link) return new Set<string>();
     return new Set(currentUser.link.map(link => link.id));
   }, [currentUser]);
-
+  
   // Transform API links to Link format
   const links: Link[] = useMemo(() => {
     if (!linksData) return [];
@@ -107,23 +139,23 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       favorite: favoriteLinkIds.has(link.id),
     }));
   }, [linksData, favoriteLinkIds]);
-
+  
   // Filter links based on search and category
   const filteredLinks = useMemo(() => {
     if (!links || !Array.isArray(links)) return [];
-
+    
     return links.filter(link => {
       if (!link || typeof link.title !== 'string') return false;
       const titleLower = link.title.toLowerCase();
       const descriptionLower = link.description?.toLowerCase() || '';
       const searchTermLower = searchTerm.toLowerCase();
       const matchesSearch = titleLower.includes(searchTermLower) ||
-        descriptionLower.includes(searchTermLower);
+      descriptionLower.includes(searchTermLower);
       const matchesCategory = selectedCategoryId === "all" || link.categoryId === selectedCategoryId;
       return matchesSearch && matchesCategory;
     });
   }, [links, searchTerm, selectedCategoryId]);
-
+  
   // Group filtered links by category
   const linksByCategory = useMemo(() => {
     return filteredLinks.reduce((acc, link) => {
@@ -132,7 +164,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       return acc;
     }, {} as Record<string, Link[]>);
   }, [filteredLinks]);
-
+  
   const handleToggleFavorite = useCallback((linkId: string) => {
     if (!currentUser?.id) {
       toast({
@@ -142,12 +174,12 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       });
       return;
     }
-
+    
     const link = links.find(l => l.id === linkId);
     if (!link) return;
-
+    
     const isFavorite = favoriteLinkIds.has(linkId);
-
+    
     if (isFavorite) {
       // Remove from favorites
       removeFavoriteMutation.mutate(
@@ -190,7 +222,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       );
     }
   }, [currentUser, links, favoriteLinkIds, addFavoriteMutation, removeFavoriteMutation, toast]);
-
+  
   const contextValue: LinksPageContextValue = {
     links,
     linkCategories,
@@ -199,16 +231,18 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
     selectedCategoryId,
     setSearchTerm,
     setSelectedCategoryId,
+    viewMode,
+    setViewMode,
     filteredLinks,
     linksByCategory,
     handleToggleFavorite,
     currentUser,
     favoriteLinkIds,
   };
-
+  
   return (
     <LinksPageContext.Provider value={contextValue}>
-      {children}
+    {children}
     </LinksPageContext.Provider>
   );
 };

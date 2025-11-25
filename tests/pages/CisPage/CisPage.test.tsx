@@ -62,28 +62,29 @@ const mockComponents = [
     id: 'comp-1',
     name: 'accounts-service',
     title: 'Accounts Service',
+    description: 'Accounts service',
     owner_id: 'team-1',
     project_id: 'cis20',
-    type: 'service',
     metadata: {},
   },
   {
     id: 'comp-2',
     name: 'billing-service',
     title: 'Billing Service',
+    description: 'Billing service',
     owner_id: 'team-2',
     project_id: 'cis20',
-    type: 'service',
     metadata: {},
   },
   {
     id: 'comp-3',
     name: 'common-lib',
     title: 'Common Library',
+    description: 'Common library',
     owner_id: 'team-1',
     project_id: 'cis20',
-    type: 'library',
-    metadata: { isLibrary: true },
+    'is-library': true,
+    metadata: {},
   },
 ];
 
@@ -166,13 +167,16 @@ describe('CisPage', () => {
       data: mockTeams,
     });
 
+    // NEW: Updated to match React Query hook interface
     vi.mocked(useHealth).mockReturnValue({
-      landscape: 'eu10-canary',
-      components: mockHealthChecks,  // Changed from 'healthChecks' to 'components'
+      healthChecks: mockHealthChecks,  // Changed from 'components' to 'healthChecks'
       isLoading: false,
       summary: mockSummary,
-      progress: { completed: 2, total: 2 },  // Added progress
-      refetch: vi.fn(),  // Added refetch
+      refetch: vi.fn(),
+      isFetching: false,  // NEW: Added isFetching
+      isError: false,  // NEW: Added isError
+      error: null,  // NEW: Added error
+      // NOTE: 'landscape' and 'progress' removed - no longer in React Query version
     });
 
     vi.mocked(useHeaderNavigation).mockReturnValue({
@@ -491,10 +495,13 @@ describe('CisPage', () => {
 
   it('should enable health checks only on components tab with selected landscape', () => {
     const mockUseHealth = vi.fn().mockReturnValue({
-      components: mockHealthChecks,  // Changed from 'healthChecks' to 'components'
+      healthChecks: mockHealthChecks,  // Changed from 'components' to 'healthChecks'
       isLoading: false,
       summary: mockSummary,
-
+      refetch: vi.fn(),
+      isFetching: false,
+      isError: false,
+      error: null,
     });
     vi.mocked(useHealth).mockImplementation(mockUseHealth);
 

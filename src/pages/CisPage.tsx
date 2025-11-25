@@ -33,7 +33,7 @@ export default function CisPage() {
   const { setTabs, activeTab: headerActiveTab, setActiveTab: setHeaderActiveTab } = useHeaderNavigation();
 
   const hasInitializedLandscape = useRef(false);
-  
+
   const {
     selectedLandscape,
     setSelectedLandscape,
@@ -196,7 +196,7 @@ export default function CisPage() {
   // Filter components based on landscape metadata
   const filteredComponents = useMemo(() => {
     if (!selectedLandscape) {
-      const allNonLibrary = cisApiComponents.filter(c => !c.metadata?.['isLibrary']);
+      const allNonLibrary = cisApiComponents.filter(c => !c['is-library']);
       return allNonLibrary.sort((a, b) => a.name.localeCompare(b.name));
     }
 
@@ -224,9 +224,11 @@ export default function CisPage() {
   }, [selectedApiLandscape]);
 
   const {
-    components: healthChecks,
+    healthChecks,
     isLoading: isLoadingHealth,
     summary,
+    refetch,
+    isFetching,
   } = useHealth({
     components: filteredComponents,
     landscape: landscapeConfig || { name: '', route: '' },
@@ -253,7 +255,7 @@ export default function CisPage() {
     setTabs(tabs);
   }, []);
 
-   // Effect to handle landscape initialization and validation
+  // Effect to handle landscape initialization and validation
   useEffect(() => {
     // Only run when landscapes are loaded
     if (!apiLandscapes || apiLandscapes.length === 0 || isLoadingApiLandscapes) {
@@ -269,7 +271,6 @@ export default function CisPage() {
       if (!hasInitializedLandscape.current || selectedLandscape !== null) {
         const defaultLandscapeId = getDefaultLandscape(apiLandscapes);
         if (defaultLandscapeId && defaultLandscapeId !== selectedLandscape) {
-          console.log('[CisPage] Setting default landscape:', defaultLandscapeId);
           setSelectedLandscape(defaultLandscapeId);
           hasInitializedLandscape.current = true;
         }

@@ -290,8 +290,6 @@ export class ApiClient {
 
       // Handle 401 Unauthorized - token expired or invalid
       if (response.status === 401) {
-        console.log('Received 401, attempting token refresh...');
-
         try {
           // Force refresh the token
           await this.getAccessToken();

@@ -25,7 +25,6 @@ const mockComponents: Component[] = [
     description: 'Handles account management',
     owner_id: 'team-1',
     project_id: 'proj-1',
-    type: 'service',
   },
   {
     id: 'comp-2',
@@ -34,7 +33,6 @@ const mockComponents: Component[] = [
     description: 'Handles billing',
     owner_id: 'team-2',
     project_id: 'proj-1',
-    type: 'service',
   },
 ];
 
@@ -238,5 +236,41 @@ describe('ComponentsTabContent', () => {
     render(<ComponentsTabContent {...defaultProps} />);
 
     expect(screen.queryByTestId('search-input')).not.toBeInTheDocument();
+  });
+
+  it('should render library components in separate section', () => {
+    const componentsWithLibrary: Component[] = [
+      {
+        id: 'comp-1',
+        name: 'accounts-service',
+        title: 'Accounts Service',
+        description: 'Handles account management',
+        owner_id: 'team-1',
+        project_id: 'proj-1',
+      },
+      {
+        id: 'comp-2',
+        name: 'ui-library',
+        title: 'UI Library',
+        description: 'Shared UI components',
+        owner_id: 'team-2',
+        project_id: 'proj-1',
+        'is-library': true,
+      },
+    ];
+
+    render(
+      <ComponentsTabContent
+        {...defaultProps}
+        components={componentsWithLibrary}
+      />
+    );
+
+    // Should render the "Library Components" heading
+    expect(screen.getByText('Library Components')).toBeInTheDocument();
+    
+    // Should render both library and non-library components
+    expect(screen.getByTestId('component-comp-1')).toBeInTheDocument(); // non-library
+    expect(screen.getByTestId('component-comp-2')).toBeInTheDocument(); // library
   });
 });
