@@ -57,15 +57,11 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
     "table"
   );
   
-  const [selectedLandscape, setSelectedLandscape] = usePersistedState<string | null>(
-    STORAGE_KEYS.SELECTED_LANDSCAPE, 
-    null
-  );
-
   // Non-persisted state (session-only)
   const [activeTab, setActiveTab] = useState("components");
   const [showLandscapeDetails, setShowLandscapeDetails] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
+  const [selectedLandscape, setSelectedLandscape] = useState<string | null>(null);
   const [meHighlightNotifications, setMeHighlightNotifications] = useState(false);
 
   const value: AppStateContextType = {

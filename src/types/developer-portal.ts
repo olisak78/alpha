@@ -30,7 +30,7 @@ export interface Landscape {
   status: "active" | "inactive";
   githubConfig: string;
   awsAccount: string;
-  camProfile: string;
+  cam: string;
   deploymentStatus: "deployed" | "deploying" | "failed";
   technical_name?: string;
   environment?: string;

@@ -15,7 +15,8 @@ vi.mock('../../src/services/ComponentsApi', () => ({
 }));
 
 vi.mock('../../src/services/LandscapesApi', () => ({
-  fetchLandscapesByProject: vi.fn()
+  fetchLandscapesByProject: vi.fn(),
+  getDefaultLandscapeId: vi.fn()
 }));
 
 // Mock API client for teams
@@ -39,7 +40,7 @@ vi.mock('../../src/data/mockFeatureToggles', () => ({
 // Import mocked services
 import { fetchProjects } from '../../src/services/ProjectsApi';
 import { fetchComponentsByProject } from '../../src/services/ComponentsApi';
-import { fetchLandscapesByProject } from '../../src/services/LandscapesApi';
+import { fetchLandscapesByProject, getDefaultLandscapeId } from '../../src/services/LandscapesApi';
 import { apiClient } from '../../src/services/ApiClient';
 import { fetchHealthStatus, buildHealthEndpoint } from '../../src/services/healthApi';
 import { Component, Landscape, Project, Team, LandscapeType, LandscapeStatus, DeploymentStatus } from '../../src/types/api';
@@ -181,6 +182,7 @@ describe('ProjectLayout Integration Tests - Dynamic Tab Building', () => {
     vi.mocked(fetchProjects).mockResolvedValue(mockProjects);
     vi.mocked(fetchComponentsByProject).mockResolvedValue(mockComponents);
     vi.mocked(fetchLandscapesByProject).mockResolvedValue(mockLandscapes);
+    vi.mocked(getDefaultLandscapeId).mockReturnValue('landscape-1'); // Return first landscape ID
     vi.mocked(apiClient.get).mockResolvedValue({ teams: mockTeams, total: 1, page: 1, page_size: 20 });
     vi.mocked(buildHealthEndpoint).mockReturnValue('https://test-service.example.com/health');
     vi.mocked(fetchHealthStatus).mockResolvedValue(mockHealthResponse);

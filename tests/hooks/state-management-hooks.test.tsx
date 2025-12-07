@@ -7,9 +7,6 @@ import { usePersistedState } from '../../src/hooks/usePersistedState';
 import { AppStateProvider, useAppState } from '../../src/contexts/AppStateContext';
 import {
   usePortalState,
-  useFeatureToggles,
-  useComponentManagement,
-  useLandscapeManagement,
 } from '../../src/contexts/hooks';
 
 // Mock localStorage
@@ -342,7 +339,7 @@ describe('AppStateContext', () => {
     expect(JSON.parse(stored!)).toBe('chart');
   });
 
-  it('should persist selectedLandscape to localStorage', () => {
+  it('should NOT persist selectedLandscape to localStorage (session-only)', () => {
     const { result } = renderHook(() => useAppState(), {
       wrapper: createAppStateWrapper(),
     });
@@ -351,10 +348,12 @@ describe('AppStateContext', () => {
       result.current.setSelectedLandscape('prod-landscape');
     });
 
-    // Fixed: Use the correct storage key from STORAGE_KEYS constant
+    // selectedLandscape should NOT be persisted to localStorage anymore
     const stored = localStorage.getItem('selectedLandscape');
-    expect(stored).toBeTruthy();
-    expect(JSON.parse(stored!)).toBe('prod-landscape');
+    expect(stored).toBe(null);
+    
+    // But the state should still be updated in memory
+    expect(result.current.selectedLandscape).toBe('prod-landscape');
   });
 
   it('should throw error when used outside provider', () => {

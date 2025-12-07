@@ -14,6 +14,7 @@ import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
 import { useTeams } from "@/hooks/api/useTeams";
 import { useHealth } from "@/hooks/api/useHealth";
+import { getDefaultLandscapeId } from "@/services/LandscapesApi";
 import type { Landscape } from "@/types/developer-portal";
 import { useNavigate } from "react-router-dom";
 import { HealthTable } from "./Health/HealthTable";
@@ -217,15 +218,21 @@ export function ProjectLayout({
 
   // Set default landscape
   useEffect(() => {
-    if (apiLandscapes && apiLandscapes.length > 0 && !selectedLandscape) {
-      const defaultLandscape = apiLandscapes.find((l: any) => l.name === 'DEFAULT');
-      if (defaultLandscape) {
-        setSelectedLandscape(defaultLandscape.id);
-      } else {
-        setSelectedLandscape(apiLandscapes[0].id);
+    if (apiLandscapes && apiLandscapes.length > 0) {
+      // Check if the currently selected landscape is valid for this project
+      const isSelectedLandscapeValid = selectedLandscape && 
+        apiLandscapes.some(landscape => landscape.id === selectedLandscape);
+      
+      // If no landscape is selected or the selected one is invalid for this project,
+      // set a default landscape
+      if (!isSelectedLandscapeValid) {
+        const defaultLandscapeId = getDefaultLandscapeId(apiLandscapes, projectId);
+        if (defaultLandscapeId) {
+          setSelectedLandscape(defaultLandscapeId);
+        }
       }
     }
-  }, [apiLandscapes, selectedLandscape, setSelectedLandscape]);
+  }, [apiLandscapes, selectedLandscape, setSelectedLandscape, projectId]);
 
   // Handlers
   const handleToggleComponentExpansion = (componentId: string) => {
@@ -270,6 +277,7 @@ export function ProjectLayout({
               landscapeGroups={landscapeGroupsArray}
               onLandscapeChange={setSelectedLandscape}
               onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
+              projectId={projectId}
             />
 
             {/* Conditional rendering based on showComponentsMetrics and view */}

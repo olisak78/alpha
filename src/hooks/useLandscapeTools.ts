@@ -19,6 +19,7 @@ interface LandscapeData {
   prometheus?: string;
   gardener?: string;
   plutono?: string;
+  cam?: string;
 }
 
 interface LandscapeToolUrls {
@@ -30,6 +31,8 @@ interface LandscapeToolUrls {
   plutono: string | null;
   operationConsole: string | null;
   controlCenter: string | null;
+  cam: string | null;
+  gardener: string | null;
 }
 
 interface LandscapeToolsAvailability {
@@ -41,6 +44,8 @@ interface LandscapeToolsAvailability {
   plutono: boolean;
   operationConsole: boolean;
   controlCenter: boolean;
+  cam: boolean;
+  gardener: boolean;
 }
 
 interface UseLandscapeToolsReturn {
@@ -63,7 +68,9 @@ export function useLandscapeTools(
           cockpit: null,
           plutono: null,
           operationConsole: null,
-          controlCenter: null
+          controlCenter: null,
+          cam: null,
+          gardener: null
         },
         availability: {
           git: false,
@@ -73,7 +80,9 @@ export function useLandscapeTools(
           cockpit: false,
           plutono: false,
           operationConsole: false,
-          controlCenter: false
+          controlCenter: false,
+          cam: false,
+          gardener: false
         },
       };
     }
@@ -92,7 +101,9 @@ export function useLandscapeTools(
           cockpit: null,
           plutono: null,
           operationConsole: null,
-          controlCenter: null
+          controlCenter: null,
+          cam: null,
+          gardener: null
         },
         availability: {
           git: false,
@@ -102,7 +113,9 @@ export function useLandscapeTools(
           cockpit: false,
           plutono: false,
           operationConsole: false,
-          controlCenter: false
+          controlCenter: false,
+          cam: false,
+          gardener: false
         },
       };
     }
@@ -114,6 +127,8 @@ export function useLandscapeTools(
     const plutonoUrl = landscape.plutono || null;
     const operationConsoleUrl = landscape['operation-console'] || null;
     const controlCenterUrl = landscape['control-center'] || null;
+    const camUrl = landscape.cam || null;
+    const gardenerUrl = landscape.gardener || null;
 
     return {
       urls: {
@@ -124,7 +139,9 @@ export function useLandscapeTools(
         cockpit: cockpitUrl,
         plutono: plutonoUrl,
         operationConsole: operationConsoleUrl,
-        controlCenter: controlCenterUrl
+        controlCenter: controlCenterUrl,
+        cam: camUrl,
+        gardener: gardenerUrl
       },
       availability: {
         git: !!gitUrl,
@@ -134,7 +151,9 @@ export function useLandscapeTools(
         cockpit: !!cockpitUrl,
         plutono: !!plutonoUrl,
         operationConsole: !!operationConsoleUrl,
-        controlCenter: !!controlCenterUrl
+        controlCenter: !!controlCenterUrl,
+        cam: !!camUrl,
+        gardener: !!gardenerUrl
       },
     };
   }, [selectedLandscapeId, landscapeData]);

@@ -168,11 +168,11 @@ describe('LandscapesApi', () => {
       expect(result).toBeNull();
     });
 
-    it('should return Israel (Tel Aviv) landscape ID when available', () => {
+    it('should return staging landscape with isCentral=true when available', () => {
       const landscapes: Landscape[] = [
-        { id: 'landscape-1', name: 'US East' } as Landscape,
-        { id: 'landscape-2', name: 'Israel (Tel Aviv)' } as Landscape,
-        { id: 'landscape-3', name: 'EU West' } as Landscape,
+        { id: 'landscape-1', name: 'US East', environment: 'production', isCentral: false } as Landscape,
+        { id: 'landscape-2', name: 'Israel (Tel Aviv)', environment: 'staging', isCentral: true } as Landscape,
+        { id: 'landscape-3', name: 'EU West', environment: 'development', isCentral: false } as Landscape,
       ];
 
       const result = getDefaultLandscapeId(landscapes);
@@ -189,13 +189,13 @@ describe('LandscapesApi', () => {
       expect(result).toBe('landscape-1');
     });
 
-    it('should handle case-sensitive matching for Israel (Tel Aviv)', () => {
+    it('should prefer project-specific staging landscape when no central staging exists', () => {
       const landscapes: Landscape[] = [
-        { id: 'landscape-1', name: 'israel (tel aviv)' } as Landscape,
-        { id: 'landscape-2', name: 'Israel (Tel Aviv)' } as Landscape,
+        { id: 'landscape-1', name: 'Production', environment: 'production', technical_name: 'prod', isCentral: false } as Landscape,
+        { id: 'landscape-2', name: 'Test Project Staging', environment: 'staging', technical_name: 'test-project-staging', isCentral: false } as Landscape,
       ];
 
-      const result = getDefaultLandscapeId(landscapes);
+      const result = getDefaultLandscapeId(landscapes, 'test-project');
       expect(result).toBe('landscape-2');
     });
   });
@@ -207,21 +207,24 @@ describe('LandscapesApi', () => {
           id: 'landscape-1',
           name: 'us-east',
           title: 'US East',
+          environment: 'production',
         }),
         createMockLandscapeApiResponse({
           id: 'landscape-2',
-          name: 'israel-tel-aviv',
-          title: 'Israel (Tel Aviv)',
+          name: 'test-project-staging',
+          title: 'Test Project Staging',
+          environment: 'staging',
+          'is-central-region': true,
         }),
       ];
 
       vi.mocked(apiClient.get).mockResolvedValue(mockApiResponse);
 
       const landscapes = await fetchLandscapesByProject('test-project');
-      const defaultId = getDefaultLandscapeId(landscapes);
+      const defaultId = getDefaultLandscapeId(landscapes, 'test-project');
 
       expect(landscapes).toHaveLength(2);
-      expect(defaultId).toBe('landscape-2'); // Israel (Tel Aviv)
+      expect(defaultId).toBe('landscape-2'); // Staging with isCentral=true
     });
   });
 });

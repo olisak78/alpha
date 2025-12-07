@@ -22,6 +22,7 @@ export interface LandscapeApiResponse {
   prometheus?: string;
   gardener?: string;
   plutono?: string;
+  cam?: string;
   metadata?: Record<string, any>;
 }
 
@@ -41,7 +42,7 @@ export async function fetchLandscapesByProject(
     status: 'active' as const,
     githubConfig: '#',
     awsAccount: landscape.id,
-    camProfile: '#',
+    cam: landscape.cam,
     deploymentStatus: 'deployed' as const,
     environment: landscape.environment,
     landscape_url: landscape.domain, 
@@ -67,15 +68,54 @@ export async function fetchLandscapesByProject(
 
 
 
-export function getDefaultLandscapeId(landscapes: Landscape[]): string | null {
+export function getDefaultLandscapeId(landscapes: Landscape[], projectName?: string): string | null {
   if (landscapes.length === 0) return null;
   
-  // Try to find "Israel (Tel Aviv)"
-  const israelLandscape = landscapes.find(l => l.name === 'Israel (Tel Aviv)');
-  if (israelLandscape) {
-    return israelLandscape.id;
+  // 1. Always prefer staging environment and isCentral
+  const stagingCentralLandscape = landscapes.find(l => 
+    l.environment === 'staging' && l.isCentral === true
+  );
+  if (stagingCentralLandscape) {
+    return stagingCentralLandscape.id;
   }
   
-  // Return first landscape as fallback
+  // 2. If no central staging, look for landscape matching pattern {projectname}-staging or staging-{projectname}
+  if (projectName) {
+    const projectStagingLandscape = landscapes.find(l => {
+      const technicalName = l.technical_name?.toLowerCase() || '';
+      const projectNameLower = projectName.toLowerCase();
+      return (
+        l.environment === 'staging' && (
+          technicalName === `${projectNameLower}-staging` ||
+          technicalName === `staging-${projectNameLower}` ||
+          technicalName.includes(`${projectNameLower}-staging`) ||
+          technicalName.includes(`staging-${projectNameLower}`)
+        )
+      );
+    });
+    if (projectStagingLandscape) {
+      return projectStagingLandscape.id;
+    }
+  }
+  
+  // 3. Special case for Cloud Automation project - prefer cloud-automation-staging
+  if (projectName && projectName.toLowerCase() === 'ca') {
+    const cloudAutomationStagingLandscape = landscapes.find(l => {
+      const technicalName = l.technical_name?.toLowerCase() || '';
+      return technicalName === 'cloud-automation-staging' || 
+             technicalName.includes('cloud-automation-staging');
+    });
+    if (cloudAutomationStagingLandscape) {
+      return cloudAutomationStagingLandscape.id;
+    }
+  }
+  
+  // 4. Fallback to any staging landscape
+  const anyStagingLandscape = landscapes.find(l => l.environment === 'staging');
+  if (anyStagingLandscape) {
+    return anyStagingLandscape.id;
+  }
+  
+  // 5. Final fallback to first landscape
   return landscapes[0].id;
 }

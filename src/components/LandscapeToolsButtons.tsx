@@ -5,9 +5,9 @@ import { ConcourseIcon } from "@/components/icons/ConcourseIcon";
 import { KibanaIcon } from "@/components/icons/KibanaIcon";
 import { DynatraceIcon } from "@/components/icons/DynatraceIcon";
 import { PlutonoIcon } from "@/components/icons/PlutonoIcon";
-import { Plane, Monitor, Settings } from "lucide-react";
+import { Plane, Monitor, Settings, FileText, Flower } from "lucide-react";
 
-export type ToolButton = 'git' | 'concourse' | 'kibana' | 'dynatrace' | 'plutono' | 'cockpit' | 'operationConsole' | 'controlCenter';
+export type ToolButton = 'git' | 'concourse' | 'kibana' | 'dynatrace' | 'plutono' | 'cockpit' | 'operationConsole' | 'controlCenter' | 'cam' | 'gardener';
 
 interface LandscapeToolsButtonsProps {
   selectedLandscape: string | null;
@@ -123,6 +123,30 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
         >
           <Settings className="h-4 w-4" />
           <span className="font-medium">Control Center</span>
+        </Button>
+      )}
+
+      {availability.cam && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleToolClick(urls.cam)}
+          className="flex items-center gap-2"
+        >
+          <FileText className="h-4 w-4" />
+          <span className="font-medium">CAM</span>
+        </Button>
+      )}
+
+      {availability.gardener && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleToolClick(urls.gardener)}
+          className="flex items-center gap-2"
+        >
+          <Flower className="h-4 w-4" />
+          <span className="font-medium">Gardener</span>
         </Button>
       )}
     </div>

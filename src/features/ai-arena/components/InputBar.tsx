@@ -1,6 +1,6 @@
 import { Paperclip, ArrowUp, X, FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { type UploadedFile } from "@/services/aiPlatformApi";
 import { useToast } from "@/hooks/use-toast";
 
@@ -144,7 +144,7 @@ export function InputBar({ onSend, disabled = false, disabledMessage }: InputBar
   const totalSize = getTotalSize(attachedFiles);
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212121] px-2 py-3 md:px-3">
+    <div className="px-2 py-3 md:px-3">
       <div className="mx-auto max-w-4xl">
         <div className="flex gap-4 md:gap-6">
           {/* Avatar space placeholder to match MessageBubble layout */}

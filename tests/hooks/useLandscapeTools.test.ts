@@ -128,7 +128,9 @@ describe('useLandscapeTools', () => {
         cockpit: null,
         plutono: null,
         operationConsole: null,
-        controlCenter: null
+        controlCenter: null,
+        cam: null,
+        gardener: null
       },
       availability: {
         git: false,
@@ -138,7 +140,9 @@ describe('useLandscapeTools', () => {
         cockpit: false,
         plutono: false,
         operationConsole: false,
-        controlCenter: false
+        controlCenter: false,
+        cam: false,
+        gardener: false
       },
     };
 
