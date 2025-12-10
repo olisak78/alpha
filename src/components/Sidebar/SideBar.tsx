@@ -23,7 +23,7 @@ const getProjectIcon = (project: string, projectsData) => {
         case 'Teams': return <Users size={16} />;
         case 'Self Service': return <Wrench size={16} />;
         case 'Links': return <Link size={16} />;
-      //  case 'Plugins': return <Puzzle size={16} />;
+        case 'Plugins': return <Puzzle size={16} />;
         case 'AI Arena': return <Brain size={16} />;
         default: break;
     }

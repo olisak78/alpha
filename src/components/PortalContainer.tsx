@@ -35,7 +35,7 @@ export const PortalContainer: React.FC = () => {
     "Teams",
     ...projects.map(project => project.title || project.name),
     "Links",
-    //"Plugins",
+    "Plugins",
     "Self Service",
     "AI Arena",
   ];
