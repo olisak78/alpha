@@ -2,24 +2,22 @@ import ComponentCard from "@/components/ComponentCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Component } from "@/types/api";
-import { GithubIcon } from "../icons/GithubIcon";
-import { ComponentDisplayProvider, useComponentDisplay } from "@/contexts/ComponentDisplayContext";
+import { GithubIcon } from "./icons/GithubIcon";
+import { useComponentDisplay } from "@/contexts/ComponentDisplayContext";
 
-interface TeamComponentsProps {
+interface ComponentsListProps {
   components: Component[];
-  teamName: string;
   showProjectGrouping?: boolean;
   compactView?: boolean;
   onComponentClick?: (componentId: string) => void;
 }
 
-export function TeamComponents({
+export function ComponentsList({
   components,
-  teamName,
   showProjectGrouping = false,
   compactView = false,
   onComponentClick,
-}: TeamComponentsProps) {
+}: ComponentsListProps) {
   const {
     teamNamesMap,
     teamColorsMap,

@@ -8,7 +8,7 @@ import { ScoreBoards } from "./ScoreBoards";
 import { MemberList } from "./MemberList";
 import QuickLinksTab from "@/components/tabs/MePageTabs/QuickLinksTab";
 import { TeamJiraIssues } from "./TeamJiraIssues";
-import { TeamComponents } from "./TeamComponents";
+import { ComponentsList } from "@/components/ComponentsList";
 import { OnDutyAndCall } from "./OnDutyAndCall";
 import { TeamDocs } from "./TeamDocs";
 import { TeamColorPicker } from "./TeamColorPicker";
@@ -304,9 +304,8 @@ export default function Team({
             onToggleExpanded={teamComponents.toggleComponentExpansion}
             system="services"
           >
-            <TeamComponents
+            <ComponentsList
               components={teamComponents.componentsData?.components || []}
-              teamName={teamName}
               showProjectGrouping={true}
               compactView={true}
               onComponentClick={handleComponentClick}

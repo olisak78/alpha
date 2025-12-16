@@ -2,13 +2,13 @@
  * Plugin API Client
  * 
  * Provides a scoped API client for plugins that automatically
- * prefixes all requests with /api/plugins/:pluginId/
+ * routes requests through the portal's proxy endpoint.
+ * 
+ * Production mode: /plugins/:pluginId/proxy?path=<endpoint>
+ * Local dev mode: Direct requests to custom backend URL
  * 
  * This ensures plugins can only access their designated endpoints
  * and inherits authentication from the main portal API client.
- * 
- * For local development, supports proxying to a custom backend URL
- * via sessionStorage configuration.
  */
 
 import { apiClient } from '@/services/ApiClient';
@@ -17,8 +17,9 @@ import type { PluginApiClient as IPluginApiClient, RequestOptions } from '../typ
 /**
  * Implementation of the PluginApiClient interface
  * 
- * All API calls are automatically scoped to /api/plugins/:pluginId/*
- * and inherit authentication from the portal's main API client.
+ * All API calls are automatically routed through the portal's proxy endpoint
+ * at /plugins/:pluginId/proxy?path=<endpoint> and inherit authentication
+ * from the portal's main API client.
  * 
  * In local development mode, if a plugin backend proxy URL is set
  * in sessionStorage, requests will be sent directly to that URL
@@ -56,33 +57,24 @@ export class PluginApiClient implements IPluginApiClient {
   }
 
   /**
-   * Build the full URL for a request
+   * Build the proxy URL for portal backend requests
    * 
-   * If a backend proxy is configured, constructs URL directly to that backend.
-   * Otherwise, builds a scoped path for the portal backend.
+   * Constructs the URL in the format: /plugins/:pluginId/proxy?path=<endpoint>
    * 
    * @param path - The API path (e.g., '/data' or '/favorites')
-   * @returns Full path or URL for the request
+   * @returns Full proxy URL for the request
    */
-  private buildRequestPath(path: string): string {
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    const backendProxy = this.getBackendUrl();
-
-    if (backendProxy) {
-      // Direct proxy mode - send to custom backend
-      console.log(`[PluginApiClient] Using backend proxy: ${backendProxy}${normalizedPath}`);
-      return `${backendProxy}${normalizedPath}`;
-    }
-
-    // Normal mode - scope to portal backend
-    return `${this.basePath}${normalizedPath}`;
+  private buildProxyUrl(path: string): string {
+    // Normalize the path - remove leading slash for the query parameter
+    const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+    return `${this.basePath}/proxy?path=${encodeURIComponent(normalizedPath)}`;
   }
 
   /**
    * Make a request with backend proxy support
    * 
    * If a backend proxy URL is configured, makes a direct fetch call.
-   * Otherwise, uses the portal's authenticated API client.
+   * Otherwise, uses the portal's authenticated API client with proxy endpoint.
    * 
    * @param path - API path
    * @param method - HTTP method
@@ -103,7 +95,7 @@ export class PluginApiClient implements IPluginApiClient {
       return this.directRequest<T>(path, method, body, options);
     }
 
-    // Normal mode - use portal's API client
+    // Normal mode - use portal's API client with proxy endpoint
     return this.portalRequest<T>(path, method, body, options);
   }
 
@@ -198,13 +190,17 @@ export class PluginApiClient implements IPluginApiClient {
   }
 
   /**
-   * Make a request through the portal's API client (production mode)
+   * Make a request through the portal's proxy endpoint (production mode)
+   * 
+   * Routes requests through /plugins/:pluginId/proxy?path=<endpoint>
+   * The proxy wraps responses in { data, pluginSuccess, statusCode, responseTime }
+   * This method automatically unwraps the response to return just the data.
    * 
    * @param path - API path
    * @param method - HTTP method
    * @param body - Request body
    * @param options - Request options
-   * @returns Response data
+   * @returns Response data (unwrapped from proxy envelope)
    */
   private async portalRequest<T>(
     path: string,
@@ -212,38 +208,62 @@ export class PluginApiClient implements IPluginApiClient {
     body?: any,
     options?: RequestOptions
   ): Promise<T> {
-    const scopedPath = this.buildRequestPath(path);
+    const proxyUrl = this.buildProxyUrl(path);
+    
+    console.log(`[PluginApiClient] Portal request: ${method} ${proxyUrl}`);
+
+    // Merge the path query param with any additional params
+    const mergedParams = { ...options?.params };
+
+    let response: any;
 
     switch (method) {
       case 'GET':
-        return apiClient.get<T>(scopedPath, {
-          params: options?.params,
+        response = await apiClient.get(proxyUrl, {
+          params: mergedParams,
           headers: options?.headers,
           signal: options?.signal,
         });
+        break;
       case 'POST':
-        return apiClient.post<T>(scopedPath, body, {
+        response = await apiClient.post(proxyUrl, body, {
           headers: options?.headers,
           signal: options?.signal,
         });
+        break;
       case 'PUT':
-        return apiClient.put<T>(scopedPath, body, {
+        response = await apiClient.put(proxyUrl, body, {
           headers: options?.headers,
           signal: options?.signal,
         });
+        break;
       case 'DELETE':
-        return apiClient.delete<T>(scopedPath, {
+        response = await apiClient.delete(proxyUrl, {
           headers: options?.headers,
           signal: options?.signal,
         });
+        break;
       case 'PATCH':
-        return apiClient.patch<T>(scopedPath, body, {
+        response = await apiClient.patch(proxyUrl, body, {
           headers: options?.headers,
           signal: options?.signal,
         });
+        break;
       default:
         throw new Error(`Unsupported HTTP method: ${method}`);
     }
+
+    // Unwrap proxy response envelope if present
+    // The proxy wraps responses in { data, pluginSuccess, statusCode, responseTime }
+    if (response && typeof response === 'object' && 'pluginSuccess' in response && 'data' in response) {
+      console.log('[PluginApiClient] Unwrapping proxy response envelope');
+      if (!response.pluginSuccess) {
+        throw new Error(response.error || 'Plugin request failed');
+      }
+      return response.data as T;
+    }
+
+    return response as T;
   }
 
   async get<T = any>(path: string, options?: RequestOptions): Promise<T> {

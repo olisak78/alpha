@@ -196,14 +196,14 @@ vi.mock('../../../src/components/Team/MemberList', () => ({
   MemberList: vi.fn(() => <div data-testid="member-list">Member List</div>),
 }));
 
-vi.mock('../../../src/components/Team/TeamComponents', () => ({
-  TeamComponents: vi.fn(({ onComponentClick }) => (
-    <div data-testid="team-components">
-      <button 
-        data-testid="mock-component-click" 
+vi.mock('../../../src/components/ComponentsList', () => ({
+  ComponentsList: vi.fn(({ onComponentClick }) => (
+    <div data-testid="components-list">
+      <button
+        data-testid="mock-component-click"
         onClick={() => onComponentClick && onComponentClick('test-component')}
       >
-        Test Component Click
+        Mock Component
       </button>
     </div>
   )),
@@ -289,7 +289,7 @@ describe('Team Component', () => {
     it('should display components tab content when active', () => {
       renderTeamWithProvider({ ...defaultTeamProps, activeCommonTab: "components" });
 
-      expect(screen.getByTestId('team-components')).toBeInTheDocument();
+      expect(screen.getByTestId('components-list')).toBeInTheDocument();
       expect(screen.queryByTestId('member-list')).not.toBeInTheDocument();
     });
 
@@ -364,7 +364,7 @@ describe('Team Component', () => {
         </QueryClientProvider>
       );
 
-      expect(screen.getByTestId('team-components')).toBeInTheDocument();
+      expect(screen.getByTestId('components-list')).toBeInTheDocument();
 
       // Test jira tab
       rerender(

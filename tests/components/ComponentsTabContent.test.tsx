@@ -4,13 +4,13 @@ import { ComponentsTabContent } from '../../src/components/ComponentsTabContent'
 import type { Component } from '../../src/types/api';
 import '@testing-library/jest-dom/vitest';
 
-// Mock TeamComponents
-vi.mock('../../src/components/Team/TeamComponents', () => ({
-  TeamComponents: ({ components }: { components: Component[] }) => (
-    <div data-testid="team-components">
+// Mock ComponentsList
+vi.mock('../../src/components/ComponentsList', () => ({
+  ComponentsList: ({ components }: { components: Component[] }) => (
+    <div data-testid="components-list">
       {components.map((c) => (
         <div key={c.id} data-testid={`component-${c.id}`}>
-          {c.name}
+          {c.title || c.name}
         </div>
       ))}
     </div>
@@ -180,11 +180,11 @@ describe('ComponentsTabContent', () => {
       />
     );
 
-    const teamComponents = screen.getByTestId('team-components');
-    const componentElements = teamComponents.querySelectorAll('[data-testid^="component-"]');
+    const componentsList = screen.getByTestId('components-list');
+    const componentElements = componentsList.querySelectorAll('[data-testid^="component-"]');
     
-    expect(componentElements[0]).toHaveTextContent('accounts-service');
-    expect(componentElements[1]).toHaveTextContent('billing-service');
+    expect(componentElements[0]).toHaveTextContent('Accounts Service');
+    expect(componentElements[1]).toHaveTextContent('Billing Service');
   });
 
   it('should render loading state with white background', () => {
@@ -224,10 +224,10 @@ describe('ComponentsTabContent', () => {
     expect(emptyStateCard).toBeInTheDocument();
   });
 
-  it('should render TeamComponents when components are available', () => {
+  it('should render ComponentsList when components are available', () => {
     render(<ComponentsTabContent {...defaultProps} />);
 
-    expect(screen.getByTestId('team-components')).toBeInTheDocument();
+    expect(screen.getByTestId('components-list')).toBeInTheDocument();
     expect(screen.getByTestId('component-comp-1')).toBeInTheDocument();
     expect(screen.getByTestId('component-comp-2')).toBeInTheDocument();
   });

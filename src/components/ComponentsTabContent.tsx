@@ -3,7 +3,7 @@ import { Search, RefreshCw, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { TeamComponents } from "@/components/Team/TeamComponents";
+import { ComponentsList } from "@/components/ComponentsList";
 import { HealthOverview } from "@/components/Health/HealthOverview";
 import { Component } from "@/types/api";
 import type { ComponentHealthCheck } from "@/types/health";
@@ -207,8 +207,7 @@ export function ComponentsTabContent({
             {/* Non-Library Components Section */}
             {nonLibraryComponents.length > 0 && (
               <div>
-                <TeamComponents
-                  teamName={teamName}
+                <ComponentsList
                   components={nonLibraryComponents}
                   showProjectGrouping={false}
                   onComponentClick={onComponentClick}
@@ -222,8 +221,7 @@ export function ComponentsTabContent({
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
                   Library Components
                 </h3>
-                <TeamComponents
-                  teamName={teamName}
+                <ComponentsList
                   components={libraryComponents}
                   showProjectGrouping={false}
                   onComponentClick={onComponentClick}

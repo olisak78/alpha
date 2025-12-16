@@ -226,8 +226,8 @@ vi.mock('../../src/components/tabs/MePageTabs/QuickLinksTab', () => ({
   ),
 }));
 
-vi.mock('../../src/components/Team/TeamComponents', () => ({
-  TeamComponents: () => <div data-testid="team-components">Team Components</div>,
+vi.mock('../../src/components/ComponentsList', () => ({
+  ComponentsList: () => <div data-testid="components-list">Components List</div>,
 }));
 
 vi.mock('../../src/components/Team/TeamJiraIssues', () => ({
@@ -416,7 +416,7 @@ describe('Team Component Integration Tests', () => {
 
       expect(screen.getByTestId('member-list')).toBeInTheDocument();
       expect(screen.getByTestId('quick-links-tab')).toBeInTheDocument();
-      expect(screen.queryByTestId('team-components')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('components-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('team-jira-issues')).not.toBeInTheDocument();
       expect(screen.queryByTestId('team-docs')).not.toBeInTheDocument();
     });
@@ -424,7 +424,7 @@ describe('Team Component Integration Tests', () => {
     it('should render components tab', () => {
       renderTeamComponent('components');
 
-      expect(screen.getByTestId('team-components')).toBeInTheDocument();
+      expect(screen.getByTestId('components-list')).toBeInTheDocument();
       expect(screen.queryByTestId('member-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('quick-links-tab')).not.toBeInTheDocument();
       expect(screen.queryByTestId('team-jira-issues')).not.toBeInTheDocument();
@@ -437,7 +437,7 @@ describe('Team Component Integration Tests', () => {
       expect(screen.getByTestId('team-jira-issues')).toBeInTheDocument();
       expect(screen.queryByTestId('member-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('quick-links-tab')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('team-components')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('components-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('team-docs')).not.toBeInTheDocument();
     });
 
@@ -447,7 +447,7 @@ describe('Team Component Integration Tests', () => {
       expect(screen.getByTestId('team-docs')).toBeInTheDocument();
       expect(screen.queryByTestId('member-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('quick-links-tab')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('team-components')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('components-list')).not.toBeInTheDocument();
       expect(screen.queryByTestId('team-jira-issues')).not.toBeInTheDocument();
     });
   });
@@ -672,7 +672,7 @@ describe('Team Component Integration Tests', () => {
 
       // Initially on overview
       expect(screen.getByTestId('member-list')).toBeInTheDocument();
-      expect(screen.queryByTestId('team-components')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('components-list')).not.toBeInTheDocument();
 
       // Switch to components tab
       rerender(
@@ -684,7 +684,7 @@ describe('Team Component Integration Tests', () => {
       );
 
       expect(screen.queryByTestId('member-list')).not.toBeInTheDocument();
-      expect(screen.getByTestId('team-components')).toBeInTheDocument();
+      expect(screen.getByTestId('components-list')).toBeInTheDocument();
     });
 
     it('should maintain state across rerenders', () => {

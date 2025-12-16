@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/vitest';
-import { TeamComponents } from '../../../src/components/Team/TeamComponents';
-import { ComponentDisplayProvider } from '../../../src/contexts/ComponentDisplayContext';
-import type { Component } from '../../../src/types/api';
-import type { ComponentHealthCheck } from '../../../src/types/health';
+import { ComponentsList } from '../../src/components/ComponentsList';
+import { ComponentDisplayProvider } from '../../src/contexts/ComponentDisplayContext';
+import type { Component } from '../../src/types/api';
+import type { ComponentHealthCheck } from '../../src/types/health';
 
 // Mock ComponentCard since it has complex dependencies
-vi.mock('../../../src/components/ComponentCard', () => ({
+vi.mock('../../src/components/ComponentCard', () => ({
   default: vi.fn(({ component, onClick }) => (
     <div 
       data-testid={`component-card-${component.id}`}
@@ -21,7 +21,7 @@ vi.mock('../../../src/components/ComponentCard', () => ({
 }));
 
 // Mock Badge component
-vi.mock('../../../src/components/ui/badge', () => ({
+vi.mock('../../src/components/ui/badge', () => ({
   Badge: vi.fn(({ children, variant, style, className }) => (
     <span 
       data-testid="badge" 
@@ -35,7 +35,7 @@ vi.mock('../../../src/components/ui/badge', () => ({
 }));
 
 // Mock Button component
-vi.mock('../../../src/components/ui/button', () => ({
+vi.mock('../../src/components/ui/button', () => ({
   Button: vi.fn(({ children, onClick, variant, size, className }) => (
     <button 
       data-testid="button"
@@ -50,7 +50,7 @@ vi.mock('../../../src/components/ui/button', () => ({
 }));
 
 // Mock GithubIcon
-vi.mock('../../../src/components/icons/GithubIcon', () => ({
+vi.mock('../../src/components/icons/GithubIcon', () => ({
   GithubIcon: vi.fn(({ className }) => (
     <svg data-testid="github-icon" className={className}>
       <path d="github-icon-path" />
@@ -58,7 +58,7 @@ vi.mock('../../../src/components/icons/GithubIcon', () => ({
   )),
 }));
 
-describe('TeamComponents', () => {
+describe('ComponentsList', () => {
   const mockComponents: Component[] = [
     {
       id: 'comp-1',
@@ -142,9 +142,8 @@ describe('TeamComponents', () => {
   describe('Basic Rendering', () => {
     it('should render component cards when components are provided', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
         />
       );
 
@@ -155,9 +154,8 @@ describe('TeamComponents', () => {
 
     it('should render empty state when no components are provided', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={[]}
-          teamName="Test Team"
         />
       );
 
@@ -169,9 +167,8 @@ describe('TeamComponents', () => {
   describe('Simple Grid Layout', () => {
     it('should render components in a simple grid layout when showProjectGrouping is false', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           showProjectGrouping={false}
         />
       );
@@ -188,9 +185,8 @@ describe('TeamComponents', () => {
   describe('Project Grouping Layout', () => {
     it('should render components grouped by project when showProjectGrouping is true', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           showProjectGrouping={true}
         />
       );
@@ -205,9 +201,8 @@ describe('TeamComponents', () => {
 
     it('should display component count badges', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           showProjectGrouping={true}
         />
       );
@@ -224,9 +219,8 @@ describe('TeamComponents', () => {
   describe('Compact View', () => {
     it('should render compact component items when compactView is true', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -240,11 +234,100 @@ describe('TeamComponents', () => {
       expect(screen.queryByTestId('component-card-comp-1')).not.toBeInTheDocument();
     });
 
+    it('should group components by project_title in compact view with project grouping', () => {
+      const componentsWithProjects = [
+        {
+          id: 'comp-1',
+          name: 'component-1',
+          title: 'Component One',
+          description: 'First component description',
+          project_id: 'project-1',
+          owner_id: 'team-1',
+          project_title: 'Alpha Project',
+          github: 'https://github.com/example/comp1',
+          qos: 'high',
+        },
+        {
+          id: 'comp-2',
+          name: 'component-2',
+          title: 'Component Two',
+          description: 'Second component description',
+          project_id: 'project-1',
+          owner_id: 'team-1',
+          project_title: 'Alpha Project',
+          github: 'https://github.com/example/comp2',
+          qos: 'medium',
+        },
+        {
+          id: 'comp-3',
+          name: 'component-3',
+          title: 'Component Three',
+          description: 'Third component description',
+          project_id: 'project-2',
+          owner_id: 'team-1',
+          project_title: 'Beta Project',
+          github: 'https://github.com/example/comp3',
+          qos: 'low',
+        },
+        {
+          id: 'comp-4',
+          name: 'component-4',
+          title: 'Component Four',
+          description: 'Fourth component description',
+          project_id: 'project-2',
+          owner_id: 'team-1',
+          project_title: 'Beta Project',
+          github: 'https://github.com/example/comp4',
+          qos: 'medium',
+        },
+      ];
+
+      renderWithProviders(
+        <ComponentsList 
+          components={componentsWithProjects}
+          compactView={true}
+          showProjectGrouping={true}
+        />
+      );
+
+      // Should render project headers sorted alphabetically
+      const projectHeaders = screen.getAllByRole('heading', { level: 3 });
+      expect(projectHeaders).toHaveLength(2);
+      expect(projectHeaders[0]).toHaveTextContent('Alpha Project');
+      expect(projectHeaders[1]).toHaveTextContent('Beta Project');
+
+      // Should render component count badges for each project
+      const badges = screen.getAllByTestId('badge');
+      const countBadges = badges.filter(badge => 
+        badge.textContent === '2' || badge.textContent === '2'
+      );
+      expect(countBadges).toHaveLength(2); // Both projects have 2 components each
+
+      // Should render all components in their respective groups
+      expect(screen.getByText('Component One')).toBeInTheDocument();
+      expect(screen.getByText('Component Two')).toBeInTheDocument();
+      expect(screen.getByText('Component Three')).toBeInTheDocument();
+      expect(screen.getByText('Component Four')).toBeInTheDocument();
+
+      // Should use correct grid layout for compact view with grouping
+      const gridContainers = screen.getAllByText('Component One')[0]
+        .closest('.grid');
+      expect(gridContainers).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'gap-3');
+
+      // Should have proper spacing structure
+      const mainContainer = screen.getByText('Alpha Project').closest('.space-y-8');
+      expect(mainContainer).toBeInTheDocument();
+      
+      const projectSections = screen.getAllByText(/Project/).map(header => 
+        header.closest('.space-y-4')
+      );
+      expect(projectSections).toHaveLength(2);
+    });
+
     it('should render GitHub buttons for components with GitHub links in compact view', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -259,9 +342,8 @@ describe('TeamComponents', () => {
 
     it('should render team badges with correct styling in compact view', () => {
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -287,9 +369,8 @@ describe('TeamComponents', () => {
       });
 
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -310,9 +391,8 @@ describe('TeamComponents', () => {
       const mockOnComponentClick = vi.fn();
       
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           onComponentClick={mockOnComponentClick}
         />
       );
@@ -326,9 +406,8 @@ describe('TeamComponents', () => {
       const mockOnComponentClick = vi.fn();
       
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
           onComponentClick={mockOnComponentClick}
         />
@@ -350,9 +429,8 @@ describe('TeamComponents', () => {
       });
       
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={true}
           onComponentClick={mockOnComponentClick}
         />
@@ -380,9 +458,8 @@ describe('TeamComponents', () => {
       }));
 
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={componentsWithoutGithub}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -399,9 +476,8 @@ describe('TeamComponents', () => {
       }));
 
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={componentsWithoutDescriptions}
-          teamName="Test Team"
           compactView={true}
         />
       );
@@ -422,9 +498,8 @@ describe('TeamComponents', () => {
       ];
 
       renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={componentsWithEmptyProject}
-          teamName="Test Team"
           showProjectGrouping={true}
         />
       );
@@ -437,9 +512,8 @@ describe('TeamComponents', () => {
   describe('Layout Differences', () => {
     it('should use different grid layouts for compact vs full view', () => {
       const { rerender } = renderWithProviders(
-        <TeamComponents 
+        <ComponentsList 
           components={mockComponents}
-          teamName="Test Team"
           compactView={false}
         />
       );
@@ -452,9 +526,8 @@ describe('TeamComponents', () => {
       rerender(
         <QueryClientProvider client={queryClient}>
           <ComponentDisplayProvider {...mockContextProps}>
-            <TeamComponents 
+            <ComponentsList 
               components={mockComponents}
-              teamName="Test Team"
               compactView={true}
             />
           </ComponentDisplayProvider>
