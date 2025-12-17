@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronRight, ChevronLeft, Users, Wrench, Home, Link, Network, Brain, MessageSquare, Puzzle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Users, Wrench, Home, Link, Network, Brain, MessageSquare, Puzzle, Store } from 'lucide-react';
 import { useSidebarState } from '@/contexts/SidebarContext';
 import { useProjectVisibility } from '@/hooks/useProjectVisibility';
 import { CloudAutomationIcon } from '../icons/CloudAutomationIcon';
@@ -13,17 +13,18 @@ interface SideBarProps {
     projects?: string[];
 }
 
-// Default visibility for cis20, usrv, and ca 
-const DEFAULT_VISIBLE_PROJECTS = ['cis20', 'usrv', 'ca'];
+const isProduction = import.meta.env.PROD;
 
 // Map project name to icon
 const getProjectIcon = (project: string, projectsData) => {
+
     switch (project) {
         case 'Home': return <Home size={16} />;
         case 'Teams': return <Users size={16} />;
         case 'Self Service': return <Wrench size={16} />;
         case 'Links': return <Link size={16} />;
         case 'Plugins': return <Puzzle size={16} />;
+        case 'Plugin Marketplace': return <Store size={16} />
         case 'AI Arena': return <Brain size={16} />;
         default: break;
     }
@@ -42,6 +43,7 @@ const getProjectIcon = (project: string, projectsData) => {
 };
 
 export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange, projects }) => {
+    
     const { isExpanded, setIsExpanded } = useSidebarState();
     const { projects: projectsData, isLoading, sidebarItems } = useProjectsContext();
     const { isProjectVisible } = useProjectVisibility();
@@ -61,18 +63,21 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
 
     // Function to determine if a project should be visible in the sidebar based on visibility rules
     const isProjectVisibleInSidebar = (project: string, projectsData: any[]) => {
+        if (project==='Plugins' && isProduction) {
+            return false;
+        }
         // Static projects (always show)
-        const staticProjects = ['Home', 'Teams', 'Self Service', 'Links', 'Plugins', 'AI Arena'];
+        const staticProjects = ['Home', 'Teams', 'Self Service', 'Links', 'Plugins', 'Plugin Marketplace', 'AI Arena'];
         if (staticProjects.includes(project)) {
             return true;
         }
-        
+
         // For dynamic projects, use the visibility hook
         const dynamicProject = projectsData.find(p => p.name === project || p.title === project);
         if (dynamicProject) {
             return isProjectVisible(dynamicProject);
         }
-        
+
         return false;
     };
 

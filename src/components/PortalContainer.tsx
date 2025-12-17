@@ -10,6 +10,7 @@ const staticRouteToProjectMap: Record<string, string> = {
   "/teams": "Teams",
   "/links": "Links",
   "/plugins": "Plugins",
+  "/plugin-marketplace": "Plugin Marketplace",
   "/self-service": "Self Service",
   "/ai-arena": "AI Arena",
 };
@@ -20,6 +21,7 @@ const staticProjectToRouteMap: Record<string, string> = {
   "Self Service": "/self-service",
   "Links": "/links",
   "Plugins": "/plugins",
+  "Plugin Marketplace": "/plugin-marketplace",
   "AI Arena": "/ai-arena",
 };
 
@@ -28,6 +30,8 @@ export const PortalContainer: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProject, setActiveProject] = useState("");
+  const isProduction = import.meta.env.PROD;
+
 
   // Combine static pages with dynamic projects
   const sidebarItems = [
@@ -35,7 +39,8 @@ export const PortalContainer: React.FC = () => {
     "Teams",
     ...projects.map(project => project.title || project.name),
     "Links",
-    "Plugins",
+    ...(!isProduction ? ["Plugins"] : []),
+    "Plugin Marketplace",
     "Self Service",
     "AI Arena",
   ];

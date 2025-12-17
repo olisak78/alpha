@@ -50,6 +50,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     ...projects.map((p: Project) => p.title || p.name),
     "Links",
     "Plugins",
+    "Plugin Marketplace",
     "Self Service",
     "AI Arena"
   ];
