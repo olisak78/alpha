@@ -1,9 +1,7 @@
-// App.tsx
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ProjectsProvider, useProjectsContext } from "@/contexts/ProjectsContext";
@@ -23,6 +21,8 @@ import { DynamicProjectPage } from "./pages/DynamicProjectPage";
 import { QueryProvider } from './providers/QueryProvider';
 import ComponentViewPage from "./pages/ComponentViewPage";
 import PluginsPage from "./pages/PluginsPage";
+import PluginMarketplacePage from '@/pages/PluginMarketplacePage';
+import PluginViewPage from '@/pages/PluginViewPage';
 
 // --- Wrapper components for dynamic projects ---
 const DynamicProjectPageWrapper = () => {
@@ -50,6 +50,11 @@ const ComponentViewPageWrapper = () => {
 
   return <ComponentViewPage />;
 };
+
+function PluginViewPageWrapper() {
+  const location = useLocation();
+  return <PluginViewPage key={location.pathname} />
+}
 
 // --- Main App ---
 const App = () => {
@@ -83,7 +88,9 @@ const App = () => {
                     <Route path="links" element={<LinksPage />} />
                     <Route path="ai-arena" element={<AIArenaPage />} />
                     <Route path="ai-arena/:tabId" element={<AIArenaPage />} />
+                    <Route path="plugins/:pluginSlug" element={<PluginViewPageWrapper />} />
                     <Route path="plugins" element={<PluginsPage />} />
+                    <Route path="plugin-marketplace" element={<PluginMarketplacePage />} />
 
                     {/* Dynamic projects */}
                     <Route path=":projectName">

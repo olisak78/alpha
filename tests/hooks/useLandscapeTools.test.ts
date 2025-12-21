@@ -123,38 +123,26 @@ describe('useLandscapeTools', () => {
       urls: {
         git: null,
         concourse: null,
-        applicationLogging: null,
         kibana: null,
-        platformLogging: null,
         dynatrace: null,
-        avs: null,
         cockpit: null,
         plutono: null,
         operationConsole: null,
         controlCenter: null,
         cam: null,
-        gardener: null,
-        vault: null,
-        iaasConsole: null,
-        iaasConsoleBS: null
+        gardener: null
       },
       availability: {
         git: false,
         concourse: false,
-        applicationLogging: false,
         kibana: false,
-        platformLogging: false,
         dynatrace: false,
-        avs: false,
         cockpit: false,
         plutono: false,
         operationConsole: false,
         controlCenter: false,
         cam: false,
-        gardener: false,
-        vault: false,
-        iaasConsole: false,
-        iaasConsoleBS: false
+        gardener: false
       },
     };
 

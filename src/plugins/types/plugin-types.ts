@@ -1,88 +1,32 @@
 /**
- * Plugin System Type Definitions
- * 
- * This file defines the core interfaces and types for the plugin system.
- * Plugin developers will implement these interfaces to create compatible plugins.
- */
-
-import { ReactNode } from 'react';
-
-// ============================================================================
-// PLUGIN METADATA - Information about the plugin stored in DB
-// ============================================================================
-
-/**
  * Plugin metadata stored in the database
  * This is what gets saved when a developer registers their plugin
  */
 export interface PluginMetadata {
-  /** Unique identifier for the plugin */
   id: string;
-
-  /** Machine-friendly plugin name */
   name: string;
-
-  /** Human-readable title displayed in the portal */
   title: string;
-
-  /** Short description of what the plugin does */
   description: string;
-
-  /** Who created the plugin */
   createdBy: string;
-
-  /** Version following semver (e.g., "1.0.0") */
   version?: string;
-
-  /** Author/developer name or team */
   author?: string;
-
-  /** URL to the compiled JS bundle (e.g., GitHub raw URL or CDN) */
   bundleUrl?: string;
-
-  /** Path to the compiled JS bundle as provided by the registry */
   jsPath?: string;
-
-  /** Path to the plugin component inside the bundle (if applicable) */
   componentPath?: string;
-
-  /** Optional icon URL or emoji */
   icon?: string;
-
-  /** Category for organizing plugins (e.g., "Data", "Monitoring", "Tools") */
   category?: string;
-
-  /** Tags for searchability */
   tags?: string[];
-
-  /** Whether the plugin is currently active/enabled */
   enabled?: boolean;
-
-  /** Timestamp when the plugin was registered */
   createdAt?: string;
-
-  /** Timestamp of last update */
   updatedAt?: string;
-
-  /** Optional configuration schema for plugin settings */
-  configSchema?: Record<string, any>;
-
-  /** Minimum portal version required (semver) */
-  minPortalVersion?: string;
 }
-
-// ============================================================================
-// PLUGIN CONTEXT - Portal resources available to plugins
-// ============================================================================
 
 /**
  * Theme information from the portal
  */
 export interface PluginTheme {
-  /** Current theme mode */
   mode: 'light' | 'dark';
-  
-  /** Primary color used in the portal */
+
   primaryColor: string;
   
   /** Common color palette */
@@ -101,65 +45,26 @@ export interface PluginTheme {
  * This is what plugins receive as props
  */
 export interface PluginContext {
-  /** Theme information for consistent styling */
   theme: PluginTheme;
-  
-  /** API client for making plugin-specific backend calls */
   apiClient: PluginApiClient;
-  
-  /** Plugin's own metadata */
   metadata: PluginMetadata;
-  
-  /** Optional configuration values set by admin/user */
   config?: Record<string, any>;
-  
-  /** Portal utilities */
   utils: {
-    /** Show toast notification */
     toast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
-    
-    /** Navigate to another page in the portal */
     navigate: (path: string) => void;
   };
 }
-
-// ============================================================================
-// PLUGIN API CLIENT - Helper for backend communication
-// ============================================================================
 
 /**
  * API client provided to plugins for backend communication
  * All calls are automatically scoped to /api/plugins/:pluginId/*
  */
 export interface PluginApiClient {
-  /**
-   * Make a GET request to the plugin's backend endpoint
-   * @param path - Path relative to /api/plugins/:pluginId/
-   * @returns Promise with typed response data
-   */
+
   get<T = any>(path: string, options?: RequestOptions): Promise<T>;
-  
-  /**
-   * Make a POST request to the plugin's backend endpoint
-   * @param path - Path relative to /api/plugins/:pluginId/
-   * @param body - Request body (will be JSON stringified)
-   * @returns Promise with typed response data
-   */
   post<T = any>(path: string, body?: any, options?: RequestOptions): Promise<T>;
-  
-  /**
-   * Make a PUT request to the plugin's backend endpoint
-   */
   put<T = any>(path: string, body?: any, options?: RequestOptions): Promise<T>;
-  
-  /**
-   * Make a DELETE request to the plugin's backend endpoint
-   */
   delete<T = any>(path: string, options?: RequestOptions): Promise<T>;
-  
-  /**
-   * Make a PATCH request to the plugin's backend endpoint
-   */
   patch<T = any>(path: string, body?: any, options?: RequestOptions): Promise<T>;
 }
 
@@ -167,22 +72,11 @@ export interface PluginApiClient {
  * Options for API requests
  */
 export interface RequestOptions {
-  /** Additional headers to include */
   headers?: Record<string, string>;
-  
-  /** Query parameters */
   params?: Record<string, string | number | boolean>;
-  
-  /** Request timeout in milliseconds */
   timeout?: number;
-  
-  /** AbortSignal for request cancellation */
   signal?: AbortSignal;
 }
-
-// ============================================================================
-// PLUGIN COMPONENT INTERFACE - What plugins must export
-// ============================================================================
 
 /**
  * Props that every plugin component will receive
@@ -225,10 +119,6 @@ export interface PluginManifest {
     onConfigChange?: (newConfig: Record<string, any>) => void | Promise<void>;
   };
 }
-
-// ============================================================================
-// PLUGIN STATE - For managing plugin loading and errors
-// ============================================================================
 
 /**
  * Plugin loading states
@@ -273,10 +163,6 @@ export interface PluginState {
   loadedAt?: string;
 }
 
-// ============================================================================
-// API RESPONSE TYPES - Backend responses
-// ============================================================================
-
 /**
  * Response when fetching all plugins
  */
@@ -317,10 +203,6 @@ export interface PluginQueryParams {
   page?: number;
   pageSize?: number;
 }
-
-// ============================================================================
-// PLUGIN REGISTRATION - For developers registering plugins
-// ============================================================================
 
 /**
  * Payload for registering a new plugin

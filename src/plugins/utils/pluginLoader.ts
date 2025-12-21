@@ -5,7 +5,7 @@
  * Fetches, parses, and validates plugin manifests.
  */
 
-import type { PluginManifest, PluginError } from '../types/plugin.types';
+import type { PluginManifest, PluginError } from '../types/plugin-types';
 
 /**
  * Load a plugin from a remote URL
