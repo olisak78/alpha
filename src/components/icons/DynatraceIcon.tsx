@@ -6,14 +6,15 @@ interface DynatraceIconProps {
 
 export const DynatraceIcon: React.FC<DynatraceIconProps> = ({ className = "h-4 w-4" }) => {
   return (
-    <svg 
-      width="800px" 
-      height="800px" 
-      viewBox="-2 0 260 260" 
-      version="1.1" 
-      xmlns="http://www.w3.org/2000/svg" 
+    <svg
+      width="800px"
+      height="800px"
+      viewBox="-2 0 260 260"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="xMidYMid"
       className={className}
+      style={{ minWidth: '1.5rem', minHeight: '1.5rem' }}
     >
       <g>
         <path 

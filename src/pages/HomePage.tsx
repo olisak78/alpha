@@ -247,8 +247,8 @@ export default function HomePage() {
               <CardContent className="pt-2">
                 {stat.chartData && stat.chartData.length > 0 ? (
                   <div className="flex items-center gap-3">
-                    <div className="flex-[1] min-w-0">
-                      <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 truncate">
+                    <div>
+                      <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                         {stat.value}
                       </div>
                       {stat.description && (

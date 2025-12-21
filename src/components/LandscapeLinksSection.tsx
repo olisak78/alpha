@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { LandscapeFilter } from "@/components/LandscapeFilter";
 import { LandscapeToolsButtons } from "@/components/LandscapeToolsButtons";
+import { Ops2goLandscapeInfo } from "@/components/Ops2goLandscapeInfo";
 
 interface LandscapeGroup {
   id: string;
@@ -50,7 +51,7 @@ export function LandscapeLinksSection({
     }, {} as Record<string, any[]>);
   }, [landscapeGroups]);
 
- 
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between gap-4">
@@ -75,6 +76,11 @@ export function LandscapeLinksSection({
           landscapeData={selectedLandscapeData}
         />
       </div>
+
+      {/* Ops2go Landscape Information */}
+      {selectedLandscapeData && (
+        <Ops2goLandscapeInfo landscapeName={selectedLandscapeData.technical_name} />
+      )}
     </div>
   );
 }

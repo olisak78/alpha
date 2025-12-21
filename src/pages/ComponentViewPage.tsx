@@ -204,29 +204,24 @@ export function ComponentViewPage() {
         );
     }
 
-    if (!isExistInLandscape) {
-        return (
-            <BreadcrumbPage>
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <h2 className="text-xl font-semibold mb-2">Component not available</h2>
-                        <p className="text-muted-foreground mb-4">
-                            Please choose a landscape where this component exists
-                        </p>
-                    </div>
-                </div>
-            </BreadcrumbPage>
-        );
-    }
-
     return (
         <BreadcrumbPage>
-        {/* Landscape Filter Section */}
+        {/* Back to Components Link */}
+        <div className="mb-4">
+            <button
+                onClick={() => navigate(`/${projectName}/components`)}
+                className="text-primary hover:underline text-sm flex items-center gap-1"
+            >
+                ← Back to Components
+            </button>
+        </div>
+        
+        {/* Landscape Filter Section - Always displayed */}
         <div className="mb-6">
             <div className="flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-semibold text-foreground">
+                <h1 className="text-2xl font-semibold text-foreground">
                     {component?.title || component?.name || 'Component'}
-                </h2>
+                </h1>
                 <div className="flex items-center gap-2">
                     <LandscapeFilter
                         selectedLandscape={effectiveSelectedLandscape}
@@ -245,6 +240,18 @@ export function ComponentViewPage() {
                 </div>
             </div>
         </div>
+
+        {/* Content Section */}
+        {!isExistInLandscape ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <h2 className="text-xl font-semibold mb-2">Component not available</h2>
+                    <p className="text-muted-foreground mb-4">
+                        Please choose a landscape where this component exists
+                    </p>
+                </div>
+            </div>
+        ) : (
             <div className="space-y-6">
                 {activeTab === 'overview' && (
                     <ComponentViewOverview
@@ -269,6 +276,7 @@ export function ComponentViewPage() {
                     />
                 )}
             </div>
+        )}
         </BreadcrumbPage>
     );
 }

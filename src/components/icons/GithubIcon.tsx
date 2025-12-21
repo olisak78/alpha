@@ -6,13 +6,14 @@ interface GithubIconProps {
 
 export const GithubIcon: React.FC<GithubIconProps> = ({ className = "h-4 w-4" }) => {
   return (
-    <svg 
-      width="16" 
-      height="16" 
-      viewBox="0 0 16 16" 
-      fill="none" 
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={{ minWidth: '1.5rem', minHeight: '1.5rem' }}
     >
       <path 
         fillRule="evenodd" 

@@ -190,9 +190,6 @@ export function ComponentViewOverview({
             <div className="space-y-4">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold">{component.title || component.name}</h1>
-                        <p className="text-muted-foreground mt-1">{component.description}</p>
-
                         {/* Component Type based on is-library property */}
                         <div className="mt-2">
                             <Badge variant="secondary" className="text-xs">
