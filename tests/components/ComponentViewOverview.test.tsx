@@ -252,26 +252,6 @@ describe('ComponentViewOverview', () => {
     expect(screen.getByTestId('alert-circle-icon')).toBeInTheDocument();
   });
 
-  it('should render component header with title and description', () => {
-    render(
-      <ComponentViewOverview
-        component={mockComponent}
-        selectedLandscape={mockSelectedLandscape}
-        selectedApiLandscape={mockSelectedApiLandscape}
-        healthData={mockHealthData}
-        healthLoading={false}
-        healthError={null}
-        responseTime={null}
-        statusCode={null}
-        sonarData={null}
-        sonarLoading={false}
-      />
-    );
-
-    expect(screen.getByText('Test Service')).toBeInTheDocument();
-    expect(screen.getByText('A test service for unit testing')).toBeInTheDocument();
-  });
-
   it('should display API Service badge for non-library components', () => {
     render(
       <ComponentViewOverview

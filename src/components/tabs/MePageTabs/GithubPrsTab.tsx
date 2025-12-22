@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Wrench, Database, List, X } from "lucide-react";
+import { Loader2, Wrench, Database, List, X, Trash2 } from "lucide-react";
 import { GitHubPullRequestsResponse, GitHubPullRequest as PRType } from "@/types/developer-portal";
 import QuickFilterButtons, { FilterOption } from "@/components/QuickFilterButtons";
 import { useClosePullRequest } from "@/hooks/api/useClosePullRequest";
@@ -191,12 +191,12 @@ export default function GithubPrsTab({
                   {pr.state === 'open' && (
                     <Button
                       size="sm"
-                      variant="destructive"
+                      variant="ghost"
                       onClick={() => handleClosePRClick(pr)}
-                      className="h-8 px-3"
+                      className="h-8 w-8 p-0 hover:text-destructive"
                       title="Close pull request"
                     >
-                      <X className="h-4 w-4  hover:text-destructive" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
                 </TableCell>

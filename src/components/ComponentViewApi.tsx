@@ -87,8 +87,12 @@ export function ComponentViewApi({ isLoading, error, swaggerData }: ComponentVie
                         <div className="flex items-center gap-4">
                             {/* Viewer Toggle */}
                             <div className="flex items-center gap-2">
-                                <Label htmlFor="viewer-toggle" className="text-sm font-medium cursor-pointer">
-                                    {useRapiDoc ? 'RapiDoc' : 'Swagger UI'}
+                               <Label
+                                    onClick={() => setUseRapiDoc(false)}
+                                    className={`text-sm font-medium cursor-pointer transition-colors ${!useRapiDoc ? 'text-foreground' : 'text-muted-foreground'
+                                        }`}
+                                >
+                                    Swagger UI
                                 </Label>
                                 <Switch
                                     id="viewer-toggle"
@@ -96,6 +100,13 @@ export function ComponentViewApi({ isLoading, error, swaggerData }: ComponentVie
                                     onCheckedChange={setUseRapiDoc}
                                     className="data-[state=unchecked]:bg-green-500"
                                 />
+                                <Label
+                                    onClick={() => setUseRapiDoc(true)}
+                                    className={`text-sm font-medium cursor-pointer transition-colors ${useRapiDoc ? 'text-foreground' : 'text-muted-foreground'
+                                        }`}
+                                >
+                                    RapiDoc
+                                </Label>
                             </div>
 
                             {/* Open in New Tab Button */}

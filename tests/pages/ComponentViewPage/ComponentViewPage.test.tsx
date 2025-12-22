@@ -607,7 +607,7 @@ describe('ComponentViewPage', () => {
       );
 
       // Should show the "Component not available" message
-      expect(screen.getByText('Component not available')).toBeInTheDocument();
+      expect(screen.getByText('Component not available in this landscape')).toBeInTheDocument();
       expect(screen.getByText('Please choose a landscape where this component exists')).toBeInTheDocument();
       
       // Should not render the normal component view

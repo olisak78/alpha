@@ -12,18 +12,18 @@ export function DynamicProjectPage({ projectName }: DynamicProjectPageProps) {
 // Dynamic project configuration based on metadata or defaults
 const getProjectConfig = (project: Project) => {
   const tabs = ['components'];
-  
+
   // Check metadata for additional tabs
   if (project.health) {
     // Add health tab if health metadata exists
       tabs.push('health');
     }
-    
+
     // Add alerts tab if alerts metadata exists
     if (project.alerts && typeof project.alerts === 'string' && project.alerts.trim() !== '') {
       tabs.push('alerts');
     }
-  
+
 
   const defaultConfig = {
     tabs: tabs,
@@ -55,7 +55,7 @@ const getProjectConfig = (project: Project) => {
       emptyStateMessage={`No ${project.title} components found for this organization.`}
       system={config.system}
       showLandscapeFilter={config.showLandscapeFilter}
-      showComponentsMetrics={config.showComponentMetrics} 
+      showComponentsMetrics={config.showComponentMetrics}
       alertsUrl={config.alertsUrl}
     />
   );

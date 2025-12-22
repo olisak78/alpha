@@ -10,7 +10,6 @@ const staticRouteToProjectMap: Record<string, string> = {
   "/teams": "Teams",
   "/links": "Links",
   "/plugins": "Plugins",
-  "/plugin-marketplace": "Plugin Marketplace",
   "/self-service": "Self Service",
   "/ai-arena": "AI Arena",
 };
@@ -21,7 +20,6 @@ const staticProjectToRouteMap: Record<string, string> = {
   "Self Service": "/self-service",
   "Links": "/links",
   "Plugins": "/plugins",
-  "Plugin Marketplace": "/plugin-marketplace",
   "AI Arena": "/ai-arena",
 };
 
@@ -30,8 +28,6 @@ export const PortalContainer: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProject, setActiveProject] = useState("");
-  const isProduction = import.meta.env.PROD;
-
 
   // Combine static pages with dynamic projects
   const sidebarItems = [
@@ -39,8 +35,7 @@ export const PortalContainer: React.FC = () => {
     "Teams",
     ...projects.map(project => project.title || project.name),
     "Links",
-    ...(!isProduction ? ["Plugins"] : []),
-    "Plugin Marketplace",
+    //"Plugins",
     "Self Service",
     "AI Arena",
   ];
@@ -57,12 +52,6 @@ export const PortalContainer: React.FC = () => {
 
   // Determine which project/page is active based on current URL
   const getProjectFromPath = (pathname: string): string => {
-    // Check for pinned plugin routes first (e.g., /plugins/some-plugin-slug)
-    if (pathname.startsWith('/plugins/') && pathname !== '/plugins') {
-      // Return the full path as the active project so sidebar can highlight it
-      return pathname;
-    }
-
     // Dynamic projects - check first for exact matches and sub-routes
     for (const project of projects) {
       const route = `/${project.name}`;
@@ -93,14 +82,6 @@ export const PortalContainer: React.FC = () => {
   }, [location.pathname, projects]);
 
   const handleProjectChange = (project: string) => {
-    // Handle pinned plugin navigation (format: "plugins/{slug}")
-    if (project.startsWith('plugins/')) {
-      navigate(`/${project}`);
-      setActiveProject(`/${project}`);
-      return;
-    }
-
-    // Handle regular project navigation
     const route = projectToRouteMap[project] || "/";
     navigate(route);
     setActiveProject(project);

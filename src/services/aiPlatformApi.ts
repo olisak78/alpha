@@ -62,6 +62,7 @@ export interface CreateDeploymentRequest {
     }>;
     scenarioId: string;
   };
+  team?: string; // Add team field to the request
 }
 
 export interface AuthCredentials {
@@ -314,15 +315,18 @@ export const useCreateDeployment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (configurationRequest: {
-      executableId: string;
-      name: string;
-      parameterBindings: Array<{
-        key: string;
-        value: string;
-      }>;
-      scenarioId: string;
-    }) => aiApiClient.createDeployment({ configurationRequest }),
+    mutationFn: (request: {
+      configurationRequest: {
+        executableId: string;
+        name: string;
+        parameterBindings: Array<{
+          key: string;
+          value: string;
+        }>;
+        scenarioId: string;
+      };
+      team?: string; // Add team parameter to the mutation function
+    }) => aiApiClient.createDeployment(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deployments'] });
     },

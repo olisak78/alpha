@@ -1,13 +1,31 @@
+/**
+ * Plugin Body Component
+ * 
+ * Content area with integrated loading and error state handling.
+ * Wraps plugin content with appropriate padding and error boundaries.
+ */
+
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface BaseBodyProps {
+  /** Plugin content */
   children: React.ReactNode;
+
+  /** Loading state */
   isLoading?: boolean;
+
+  /** Error state */
   error?: Error | string | null;
+
+  /** Optional custom loading message */
   loadingMessage?: string;
+
+  /** Optional retry handler for errors */
   onRetry?: () => void;
+
+  /** Minimum height for the body */
   minHeight?: string;
 }
 

@@ -1,9 +1,8 @@
-import { useState, useMemo, useEffect, ReactNode } from "react";
+import { useState, useMemo, useEffect, ReactNode, useCallback } from "react";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { LandscapeLinksSection } from "@/components/LandscapeLinksSection";
 import { ComponentsTabContent } from "@/components/ComponentsTabContent";
 import { HealthDashboard } from "@/components/Health/HealthDashboard";
-import { HealthOverview } from "@/components/Health/HealthOverview";
 import AlertsPage from "@/pages/AlertsPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import {
@@ -22,7 +21,6 @@ import { ViewSwitcher } from "./ViewSwitcher";
 import { Badge } from "./ui/badge";
 import { HealthStatusFilter } from "./HealthStatusFilter";
 import { ComponentDisplayProvider } from "@/contexts/ComponentDisplayContext";
-
 
 export interface ProjectLayoutProps {
   projectName: string;
@@ -65,12 +63,12 @@ export function ProjectLayout({
   const { currentTabFromUrl, syncTabWithUrl } = useTabRouting();
 
   // Context hooks
-  const { 
-    getSelectedLandscapeForProject, 
-    setSelectedLandscapeForProject, 
+  const {
+    getSelectedLandscapeForProject,
+    setSelectedLandscapeForProject,
     setShowLandscapeDetails
   } = usePortalState();
-  
+
   // Get project-specific selected landscape (reactive to changes)
   const selectedLandscape = useMemo(() => {
     return getSelectedLandscapeForProject(projectId);
@@ -124,7 +122,6 @@ export function ProjectLayout({
     }));
   }, [landscapeGroupsRecord]);
 
-  const currentProjectLandscapes = apiLandscapes || [];
 
   // Find selected landscape object
   const selectedApiLandscape = useMemo(() => {
@@ -231,9 +228,9 @@ export function ProjectLayout({
     if (apiLandscapes && apiLandscapes.length > 0) {
       // Check if there's a valid landscape selection for this project
       const currentSelection = getSelectedLandscapeForProject(projectId);
-      const isValidSelection = currentSelection && 
+      const isValidSelection = currentSelection &&
         apiLandscapes.some(landscape => landscape.id === currentSelection);
-      
+
       // If no valid selection exists, set the default
       if (!isValidSelection) {
         const defaultLandscapeId = getDefaultLandscapeId(apiLandscapes, projectId);
@@ -275,6 +272,14 @@ export function ProjectLayout({
     navigate(`/${projectId}/component/${componentName}`);
   };
 
+  const handleLandscapeChange = useCallback((landscapeId: string | null) => {
+    setSelectedLandscapeForProject(projectId, landscapeId);
+  }, [projectId, setSelectedLandscapeForProject]);
+
+  const handleShowLandscapeDetails = useCallback(() => {
+    setShowLandscapeDetails(true);
+  }, [setShowLandscapeDetails]);
+
   const renderGenericTabContent = () => {
     switch (activeTab) {
       case "components":
@@ -285,8 +290,8 @@ export function ProjectLayout({
               selectedLandscape={selectedLandscape}
               selectedLandscapeData={selectedApiLandscape}
               landscapeGroups={landscapeGroupsArray}
-              onLandscapeChange={(landscapeId) => setSelectedLandscapeForProject(projectId, landscapeId)}
-              onShowLandscapeDetails={() => setShowLandscapeDetails(true)}
+              onLandscapeChange={handleLandscapeChange}
+              onShowLandscapeDetails={handleShowLandscapeDetails} 
               projectId={projectId}
             />
 
@@ -408,8 +413,8 @@ export function ProjectLayout({
                             {!selectedLandscape
                               ? 'Select a landscape to view component health status'
                               : hideDownComponents
-                              ? 'No healthy components found in this landscape'
-                              : 'No components found in this landscape'}
+                                ? 'No healthy components found in this landscape'
+                                : 'No components found in this landscape'}
                           </p>
                         </div>
                       )}

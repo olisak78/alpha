@@ -52,26 +52,38 @@ function mockUseLandscapeTools(overrides?: Partial<ReturnType<typeof useLandscap
     urls: {
       git: 'https://github.com',
       concourse: 'https://concourse.example.com',
+      applicationLogging: 'https://app-logs.example.com',
       kibana: 'https://kibana.example.com',
+      platformLogging: 'https://infra-logs.example.com',
       dynatrace: 'https://dynatrace.example.com',
+      avs: 'https://avs.example.com',
       cockpit: 'https://cockpit.example.com',
       plutono: 'https://plutono.example.com',
       operationConsole: 'https://ops.example.com',
       controlCenter: 'https://control-center.example.com',
       cam: 'https://cam.example.com',
       gardener: 'https://gardener.example.com',
+      vault: 'https://vault.example.com',
+      iaasConsole: 'https://iaas.example.com',
+      iaasConsoleBS: 'https://iaas-bs.example.com',
     },
     availability: {
       git: true,
       concourse: true,
+      applicationLogging: true,
       kibana: true,
+      platformLogging: true,
       dynatrace: true,
+      avs: true,
       cockpit: true,
       plutono: true,
       operationConsole: true,
       controlCenter: true,
       cam: true,
       gardener: true,
+      vault: true,
+      iaasConsole: true,
+      iaasConsoleBS: true,
     },
   };
 
@@ -103,16 +115,26 @@ describe('LandscapeToolsButtons', () => {
       mockUseLandscapeTools();
       renderLandscapeToolsButtons();
 
-      expect(screen.getByRole('button', { name: /git/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /concourse/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /kibana/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /dynatrace/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cockpit/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /plutono/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /operation console/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /control center/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cam/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /gardener/i })).toBeInTheDocument();
+      // Simply check that we have 15 buttons (all tools are available)
+      const buttons = screen.getAllByRole('button');
+      expect(buttons).toHaveLength(15);
+
+      // Verify specific buttons exist
+      expect(screen.getByText('Git')).toBeInTheDocument();
+      expect(screen.getByText('Vault')).toBeInTheDocument();
+      expect(screen.getByText('Concourse')).toBeInTheDocument();
+      expect(screen.getByText('App Logs')).toBeInTheDocument();
+      expect(screen.getByText('Infra Logs')).toBeInTheDocument();
+      expect(screen.getByText('Dynatrace')).toBeInTheDocument();
+      expect(screen.getByText('Plutono')).toBeInTheDocument();
+      expect(screen.getByText('Gardener')).toBeInTheDocument();
+      expect(screen.getByText('IaaS')).toBeInTheDocument();
+      expect(screen.getByText('IaaS (BS)')).toBeInTheDocument();
+      expect(screen.getByText('AVS')).toBeInTheDocument();
+      expect(screen.getByText('CAM')).toBeInTheDocument();
+      expect(screen.getByText('Operation Console')).toBeInTheDocument();
+      expect(screen.getByText('Cockpit')).toBeInTheDocument();
+      expect(screen.getByText('Control Center')).toBeInTheDocument();
     });
 
     it('should not render when no landscape is selected', () => {
@@ -128,14 +150,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: false,
           concourse: true,
+          applicationLogging: true,
           kibana: true,
+          platformLogging: true,
           dynatrace: true,
+          avs: true,
           cockpit: true,
           plutono: true,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
@@ -150,14 +178,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: true,
           concourse: false,
+          applicationLogging: true,
           kibana: true,
+          platformLogging: true,
           dynatrace: true,
+          avs: true,
           cockpit: true,
           plutono: true,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
@@ -167,24 +201,30 @@ describe('LandscapeToolsButtons', () => {
     });
 
     // CHANGED: Button should be hidden (not rendered) instead of disabled
-    it('should hide Kibana button when Kibana is not available', () => {
+    it('should hide App Logs button when App Logs is not available', () => {
       mockUseLandscapeTools({
         availability: {
           git: true,
           concourse: true,
-          kibana: false,
+          applicationLogging: false,
+          kibana: true,
+          platformLogging: true,
           dynatrace: true,
+          avs: true,
           cockpit: true,
           plutono: true,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
 
-      expect(screen.queryByRole('button', { name: /kibana/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /app logs/i })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /git/i })).toBeInTheDocument();
     });
 
@@ -194,14 +234,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: true,
           concourse: true,
+          applicationLogging: true,
           kibana: true,
+          platformLogging: true,
           dynatrace: false,
+          avs: true,
           cockpit: true,
           plutono: true,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
@@ -216,14 +262,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: true,
           concourse: true,
+          applicationLogging: true,
           kibana: true,
+          platformLogging: true,
           dynatrace: true,
+          avs: true,
           cockpit: false,
           plutono: true,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
@@ -238,14 +290,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: true,
           concourse: true,
+          applicationLogging: true,
           kibana: true,
+          platformLogging: true,
           dynatrace: true,
+          avs: true,
           cockpit: true,
           plutono: false,
           operationConsole: true,
           controlCenter: true,
           cam: true,
-          gardener: true
+          gardener: true,
+          vault: true,
+          iaasConsole: true,
+          iaasConsoleBS: true
         },
       });
       renderLandscapeToolsButtons();
@@ -260,14 +318,20 @@ describe('LandscapeToolsButtons', () => {
         availability: {
           git: false,
           concourse: false,
+          applicationLogging: false,
           kibana: false,
+          platformLogging: false,
           dynatrace: false,
+          avs: false,
           cockpit: false,
           plutono: false,
           operationConsole: false,
           controlCenter: false,
           cam: false,
-          gardener: false
+          gardener: false,
+          vault: false,
+          iaasConsole: false,
+          iaasConsoleBS: false
         },
       });
       renderLandscapeToolsButtons();
@@ -292,8 +356,8 @@ describe('LandscapeToolsButtons', () => {
     it('should open Git URL when Git button is clicked', () => {
       const gitUrl = 'https://github.com';
       mockUseLandscapeTools({
-        urls: { git: gitUrl, concourse: null, kibana: null, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null },
-        availability: { git: true, concourse: false, kibana: false, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false },
+        urls: { git: gitUrl, concourse: null, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: true, concourse: false, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -307,8 +371,8 @@ describe('LandscapeToolsButtons', () => {
     it('should open Concourse URL when Concourse button is clicked', () => {
       const concourseUrl = 'https://concourse.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: concourseUrl, kibana: null, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null },
-        availability: { git: false, concourse: true, kibana: false, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false },
+        urls: { git: null, concourse: concourseUrl, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: true, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -318,25 +382,25 @@ describe('LandscapeToolsButtons', () => {
       expect(mockWindowOpen).toHaveBeenCalledWith(concourseUrl, '_blank', 'noopener,noreferrer');
     });
 
-    it('should open Kibana URL when Kibana button is clicked', () => {
-      const kibanaUrl = 'https://kibana.example.com';
+    it('should open App Logs URL when App Logs button is clicked', () => {
+      const appLogsUrl = 'https://app-logs.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: null, kibana: kibanaUrl, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null },
-        availability: { git: false, concourse: false, kibana: true, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false },
+        urls: { git: null, concourse: null, applicationLogging: appLogsUrl, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: false, applicationLogging: true, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
-      const kibanaButton = screen.getByRole('button', { name: /kibana/i });
-      fireEvent.click(kibanaButton);
+      const appLogsButton = screen.getByRole('button', { name: /app logs/i });
+      fireEvent.click(appLogsButton);
 
-      expect(mockWindowOpen).toHaveBeenCalledWith(kibanaUrl, '_blank', 'noopener,noreferrer');
+      expect(mockWindowOpen).toHaveBeenCalledWith(appLogsUrl, '_blank', 'noopener,noreferrer');
     });
 
     it('should open Dynatrace URL when Dynatrace button is clicked', () => {
       const dynatraceUrl = 'https://dynatrace.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: null, kibana: null, dynatrace: dynatraceUrl, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null },
-        availability: { git: false, concourse: false, kibana: false, dynatrace: true, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false },
+        urls: { git: null, concourse: null, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: dynatraceUrl, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: false, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: true, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -349,8 +413,8 @@ describe('LandscapeToolsButtons', () => {
     it('should open Control Center URL when Control Center button is clicked', () => {
       const controlCenterUrl = 'https://control-center.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: null, kibana: null, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: controlCenterUrl, cam: null, gardener: null },
-        availability: { git: false, concourse: false, kibana: false, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: true, cam: false, gardener: false },
+        urls: { git: null, concourse: null, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: controlCenterUrl, cam: null, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: false, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: true, cam: false, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -363,8 +427,8 @@ describe('LandscapeToolsButtons', () => {
     it('should open CAM URL when CAM button is clicked', () => {
       const camUrl = 'https://cam.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: null, kibana: null, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: camUrl, gardener: null },
-        availability: { git: false, concourse: false, kibana: false, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: true, gardener: false },
+        urls: { git: null, concourse: null, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: camUrl, gardener: null, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: false, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: true, gardener: false, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -377,8 +441,8 @@ describe('LandscapeToolsButtons', () => {
     it('should open Gardener URL when Gardener button is clicked', () => {
       const gardenerUrl = 'https://gardener.example.com';
       mockUseLandscapeTools({
-        urls: { git: null, concourse: null, kibana: null, dynatrace: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: gardenerUrl },
-        availability: { git: false, concourse: false, kibana: false, dynatrace: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: true },
+        urls: { git: null, concourse: null, applicationLogging: null, kibana: null, platformLogging: null, dynatrace: null, avs: null, plutono: null, cockpit: null, operationConsole: null, controlCenter: null, cam: null, gardener: gardenerUrl, vault: null, iaasConsole: null, iaasConsoleBS: null },
+        availability: { git: false, concourse: false, applicationLogging: false, kibana: false, platformLogging: false, dynatrace: false, avs: false, plutono: false, cockpit: false, operationConsole: false, controlCenter: false, cam: false, gardener: true, vault: false, iaasConsole: false, iaasConsoleBS: false },
       });
       renderLandscapeToolsButtons();
 
@@ -424,18 +488,24 @@ describe('LandscapeToolsButtons', () => {
       const customUrls = {
         git: 'https://custom-git.com',
         concourse: 'https://custom-concourse.com',
+        applicationLogging: 'https://custom-app-logs.com',
         kibana: 'https://custom-kibana.com',
+        platformLogging: 'https://custom-infra-logs.com',
         dynatrace: 'https://custom-dynatrace.com',
+        avs: 'https://custom-avs.com',
         plutono: 'https://custom-plutono.com',
         cockpit: 'https://custom-cockpit.com',
         operationConsole: 'https://custom-ops.com',
         controlCenter: 'https://custom-control-center.com',
         cam: 'https://custom-cam.com',
-        gardener: 'https://custom-gardener.com'
+        gardener: 'https://custom-gardener.com',
+        vault: 'https://custom-vault.com',
+        iaasConsole: 'https://custom-iaas.com',
+        iaasConsoleBS: 'https://custom-iaas-bs.com'
       };
       mockUseLandscapeTools({
         urls: customUrls,
-        availability: { git: true, concourse: true, kibana: true, dynatrace: true, plutono: true, cockpit: true, operationConsole: true, controlCenter: true, cam: true, gardener: true },
+        availability: { git: true, concourse: true, applicationLogging: true, kibana: true, platformLogging: true, dynatrace: true, avs: true, plutono: true, cockpit: true, operationConsole: true, controlCenter: true, cam: true, gardener: true, vault: true, iaasConsole: true, iaasConsoleBS: true },
       });
       renderLandscapeToolsButtons();
 

@@ -382,16 +382,18 @@ describe('aiPlatformApi', () => {
         scenarioId: 'foundation-models',
       };
 
-      result.current.mutate(configurationRequest);
+      const createDeploymentRequest = {
+        configurationRequest,
+      };
+
+      result.current.mutate(createDeploymentRequest);
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
       expect(result.current.data).toEqual(mockResponse);
-      expect(apiClient.post).toHaveBeenCalledWith('/ai-core/deployments', {
-        configurationRequest,
-      });
+      expect(apiClient.post).toHaveBeenCalledWith('/ai-core/deployments', createDeploymentRequest);
     });
   });
 
@@ -644,7 +646,11 @@ describe('aiPlatformApi', () => {
         scenarioId: 'foundation-models',
       };
 
-      result.current.mutate(configurationRequest);
+      const createDeploymentRequest = {
+        configurationRequest,
+      };
+
+      result.current.mutate(createDeploymentRequest);
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);

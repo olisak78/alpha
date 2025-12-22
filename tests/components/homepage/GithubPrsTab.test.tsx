@@ -13,6 +13,7 @@ vi.mock('lucide-react', () => ({
   Database: () => <div data-testid="database-icon" />,
   List: () => <div data-testid="list-icon" />,
   X: (props: any) => <div data-testid="x-icon" {...props} />,
+  Trash2: (props: any) => <div data-testid="trash-icon" {...props} />,
   GitPullRequest: () => <div data-testid="git-pr-icon" />,
   ChevronDown: () => <div data-testid="chevron-down-icon" />,
   ChevronUp: () => <div data-testid="chevron-up-icon" />,

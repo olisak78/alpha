@@ -10,6 +10,8 @@ export interface LandscapeApiResponse {
   domain: string;
   environment: string;
   'is-central-region'?: boolean;
+  'application-logging'?: string;
+  'avs-aggregated-monitor'?: string;
   git?: string;
   concourse?: string;
   kibana?: string;
@@ -17,12 +19,16 @@ export interface LandscapeApiResponse {
   cockpit?: string;
   'operation-console'?: string;
   'control-center'?: string;
+  'platform-logging'?: string;
   type?: string;
   grafana?: string;
   prometheus?: string;
   gardener?: string;
   plutono?: string;
   cam?: string;
+  vault?: string;
+  'iaas-console'?: string;
+  'iaas-console-backing-service'?: string;
   metadata?: Record<string, any>;
 }
 
@@ -37,18 +43,20 @@ export async function fetchLandscapesByProject(
   return response.map(landscape => {
     return {
     id: landscape.id, // Keep UUID as id for component filtering
-    name: landscape.title || landscape.name, 
-    technical_name: landscape.name, 
+    name: landscape.title || landscape.name,
+    technical_name: landscape.name,
     status: 'active' as const,
     githubConfig: '#',
     awsAccount: landscape.id,
     cam: landscape.cam,
     deploymentStatus: 'deployed' as const,
     environment: landscape.environment,
-    landscape_url: landscape.domain, 
-    metadata: landscape.metadata, 
+    landscape_url: landscape.domain,
+    metadata: landscape.metadata,
     title: landscape.title,
     domain: landscape.domain,
+    'application-logging': landscape['application-logging'],
+    'avs-aggregated-monitor': landscape['avs-aggregated-monitor'],
     git: landscape.git,
     concourse: landscape.concourse,
     kibana: landscape.kibana,
@@ -56,11 +64,15 @@ export async function fetchLandscapesByProject(
     cockpit: landscape.cockpit,
     'operation-console': landscape['operation-console'],
     'control-center': landscape['control-center'],
+    'platform-logging': landscape['platform-logging'],
     type: landscape.type,
     grafana: landscape.grafana,
     prometheus: landscape.prometheus,
     gardener: landscape.gardener,
     plutono: landscape.plutono,
+    vault: landscape.vault,
+    'iaas-console': landscape['iaas-console'],
+    'iaas-console-backing-service': landscape['iaas-console-backing-service'],
     isCentral: landscape['is-central-region'] || false,
   } as any;
  });

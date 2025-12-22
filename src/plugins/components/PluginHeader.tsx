@@ -1,11 +1,24 @@
+/**
+ * Plugin Header Component
+ * 
+ * Displays plugin title, description, and optional icon with consistent styling.
+ */
+
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import * as LucideIcons from 'lucide-react';
 
 interface BaseHeaderProps {
+  /** Plugin title */
   title: string;
+
+  /** Optional description */
   description?: string;
+
+  /** Optional Lucide icon name */
   icon?: string;
+
+  /** Optional action buttons/elements */
   actions?: React.ReactNode;
 }
 

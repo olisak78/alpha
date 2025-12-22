@@ -256,6 +256,7 @@ export interface Project {
   description: string;
   isVisible?: boolean; // Controls visibility in sidebar
   alerts?: string;
+  ops2go?: boolean;
   health?: {
     endpoint?: string;
   };

@@ -178,12 +178,4 @@ export const queryKeys = {
     byComponent: (componentId: string, landscapeName: string) =>
       [...queryKeys.swagger.all, 'component', componentId, landscapeName] as const,
   },
-  plugins: {
-    all: ['plugins'] as const,
-    lists: () => [...queryKeys.plugins.all, 'list'] as const,
-    list: (params?: { limit?: number; offset?: number }) =>
-      [...queryKeys.plugins.lists(), params] as const,
-    details: () => [...queryKeys.plugins.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.plugins.details(), id] as const,
-  },
 } as const;

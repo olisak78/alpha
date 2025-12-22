@@ -7,6 +7,7 @@ interface CreateDeploymentDialogButtonsProps {
   step: 'select' | 'configure';
   isDeploying: boolean;
   selectedModel: FoundationModel | null;
+  hasTeamSelected?: boolean; // Add team selection state
   onBack: () => void;
   onCancel: () => void;
   onDeploy: () => void;
@@ -16,6 +17,7 @@ export const CreateDeploymentDialogButtons: React.FC<CreateDeploymentDialogButto
   step,
   isDeploying,
   selectedModel,
+  hasTeamSelected = true, // Default to true for backward compatibility
   onBack,
   onCancel,
   onDeploy,
@@ -40,7 +42,7 @@ export const CreateDeploymentDialogButtons: React.FC<CreateDeploymentDialogButto
         {step === 'configure' && (
           <Button
             onClick={onDeploy}
-            disabled={isDeploying || !selectedModel}
+            disabled={isDeploying || !selectedModel || !hasTeamSelected}
             className="flex items-center gap-2"
           >
             {isDeploying ? (

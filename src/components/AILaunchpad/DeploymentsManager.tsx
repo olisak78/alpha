@@ -263,6 +263,8 @@ export const DeploymentsManager: React.FC<DeploymentsManagerProps> = ({
       <CreateDeploymentDialog
         open={showCreateDialog}
         onOpenChange={setShowCreateDialog}
+        selectedTeam={selectedTeam}
+        availableTeams={teams}
       />
     </div>
   );
