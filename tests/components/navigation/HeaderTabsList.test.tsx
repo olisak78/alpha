@@ -4,7 +4,6 @@ import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { HeaderTabsList } from '../../../src/components/DeveloperPortalHeader/HeaderTabsList';
 import { HeaderTab, HeaderNavigationProvider } from '../../../src/contexts/HeaderNavigationContext';
-import { SidebarProvider } from '../../../src/contexts/SidebarContext';
 import { ProjectsProvider } from '../../../src/contexts/ProjectsContext';
 import { ReactNode } from 'react';
 
@@ -74,11 +73,9 @@ function TestWrapper({ children }: { children: ReactNode }) {
   return (
     <MemoryRouter>
       <ProjectsProvider>
-        <SidebarProvider>
           <HeaderNavigationProvider>
             {children}
           </HeaderNavigationProvider>
-        </SidebarProvider>
       </ProjectsProvider>
     </MemoryRouter>
   );

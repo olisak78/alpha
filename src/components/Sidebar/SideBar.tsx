@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft, Users, Wrench, Home, Link, Network, Brain, MessageSquare, Puzzle } from 'lucide-react';
-import { useSidebarState } from '@/contexts/SidebarContext';
+import { useSidebarStore } from '@/stores/sidebarStore';
 import { useProjectVisibility } from '@/hooks/useProjectVisibility';
 import { CloudAutomationIcon } from '../icons/CloudAutomationIcon';
 import { UnifiedServicesIcon } from '../icons/UnifiedServiceIcon';
@@ -23,7 +23,7 @@ const getProjectIcon = (project: string, projectsData) => {
         case 'Teams': return <Users size={16} />;
         case 'Self Service': return <Wrench size={16} />;
         case 'Links': return <Link size={16} />;
-      //  case 'Plugins': return <Puzzle size={16} />;
+        //  case 'Plugins': return <Puzzle size={16} />;
         case 'AI Arena': return <Brain size={16} />;
         default: break;
     }
@@ -42,7 +42,10 @@ const getProjectIcon = (project: string, projectsData) => {
 };
 
 export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange, projects }) => {
-    const { isExpanded, setIsExpanded } = useSidebarState();
+    // Updated: Using Zustand store instead of Context
+    const isExpanded = useSidebarStore((state) => state.isExpanded);
+    const toggle = useSidebarStore((state) => state.toggle);
+
     const { projects: projectsData, isLoading, sidebarItems } = useProjectsContext();
     const { isProjectVisible } = useProjectVisibility();
     const [visibilityKey, setVisibilityKey] = useState(0);
@@ -66,13 +69,13 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
         if (staticProjects.includes(project)) {
             return true;
         }
-        
+
         // For dynamic projects, use the visibility hook
         const dynamicProject = projectsData.find(p => p.name === project || p.title === project);
         if (dynamicProject) {
             return isProjectVisible(dynamicProject);
         }
-        
+
         return false;
     };
 
@@ -100,7 +103,7 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
                 className={`fixed top-0 left-0 h-screen bg-background border-r border-border transition-all duration-300 ease-in-out z-50 ${isExpanded ? 'w-52' : 'w-16'}`}
             >
                 <button
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    onClick={toggle}
                     className="absolute top-4 -right-3 z-50 flex items-center justify-center w-6 h-6 rounded-full bg-accent/80 dark:bg-accent border-2 border-border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-accent hover:brightness-90 dark:hover:brightness-125 text-foreground dark:text-foreground"
                     aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
                 >

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { SideBar } from '../../../src/components/Sidebar/SideBar';
-import { SidebarProvider } from '../../../src/contexts/SidebarContext';
 import { ProjectsProvider } from '../../../src/contexts/ProjectsContext';
 import { ReactNode } from 'react';
 
@@ -40,7 +39,7 @@ vi.mock('@/hooks/api/useProjects', () => ({
 function createSidebarWrapper() {
   return ({ children }: { children: ReactNode }) => (
     <ProjectsProvider>
-      <SidebarProvider>{children}</SidebarProvider>
+      {children}
     </ProjectsProvider>
   );
 }
@@ -101,10 +100,10 @@ describe('SideBar Component', () => {
       renderSidebar({ onProjectChange: mockOnProjectChange });
 
       // Check that icons are rendered (lucide-react icons have aria-hidden attribute)
-      const icons = screen.getAllByRole('button').filter(button => 
+      const icons = screen.getAllByRole('button').filter(button =>
         button.querySelector('svg')
       );
-      
+
       expect(icons.length).toBeGreaterThan(0);
     });
 
@@ -146,9 +145,9 @@ describe('SideBar Component', () => {
     });
 
     it('should call onProjectChange when a project is clicked', () => {
-      renderSidebar({ 
+      renderSidebar({
         projects: ['Me', 'Teams', 'CIS@2.0'],
-        onProjectChange: mockOnProjectChange 
+        onProjectChange: mockOnProjectChange
       });
 
       const teamsButton = screen.getByRole('button', { name: /teams/i });
@@ -159,14 +158,14 @@ describe('SideBar Component', () => {
     });
 
     it('should handle clicking the same project twice', () => {
-      renderSidebar({ 
+      renderSidebar({
         activeProject: 'Home',
         projects: ['Home', 'Teams'],
-        onProjectChange: mockOnProjectChange 
+        onProjectChange: mockOnProjectChange
       });
 
       const homeButton = screen.getByRole('button', { name: /^home$/i });
-      
+
       fireEvent.click(homeButton);
       fireEvent.click(homeButton);
 
@@ -198,7 +197,7 @@ describe('SideBar Component', () => {
 
       // Collapse
       fireEvent.click(collapseButton);
-      
+
       await waitFor(() => {
         expect(sidebar).toHaveClass('w-16');
       });
@@ -226,7 +225,7 @@ describe('SideBar Component', () => {
       const spacer = container.querySelector('div.transition-all.duration-300.ease-in-out:not([role])');
 
       expect(spacer).toBeInTheDocument();
-      
+
       // Both should have matching width classes
       if (sidebar.classList.contains('w-16')) {
         expect(spacer).toHaveClass('w-16');
@@ -259,30 +258,30 @@ describe('SideBar Component', () => {
     });
 
     it('should have clickable project buttons with proper roles', () => {
-      renderSidebar({ 
+      renderSidebar({
         projects: ['Me', 'Teams'],
-        onProjectChange: mockOnProjectChange 
+        onProjectChange: mockOnProjectChange
       });
 
       const buttons = screen.getAllByRole('button');
-      
+
       // At least project buttons + toggle button
       expect(buttons.length).toBeGreaterThanOrEqual(3);
-      
+
       buttons.forEach(button => {
         expect(button).toBeEnabled();
       });
     });
 
     it('should be keyboard navigable', () => {
-      renderSidebar({ 
+      renderSidebar({
         projects: ['Me', 'Teams'],
-        onProjectChange: mockOnProjectChange 
+        onProjectChange: mockOnProjectChange
       });
 
       const firstButton = screen.getAllByRole('button')[0];
       firstButton.focus();
-      
+
       expect(document.activeElement).toBe(firstButton);
     });
 
@@ -314,7 +313,7 @@ describe('SideBar Component', () => {
 
       const sidebar = screen.getByRole('complementary');
       const computedStyle = window.getComputedStyle(sidebar);
-      
+
       // Should have a z-index to stay above content
       expect(sidebar.className).toContain('z-');
     });
@@ -333,16 +332,14 @@ describe('SideBar Component', () => {
   // ==========================================================================
 
   describe('Context Integration', () => {
-    it('should work with SidebarProvider context', () => {
+    it('should work without SidebarProvider context', () => {
       const { container } = render(
         <ProjectsProvider>
-          <SidebarProvider>
             <SideBar
               activeProject="Me"
               projects={['Me', 'Teams']}
               onProjectChange={mockOnProjectChange}
             />
-          </SidebarProvider>
         </ProjectsProvider>
       );
 
@@ -374,7 +371,7 @@ describe('SideBar Component', () => {
       renderSidebar({ onProjectChange: mockOnProjectChange });
 
       const sidebar = screen.getByRole('complementary');
-      
+
       // Initially expanded
       expect(sidebar).toHaveClass('w-52');
 
@@ -429,7 +426,7 @@ describe('SideBar Component', () => {
       const { rerender } = renderSidebar({ onProjectChange: mockOnProjectChange });
 
       const sidebar = screen.getByRole('complementary');
-      
+
       // Initially expanded
       expect(sidebar).toHaveClass('fixed top-0 left-0 h-screen bg-background border-r border-border transition-all duration-300 ease-in-out z-50 w-52');
 
@@ -446,13 +443,11 @@ describe('SideBar Component', () => {
 
       // Force re-render to see the effect
       rerender(
-        <SidebarProvider>
           <SideBar
             activeProject="Me"
             projects={['Me', 'Teams', 'CIS@2.0', 'Cloud Automation', 'Unified Services', 'Self Service', 'Links']}
             onProjectChange={mockOnProjectChange}
           />
-        </SidebarProvider>
       );
 
       // Should reflect the change from the storage event

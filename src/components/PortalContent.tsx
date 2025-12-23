@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePortalState } from "@/contexts/hooks";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
-import { useSidebarState } from "@/contexts/SidebarContext";
+import { useSidebarWidth } from "@/stores/sidebarStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DeveloperPortalHeader } from "./DeveloperPortalHeader/DeveloperPortalHeader";
 import { HeaderNavigation } from "./DeveloperPortalHeader/HeaderNavigation";
@@ -18,7 +18,7 @@ export const PortalContent: React.FC<{
   const { currentDevId, setMeHighlightNotifications } = usePortalState();
   const { notifications, unreadCount, markAllRead } = useNotifications(currentDevId);
   const { tabs, activeTab, setActiveTab, isDropdown } = useHeaderNavigation();
-  const { sidebarWidth } = useSidebarState();
+  const sidebarWidth = useSidebarWidth();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);

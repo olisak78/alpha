@@ -23,11 +23,6 @@ vi.mock('@/contexts/HeaderNavigationContext', () => ({
   )
 }));
 
-vi.mock('@/contexts/SidebarContext', () => ({
-  SidebarProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="sidebar-provider">{children}</div>
-  )
-}));
 
 vi.mock('@/contexts/ProjectsContext', () => ({
   ProjectsProvider: ({ children }: { children: React.ReactNode }) => (

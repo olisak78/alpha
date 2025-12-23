@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { HeaderTab } from "@/contexts/HeaderNavigationContext";
-import { useSidebarState } from "@/contexts/SidebarContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Select,
@@ -27,7 +26,6 @@ export function HeaderDropdown({
   placeholder = "Select a team",
   width = "w-64"
 }: HeaderDropdownProps) {
-  const { isExpanded } = useSidebarState();
   const location = useLocation();
   const navigate = useNavigate();
 

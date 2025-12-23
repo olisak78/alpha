@@ -1,13 +1,10 @@
-import { Bell, PanelLeft, PanelLeftClose, Sun, Moon } from "lucide-react";
+import { Bell, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserProfileDropdown } from "@/components/DeveloperPortalHeader/UserProfileDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useSidebarState } from "@/contexts/SidebarContext";
 
 interface DeveloperPortalHeaderProps {
   unreadCount: number;
@@ -20,10 +17,7 @@ export function DeveloperPortalHeader({
 }: DeveloperPortalHeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const { tabs, activeTab, setActiveTab, isDropdown } = useHeaderNavigation();
   const { actualTheme, toggleTheme } = useTheme();
-  const { isExpanded, sidebarWidth } = useSidebarState();
 
   const handleLogout = async () => {
     try {
@@ -94,8 +88,6 @@ export function DeveloperPortalHeader({
           )}
         </div>
       </div>
-
-      
     </div>
   );
 }

@@ -1,11 +1,7 @@
-// App.tsx
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
-
-import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ProjectsProvider, useProjectsContext } from "@/contexts/ProjectsContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -61,43 +57,41 @@ const App = () => {
             <Toaster />
             <Sonner />
             <AuthProvider>
-              <SidebarProvider>
-                <Routes>
-                  {/* Public */}
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/me" element={<Navigate to="/" replace />} />
+              <Routes>
+                {/* Public */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/me" element={<Navigate to="/" replace />} />
 
-                  {/* Protected */}
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <PortalContainer />
-                      </ProtectedRoute>
-                    }
-                  >
-                    <Route index element={<HomePage />} />
-                    <Route path="teams" element={<TeamsPage />} />
-                    <Route path="teams/:teamName/:tabId" element={<TeamsPage />} />
-                    <Route path="self-service" element={<SelfServicePage />} />
-                    <Route path="links" element={<LinksPage />} />
-                    <Route path="ai-arena" element={<AIArenaPage />} />
-                    <Route path="ai-arena/:tabId" element={<AIArenaPage />} />
-                    <Route path="plugins" element={<PluginsPage />} />
+                {/* Protected */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <PortalContainer />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<HomePage />} />
+                  <Route path="teams" element={<TeamsPage />} />
+                  <Route path="teams/:teamName/:tabId" element={<TeamsPage />} />
+                  <Route path="self-service" element={<SelfServicePage />} />
+                  <Route path="links" element={<LinksPage />} />
+                  <Route path="ai-arena" element={<AIArenaPage />} />
+                  <Route path="ai-arena/:tabId" element={<AIArenaPage />} />
+                  <Route path="plugins" element={<PluginsPage />} />
 
-                    {/* Dynamic projects */}
-                    <Route path=":projectName">
-                      <Route index element={<DynamicProjectPageWrapper />} />
-                      <Route path="component/:componentName" element={<ComponentViewPageWrapper />} />
-                      <Route path="component/:componentName/:tabId" element={<ComponentViewPageWrapper />} />
-                      <Route path=":tabId" element={<DynamicProjectPageWrapper />} />
-                    </Route>
-
-                    {/* 404 */}
-                    <Route path="*" element={<NotFound />} />
+                  {/* Dynamic projects */}
+                  <Route path=":projectName">
+                    <Route index element={<DynamicProjectPageWrapper />} />
+                    <Route path="component/:componentName" element={<ComponentViewPageWrapper />} />
+                    <Route path="component/:componentName/:tabId" element={<ComponentViewPageWrapper />} />
+                    <Route path=":tabId" element={<DynamicProjectPageWrapper />} />
                   </Route>
-                </Routes>
-              </SidebarProvider>
+
+                  {/* 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
             </AuthProvider>
           </TooltipProvider>
         </ProjectsProvider>

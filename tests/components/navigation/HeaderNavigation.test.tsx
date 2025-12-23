@@ -5,7 +5,6 @@ import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeaderNavigation } from '../../../src/components/DeveloperPortalHeader/HeaderNavigation';
 import { HeaderTab, HeaderNavigationProvider } from '../../../src/contexts/HeaderNavigationContext';
-import { SidebarProvider } from '../../../src/contexts/SidebarContext';
 import { ProjectsProvider } from '../../../src/contexts/ProjectsContext';
 
 // Mock the useFetchProjects hook
@@ -74,11 +73,9 @@ function TestWrapper({ children }: { children: ReactNode }) {
   return (
     <MemoryRouter>
       <ProjectsProvider>
-        <SidebarProvider>
           <HeaderNavigationProvider>
             {children}
           </HeaderNavigationProvider>
-        </SidebarProvider>
       </ProjectsProvider>
     </MemoryRouter>
   );
