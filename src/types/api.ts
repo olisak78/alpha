@@ -260,6 +260,7 @@ export interface Project {
   health?: {
     endpoint?: string;
   };
+  monitoring?:boolean;
   'components-metrics'?: boolean
 }
 
@@ -1182,4 +1183,62 @@ export interface LdapUserSearchResponse {
  */
 export interface ProjectResponse {
   projects: Project[];
+}
+
+// ============================================================================
+// TRIGGERED ALERTS TYPES - Alert history and triggered alerts
+// ============================================================================
+
+/**
+ * Triggered Alert model
+ * Represents a triggered alert from the alert history API
+ */
+export interface TriggeredAlert {
+  fingerprint: string;
+  alertname: string;
+  status: string;
+  severity: string;
+  landscape: string;
+  region: string;
+  startsAt: string;
+  endsAt?: string;
+  labels: Record<string, any>;
+  annotations: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  component?:string
+}
+
+/**
+ * Triggered Alerts Paginated Response
+ * Response structure for triggered alerts endpoint with pagination
+ */
+export interface TriggeredAlertsResponse {
+  data: TriggeredAlert[];
+}
+
+interface AlertLabel{
+  key:string;
+  value:string;
+}
+
+export interface TriggeredAlertsLabelUpdatePayload {
+  fingerprint: string;
+  label: AlertLabel;
+  message?: string;
+  project: string;
+}
+
+/**
+ * Triggered Alerts Filters Response
+ * Response structure for triggered alerts filters endpoint
+ * All filter categories are optional arrays of strings
+ */
+export interface TriggeredAlertsFiltersResponse {
+  alertname?: string[];
+  landscape?: string[];
+  region?: string[];
+  severity?: string[];
+  status?: string[];
+  component?: string[];
 }

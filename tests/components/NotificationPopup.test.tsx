@@ -146,7 +146,8 @@ describe('NotificationPopup Component', () => {
 
       expect(screen.getByText(/Due:/)).toBeInTheDocument();
       expect(screen.getAllByText(/\d+h ago/)).toHaveLength(2);
-      expect(screen.getByText(/\d{1,2}\/\d{1,2}\/\d{4}/)).toBeInTheDocument();
+      // Date format is locale-specific (e.g., "26.12.2025" or "12/26/2025")
+      expect(screen.getByText(/\d{1,2}[.\/]\d{1,2}[.\/]\d{4}/)).toBeInTheDocument();
     });
   });
 

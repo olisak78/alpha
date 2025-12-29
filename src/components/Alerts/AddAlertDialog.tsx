@@ -12,33 +12,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, GitPullRequest, X, Clock, Activity, Tag } from "lucide-react";
-import { Alert, AlertFile, useCreateAlertPR } from "@/hooks/api/useAlerts";
+import { AlertCircle, GitPullRequest, X, Clock, Activity, Tag, Plus } from "lucide-react";
+import { AlertFile, useCreateAlertPR } from "@/hooks/api/useAlerts";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 import * as yaml from 'js-yaml';
 
-interface AlertEditorDialogProps {
+interface AddAlertDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  alert: Alert;
-  file: AlertFile;
+  files: AlertFile[];
   projectId: string;
 }
 
-export function AlertEditorDialog({
+export function AddAlertDialog({
   open,
   onOpenChange,
-  alert,
-  file,
+  files,
   projectId,
-}: AlertEditorDialogProps) {
-  // Form fields for specific alert properties
+}: AddAlertDialogProps) {
+  // Form fields
+  const [selectedFile, setSelectedFile] = useState("");
   const [alertName, setAlertName] = useState("");
   const [expression, setExpression] = useState("");
-  const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState("5m");
   const [severity, setSeverity] = useState<string>("warning");
-  const [labels, setLabels] = useState<Record<string, any>>({});
+  const [labels, setLabels] = useState<Record<string, any>>({ severity: "warning" });
   const [annotations, setAnnotations] = useState<Record<string, any>>({});
   const [commitMessage, setCommitMessage] = useState("");
   const [prDescription, setPrDescription] = useState("");
@@ -46,26 +44,21 @@ export function AlertEditorDialog({
   const { toast } = useToast();
   const createPRMutation = useCreateAlertPR(projectId);
 
-  // Store original alert to preserve all fields
-  const [originalAlert, setOriginalAlert] = useState<Alert | null>(null);
-
   useEffect(() => {
-    if (open && alert) {
-      // Store original alert for merging later
-      setOriginalAlert(alert);
-
-      // Populate form with alert data
-      setAlertName(alert.alert || "");
-      setExpression(alert.expr || "");
-      setDuration(alert.for || "");
-      setSeverity(alert.labels?.severity || "warning");
-      setLabels(alert.labels || {});
-      setAnnotations(alert.annotations || {});
-      setCommitMessage(`[Update-Rule] ${alert.alert || "unnamed"}`);
-      setPrDescription(`Update Prometheus alert configuration for **${alert.alert || "unnamed"}**`);
+    if (open) {
+      // Reset form
+      setSelectedFile(files.length > 0 ? files[0].name : "");
+      setAlertName("");
+      setExpression("");
+      setDuration("5m");
+      setSeverity("warning");
+      setLabels({ severity: "warning" });
+      setAnnotations({});
+      setCommitMessage("[Add-Rule] ");
+      setPrDescription("Add new Prometheus alert rule");
       setValidationError(null);
     }
-  }, [open, alert]);
+  }, [open, files]);
 
   // Keep labels.severity in sync with severity dropdown
   useEffect(() => {
@@ -73,12 +66,20 @@ export function AlertEditorDialog({
   }, [severity]);
 
   const validateForm = (): boolean => {
+    if (!selectedFile) {
+      setValidationError("Please select a file");
+      return false;
+    }
     if (!alertName.trim()) {
       setValidationError("Alert name is required");
       return false;
     }
     if (!expression.trim()) {
       setValidationError("Alert expression is required");
+      return false;
+    }
+    if (!duration.trim()) {
+      setValidationError("Duration is required");
       return false;
     }
     setValidationError(null);
@@ -99,7 +100,7 @@ export function AlertEditorDialog({
 
   const addLabel = () => {
     const newKey = "<new label name>";
-    setLabels(prev => ({ [newKey]: "", ...prev })); // Add at top
+    setLabels(prev => ({ [newKey]: "", ...prev }));
   };
 
   const removeLabel = (key: string) => {
@@ -144,7 +145,7 @@ export function AlertEditorDialog({
 
   const addAnnotation = () => {
     const newKey = "<new annotation name>";
-    setAnnotations(prev => ({ [newKey]: "", ...prev })); // Add at top
+    setAnnotations(prev => ({ [newKey]: "", ...prev }));
   };
 
   const removeAnnotation = (key: string) => {
@@ -193,29 +194,30 @@ export function AlertEditorDialog({
     }
 
     try {
-      // Merge updated values with original alert to preserve all fields
-      const updatedAlert: any = {
-        ...originalAlert, // Start with all original data
+      const selectedFileObj = files.find(f => f.name === selectedFile);
+      if (!selectedFileObj) {
+        throw new Error("Selected file not found");
+      }
+
+      const newAlert: any = {
         alert: alertName,
         expr: expression,
-        ...(duration && { for: duration }),
+        for: duration,
       };
 
-      // Add labels if any
       if (Object.keys(labels).length > 0) {
-        updatedAlert.labels = labels;
+        newAlert.labels = labels;
       }
 
-      // Add annotations if any
       if (Object.keys(annotations).length > 0) {
-        updatedAlert.annotations = annotations;
+        newAlert.annotations = annotations;
       }
 
-      // Find and replace the alert in the original file content
-      const updatedContent = replaceAlertInContent(file.content, alert.alert, updatedAlert);
+      // Add the alert to the file content
+      const updatedContent = addAlertToContent(selectedFileObj.content, newAlert);
 
       const result = await createPRMutation.mutateAsync({
-        fileName: file.name,
+        fileName: selectedFileObj.name,
         content: updatedContent,
         message: commitMessage,
         description: prDescription,
@@ -227,7 +229,6 @@ export function AlertEditorDialog({
         className: "border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50",
       });
 
-      // Open PR URL in new tab
       if (result.prUrl) {
         window.open(result.prUrl, "_blank", "noopener,noreferrer");
       }
@@ -242,60 +243,93 @@ export function AlertEditorDialog({
     }
   };
 
-  // Helper function to replace alert in the original content
-  // Uses surgical text-based replacement to preserve original formatting
-  const replaceAlertInContent = (content: string, oldAlertName: string | undefined, newAlert: any): string => {
-    if (!oldAlertName) {
-      return content;
-    }
-
-    // Find and extract the specific alert block
+  const addAlertToContent = (content: string, newAlert: any): string => {
     const lines = content.split('\n');
-    let alertStartIdx = -1;
-    let alertEndIdx = -1;
+
+    // Find where to insert (at the end of the rules section, before {{- end }})
+    let insertIdx = -1;
     let baseIndent = '';
+    let inRulesSection = false;
+    let rulesStartIdx = -1;
+    let lastAlertIdx = -1;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      // Find alert start
-      if (line.match(new RegExp(`^(\\s*)-\\s*alert:\\s*${oldAlertName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`))) {
-        alertStartIdx = i;
-        baseIndent = line.match(/^(\s*)-/)?.[1] || '';
+
+      // Look for rules: section
+      if (line.match(/^\s*rules:\s*$/)) {
+        inRulesSection = true;
+        rulesStartIdx = i;
+        baseIndent = line.match(/^(\s*)/)?.[1] || '';
+        baseIndent += '  '; // Rules items are indented under rules:
         continue;
       }
 
-      // Find alert end (next alert or end of list)
-      if (alertStartIdx >= 0 && alertEndIdx < 0) {
-        if (line.match(/^\s*-\s*alert:/) || (line.trim() && !line.startsWith(baseIndent + '  ') && !line.startsWith(baseIndent + '-'))) {
-          alertEndIdx = i;
-          break;
+      // Track the last alert in rules section
+      if (inRulesSection && line.match(/^(\s*)-\s*alert:/)) {
+        const alertIndent = line.match(/^(\s*)-/)?.[1] || '';
+        if (!baseIndent) {
+          baseIndent = alertIndent;
         }
+        lastAlertIdx = i;
       }
     }
 
-    if (alertStartIdx < 0) {
-      console.warn(`Could not find alert "${oldAlertName}" in content`);
-      return content;
+    // Now find where the last alert ends
+    if (lastAlertIdx >= 0) {
+      // Scan forward from the last alert to find where it ends
+      insertIdx = lastAlertIdx + 1;
+      for (let i = lastAlertIdx + 1; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Stop if we hit {{- end }} or {{- else }}
+        if (line.match(/^\s*\{\{-\s*(end|else)\s*\}\}/)) {
+          insertIdx = i;
+          break;
+        }
+
+        // Stop if we hit another alert (shouldn't happen, but safety check)
+        if (line.match(/^\s*-\s*alert:/)) {
+          insertIdx = i;
+          break;
+        }
+
+        // If the line is part of the alert (properly indented), keep scanning
+        if (line.trim() && line.startsWith(baseIndent)) {
+          insertIdx = i + 1;
+          continue;
+        }
+
+        // If we hit an empty line, keep it as part of the spacing
+        if (!line.trim()) {
+          insertIdx = i + 1;
+          continue;
+        }
+
+        // Otherwise we've gone too far, insert before this line
+        insertIdx = i;
+        break;
+      }
+    } else if (rulesStartIdx >= 0) {
+      // No alerts found, add right after rules: line
+      insertIdx = rulesStartIdx + 1;
+    } else {
+      throw new Error("Could not find rules section in file");
     }
 
-    // If we didn't find an explicit end, go to the end of file
-    if (alertEndIdx < 0) {
-      alertEndIdx = lines.length;
+    if (insertIdx < 0) {
+      throw new Error("Could not determine insertion point in file");
     }
 
-    // Manually build YAML for the alert to maintain proper structure
-    const indent1 = baseIndent + '  '; // First level indent
-    const indent2 = baseIndent + '    '; // Second level indent (for nested objects)
+    // Build the new alert YAML
+    const indent1 = baseIndent + '  ';
+    const indent2 = baseIndent + '    ';
 
     const newAlertLines: string[] = [];
     newAlertLines.push(`${baseIndent}- alert: ${newAlert.alert}`);
     newAlertLines.push(`${indent1}expr: ${newAlert.expr}`);
+    newAlertLines.push(`${indent1}for: ${newAlert.for}`);
 
-    if (newAlert.for) {
-      newAlertLines.push(`${indent1}for: ${newAlert.for}`);
-    }
-
-    // Add labels
     if (newAlert.labels && Object.keys(newAlert.labels).length > 0) {
       newAlertLines.push(`${indent1}labels:`);
       Object.entries(newAlert.labels).forEach(([key, value]) => {
@@ -303,20 +337,18 @@ export function AlertEditorDialog({
       });
     }
 
-    // Add annotations (always quoted)
     if (newAlert.annotations && Object.keys(newAlert.annotations).length > 0) {
       newAlertLines.push(`${indent1}annotations:`);
       Object.entries(newAlert.annotations).forEach(([key, value]) => {
         const strValue = String(value);
-        // Always quote annotation values and escape any quotes inside
         const escapedValue = strValue.replace(/"/g, '\\"');
         newAlertLines.push(`${indent2}${key}: "${escapedValue}"`);
       });
     }
 
-    // Replace the alert block
-    const before = lines.slice(0, alertStartIdx);
-    const after = lines.slice(alertEndIdx);
+    // Insert the new alert
+    const before = lines.slice(0, insertIdx);
+    const after = lines.slice(insertIdx);
 
     return [...before, ...newAlertLines, ...after].join('\n');
   };
@@ -326,25 +358,30 @@ export function AlertEditorDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
-            Edit Alert Configuration
+            <Plus className="h-5 w-5 text-primary" />
+            Add New Alert Rule
           </DialogTitle>
           <DialogDescription>
-            Modify the alert properties and create a pull request with your changes
+            Create a new Prometheus alert rule and submit a pull request
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 space-y-6 overflow-y-auto pr-2">
-          {/* Alert Info Card */}
-          <div className="bg-muted/50 rounded-lg p-4 border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-muted-foreground">File</span>
-              <span className="text-sm font-mono">{file.name}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">Category</span>
-              <Badge variant="outline">{file.category}</Badge>
-            </div>
+          {/* File Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="file-select">Target File *</Label>
+            <Select value={selectedFile} onValueChange={setSelectedFile}>
+              <SelectTrigger id="file-select">
+                <SelectValue placeholder="Select a file" />
+              </SelectTrigger>
+              <SelectContent>
+                {files.map((file) => (
+                  <SelectItem key={file.name} value={file.name}>
+                    {file.name} ({file.category})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Alert Configuration Form */}
@@ -384,7 +421,7 @@ export function AlertEditorDialog({
               <div className="space-y-2">
                 <Label htmlFor="duration" className="flex items-center gap-2">
                   <Clock className="h-3.5 w-3.5" />
-                  Duration
+                  Duration *
                   <span className="text-xs text-muted-foreground font-normal">(e.g., 5m)</span>
                 </Label>
                 <Input
@@ -415,62 +452,56 @@ export function AlertEditorDialog({
                   </Button>
                 </div>
                 <div className="space-y-2 border rounded-lg p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
-                  {Object.keys(labels).length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No labels defined. Click "Add Label" to create one.
-                    </p>
-                  ) : (
-                    Object.entries(labels).map(([key, value], index) => (
-                      <div key={`label-${index}`} className="bg-background/80 backdrop-blur-sm rounded-lg border shadow-sm p-3 flex gap-2 items-center">
-                        <div className="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0"></div>
-                        {key === "severity" ? (
-                          <>
-                            <Input
-                              value="severity"
-                              disabled
-                              className="font-mono text-xs h-8 flex-1 border-0 bg-transparent opacity-60"
-                            />
-                            <span className="text-muted-foreground text-sm">=</span>
-                            <Select value={severity} onValueChange={setSeverity}>
-                              <SelectTrigger className="h-8 flex-1 font-mono text-xs border-0 bg-muted/50 focus:ring-1">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="warning">warning</SelectItem>
-                                <SelectItem value="critical">critical</SelectItem>
-                                <SelectItem value="info">info</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </>
-                        ) : (
-                          <>
-                            <Input
-                              value={key}
-                              onChange={(e) => updateLabelKey(key, e.target.value)}
-                              placeholder="key"
-                              className="font-mono text-xs h-8 flex-1 border-0 bg-transparent focus-visible:ring-1"
-                            />
-                            <span className="text-muted-foreground text-sm">=</span>
-                            <Input
-                              value={String(value)}
-                              onChange={(e) => handleLabelChange(key, e.target.value)}
-                              placeholder="value"
-                              className="font-mono text-xs h-8 flex-1 border-0 bg-muted/50 focus-visible:ring-1"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeLabel(key)}
-                              className="h-7 w-7 p-0 flex-shrink-0 hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    ))
-                  )}
+                  {Object.entries(labels).map(([key, value], index) => (
+                    <div key={`label-${index}`} className="bg-background/80 backdrop-blur-sm rounded-lg border shadow-sm p-3 flex gap-2 items-center">
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0"></div>
+                      {key === "severity" ? (
+                        <>
+                          <Input
+                            value="severity"
+                            disabled
+                            className="font-mono text-xs h-8 flex-1 border-0 bg-transparent opacity-60"
+                          />
+                          <span className="text-muted-foreground text-sm">=</span>
+                          <Select value={severity} onValueChange={setSeverity}>
+                            <SelectTrigger className="h-8 flex-1 font-mono text-xs border-0 bg-muted/50 focus:ring-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="warning">warning</SelectItem>
+                              <SelectItem value="critical">critical</SelectItem>
+                              <SelectItem value="info">info</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </>
+                      ) : (
+                        <>
+                          <Input
+                            value={key}
+                            onChange={(e) => updateLabelKey(key, e.target.value)}
+                            placeholder="key"
+                            className="font-mono text-xs h-8 flex-1 border-0 bg-transparent focus-visible:ring-1"
+                          />
+                          <span className="text-muted-foreground text-sm">=</span>
+                          <Input
+                            value={String(value)}
+                            onChange={(e) => handleLabelChange(key, e.target.value)}
+                            placeholder="value"
+                            className="font-mono text-xs h-8 flex-1 border-0 bg-muted/50 focus-visible:ring-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeLabel(key)}
+                            className="h-7 w-7 p-0 flex-shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 

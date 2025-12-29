@@ -4,6 +4,7 @@ import { LandscapeLinksSection } from "@/components/LandscapeLinksSection";
 import { ComponentsTabContent } from "@/components/ComponentsTabContent";
 import { HealthDashboard } from "@/components/Health/HealthDashboard";
 import AlertsPage from "@/pages/AlertsPage";
+import MonitoringPage from "@/pages/MonitoringPage";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useLandscapeSelection, useSelectedLandscapeForProject, useUIActions } from "@/stores/appStateStore";
 import { useTabRouting } from "@/hooks/useTabRouting";
@@ -188,12 +189,7 @@ export function ProjectLayout({
 
   // Tab label mapping
   const getTabLabel = (tabId: string): string => {
-    const labelMap: Record<string, string> = {
-      'components': 'Components',
-      'health': 'Health',
-      'alerts': 'Alerts',
-    };
-    return labelMap[tabId] || tabId.charAt(0).toUpperCase() + tabId.slice(1);
+    return tabId.charAt(0).toUpperCase() + tabId.slice(1);
   };
 
   // Build header tabs from database array
@@ -446,6 +442,14 @@ export function ProjectLayout({
       case "alerts":
         return (
           <AlertsPage
+            projectId={projectId}
+            projectName={projectName}
+            alertsUrl={alertsUrl}
+          />
+        );
+      case "monitoring":
+        return (
+          <MonitoringPage
             projectId={projectId}
             projectName={projectName}
             alertsUrl={alertsUrl}

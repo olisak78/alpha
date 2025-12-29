@@ -15,15 +15,14 @@ const getProjectConfig = (project: Project) => {
 
   // Check metadata for additional tabs
   if (project.health) {
-    // Add health tab if health metadata exists
-      tabs.push('health');
-    }
+  // Add health tab if health metadata exists
+    tabs.push('health');
+  }
 
-    // Add alerts tab if alerts metadata exists
-    if (project.alerts && typeof project.alerts === 'string' && project.alerts.trim() !== '') {
-      tabs.push('alerts');
-    }
-
+  if (project.monitoring) {
+    tabs.push('monitoring');
+  }
+  
 
   const defaultConfig = {
     tabs: tabs,

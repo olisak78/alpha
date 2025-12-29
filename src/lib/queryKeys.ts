@@ -173,6 +173,17 @@ export const queryKeys = {
     all: ['categories'] as const,
   },
 
+  triggeredAlerts: {
+    all: ['triggered-alerts'] as const,
+    projects: () => [...queryKeys.triggeredAlerts.all, 'projects'] as const,
+    byProject: (projectname: string) => 
+      [...queryKeys.triggeredAlerts.all, 'by-project', projectname] as const,
+    detail: (projectname: string, fingerprint: string) =>
+      [...queryKeys.triggeredAlerts.all, 'detail', projectname, fingerprint] as const,
+    filters: (projectname: string) =>
+      [...queryKeys.triggeredAlerts.all, 'filters', projectname] as const,
+  },
+
   swagger: {
     all: ['swagger'] as const,
     byComponent: (componentId: string, landscapeName: string) =>

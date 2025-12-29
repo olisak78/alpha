@@ -261,7 +261,6 @@ describe('ProjectLayout', () => {
   describe('Rendering', () => {
     it('should render BreadcrumbPage', () => {
       renderWithRouter(<ProjectLayout {...defaultProps} />);
-
       expect(screen.getByTestId('breadcrumb-page')).toBeInTheDocument();
     });
 

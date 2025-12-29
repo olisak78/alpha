@@ -36,6 +36,7 @@ describe('DynamicProjectPage', () => {
       title: 'CIS 2.0',
       description: 'CIS Project',
       health: true,
+      monitoring: true,
       alerts: 'https://alerts.example.com/cis20',
     },
     {
@@ -44,6 +45,7 @@ describe('DynamicProjectPage', () => {
       title: 'Platform Services',
       description: 'Platform Project',
       health: false,
+      monitoring: false,
       alerts: '',
     },
     {
@@ -51,7 +53,7 @@ describe('DynamicProjectPage', () => {
       name: 'infrastructure',
       title: 'Infrastructure',
       description: 'Infrastructure Project',
-      // No health or alerts metadata
+      // No health or monitoring metadata
     },
   ];
 
@@ -194,59 +196,41 @@ describe('DynamicProjectPage', () => {
       });
     });
 
-    describe('Alerts Tab', () => {
-      it('should include alerts tab when alerts is a non-empty string', () => {
+    describe('Monitoring Tab', () => {
+      it('should include monitoring tab when monitoring metadata is true', () => {
         render(<DynamicProjectPage projectName="cis20" />);
 
-        expect(screen.getByTestId('tabs')).toHaveTextContent('alerts');
+        expect(screen.getByTestId('tabs')).toHaveTextContent('monitoring');
       });
 
-      it('should not include alerts tab when alerts is empty string', () => {
+      it('should not include monitoring tab when monitoring metadata is false', () => {
         render(<DynamicProjectPage projectName="platform" />);
 
-        expect(screen.getByTestId('tabs').textContent).not.toContain('alerts');
+        expect(screen.getByTestId('tabs').textContent).not.toContain('monitoring');
       });
 
-      it('should not include alerts tab when alerts is whitespace only', () => {
-        const projectsWithWhitespace = [
-          {
-            id: 'proj-1',
-            name: 'test',
-            title: 'Test',
-            description: 'Test',
-            alerts: '   ',
-          },
-        ];
-
-        vi.mocked(useProjects).mockReturnValue(projectsWithWhitespace);
-
-        render(<DynamicProjectPage projectName="test" />);
-
-        expect(screen.getByTestId('tabs').textContent).not.toContain('alerts');
-      });
-
-      it('should not include alerts tab when alerts is missing', () => {
+      it('should not include monitoring tab when monitoring metadata is missing', () => {
         render(<DynamicProjectPage projectName="infrastructure" />);
 
-        expect(screen.getByTestId('tabs').textContent).not.toContain('alerts');
+        expect(screen.getByTestId('tabs').textContent).not.toContain('monitoring');
       });
 
-      it('should not include alerts tab when alerts is not a string', () => {
-        const projectsWithNonStringAlerts = [
+      it('should include monitoring tab when monitoring metadata exists (truthy)', () => {
+        const projectsWithMonitoring = [
           {
             id: 'proj-1',
             name: 'test',
             title: 'Test',
             description: 'Test',
-            alerts: true, // Not a string
+            monitoring: 'enabled', // Truthy but not boolean
           } as any,
         ];
 
-        vi.mocked(useProjects).mockReturnValue(projectsWithNonStringAlerts);
+        vi.mocked(useProjects).mockReturnValue(projectsWithMonitoring);
 
         render(<DynamicProjectPage projectName="test" />);
 
-        expect(screen.getByTestId('tabs').textContent).not.toContain('alerts');
+        expect(screen.getByTestId('tabs')).toHaveTextContent('monitoring');
       });
 
       it('should pass alerts URL to ProjectLayout when available', () => {
@@ -286,7 +270,7 @@ describe('DynamicProjectPage', () => {
 
         expect(screen.getByTestId('tabs')).toHaveTextContent('components');
         expect(screen.getByTestId('tabs').textContent).not.toContain('health');
-        expect(screen.getByTestId('tabs').textContent).not.toContain('alerts');
+        expect(screen.getByTestId('tabs').textContent).not.toContain('monitoring');
       });
 
       it('should have components and health tabs when only health is enabled', () => {
@@ -308,30 +292,30 @@ describe('DynamicProjectPage', () => {
         expect(tabs).toEqual(['components', 'health']);
       });
 
-      it('should have components and alerts tabs when only alerts is configured', () => {
-        const projectsWithOnlyAlerts = [
+      it('should have components and monitoring tabs when only monitoring is configured', () => {
+        const projectsWithOnlyMonitoring = [
           {
             id: 'proj-1',
             name: 'test',
             title: 'Test',
             description: 'Test',
-            alerts: 'https://alerts.example.com',
+            monitoring: true,
           },
         ];
 
-        vi.mocked(useProjects).mockReturnValue(projectsWithOnlyAlerts);
+        vi.mocked(useProjects).mockReturnValue(projectsWithOnlyMonitoring);
 
         render(<DynamicProjectPage projectName="test" />);
 
         const tabs = screen.getByTestId('tabs').textContent?.split(',') || [];
-        expect(tabs).toEqual(['components', 'alerts']);
+        expect(tabs).toEqual(['components', 'monitoring']);
       });
 
-      it('should have all three tabs when both health and alerts are configured', () => {
+      it('should have all three tabs when both health and monitoring are configured', () => {
         render(<DynamicProjectPage projectName="cis20" />);
 
         const tabs = screen.getByTestId('tabs').textContent?.split(',') || [];
-        expect(tabs).toEqual(['components', 'health', 'alerts']);
+        expect(tabs).toEqual(['components', 'health', 'monitoring']);
       });
     });
   });
@@ -342,7 +326,7 @@ describe('DynamicProjectPage', () => {
 
       expect(screen.getByTestId('project-name')).toHaveTextContent('CIS 2.0');
       expect(screen.getByTestId('project-id')).toHaveTextContent('cis20');
-      expect(screen.getByTestId('tabs')).toHaveTextContent('components,health,alerts');
+      expect(screen.getByTestId('tabs')).toHaveTextContent('components,health,monitoring');
     });
 
     it('should render correctly for platform project', () => {
@@ -393,7 +377,7 @@ describe('DynamicProjectPage', () => {
           projectName: 'CIS 2.0',
           projectId: 'cis20',
           defaultTab: 'components',
-          tabs: ['components', 'health', 'alerts'],
+          tabs: ['components', 'health', 'monitoring'],
           componentsTitle: 'CIS 2.0 Components',
           emptyStateMessage: 'No CIS 2.0 components found for this organization.',
           system: 'cis20',

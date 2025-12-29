@@ -194,9 +194,13 @@ describe('GithubPrsTab', () => {
 
   it('displays formatted update dates', () => {
     renderWithClient(<GithubPrsTab {...mockProps} />);
-    
-    expect(screen.getByText(/12\/1\/2023/)).toBeInTheDocument();
-    expect(screen.getByText(/11\/30\/2023/)).toBeInTheDocument();
+
+    // Date format from toLocaleString() is locale-specific and includes time
+    // US format: "12/1/2023, 10:00:00 AM" (MM/DD/YYYY)
+    // European format: "1.12.2023, 10:00:00" or "01/12/2023, 10:00:00" (DD/MM/YYYY)
+    // Match either format with flexible separators and optional leading zeros
+    expect(screen.getByText(/(12[.\/]0?1[.\/]2023|0?1[.\/]12[.\/]2023)/)).toBeInTheDocument();
+    expect(screen.getByText(/(11[.\/]30[.\/]2023|30[.\/]11[.\/]2023)/)).toBeInTheDocument();
   });
 
   it('shows repository filter options', () => {
