@@ -7,7 +7,7 @@ import { TriggeredAlert, TriggeredAlertsResponse, TriggeredAlertsLabelUpdatePayl
  * @returns Promise<TriggeredAlertsResponse> - List of triggered alerts for the project
  */
 export async function getTriggeredAlerts(projectname: string): Promise<TriggeredAlertsResponse> {
-  return apiClient.get<TriggeredAlertsResponse>(`/alert-history/alerts/${projectname}`);
+  return apiClient.get<TriggeredAlertsResponse>(`/alert-storage/alerts/${projectname}`);
 }
 
 /**
@@ -17,7 +17,7 @@ export async function getTriggeredAlerts(projectname: string): Promise<Triggered
  * @returns Promise<TriggeredAlert> - The specific triggered alert
  */
 export async function getTriggeredAlert(projectname: string, fingerprint: string): Promise<TriggeredAlert> {
-  return apiClient.get<TriggeredAlert>(`/alert-history/alerts/${projectname}/${fingerprint}`);
+  return apiClient.get<TriggeredAlert>(`/alert-storage/alerts/${projectname}/${fingerprint}`);
 }
 
 /**
@@ -25,7 +25,7 @@ export async function getTriggeredAlert(projectname: string, fingerprint: string
  * @returns Promise<string[]> - Array of project names
  */
 export async function getAlertProjects(): Promise<string[]> {
-  return apiClient.get<string[]>('/alert-history/alerts/project');
+  return apiClient.get<string[]>('/alert-storage/alerts/project');
 }
 
 /**
@@ -34,7 +34,7 @@ export async function getAlertProjects(): Promise<string[]> {
  * @returns Promise<TriggeredAlertsFiltersResponse> - Filter options for the project's alerts
  */
 export async function getTriggeredAlertsFilters(projectname: string): Promise<TriggeredAlertsFiltersResponse> {
-  return apiClient.get<TriggeredAlertsFiltersResponse>(`/alert-history/alerts/${projectname}/filters`);
+  return apiClient.get<TriggeredAlertsFiltersResponse>(`/alert-storage/alerts/${projectname}/filters`);
 }
 
 /**
@@ -49,7 +49,7 @@ export async function updateTriggeredAlertLabel(
   fingerprint: string,
   payload: TriggeredAlertsLabelUpdatePayload
 ): Promise<void> {
-  return apiClient.put<void>(`/alert-history/alerts/${projectname}/${fingerprint}/label`, payload);
+  return apiClient.put<void>(`/alert-storage/alerts/${projectname}/${fingerprint}/label`, payload);
 }
 
 

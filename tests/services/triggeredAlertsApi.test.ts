@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { 
-  getTriggeredAlerts, 
-  getTriggeredAlert, 
-  getAlertProjects, 
-  updateTriggeredAlertLabel 
+import {
+  getTriggeredAlerts,
+  getTriggeredAlert,
+  getAlertProjects,
+  getTriggeredAlertsFilters,
+  updateTriggeredAlertLabel
 } from '../../src/services/triggeredAlertsApi';
 import { apiClient } from '../../src/services/ApiClient';
 
@@ -70,6 +71,14 @@ const createMockLabelUpdatePayload = (overrides?: any) => ({
   ...overrides,
 });
 
+const createMockTriggeredAlertsFiltersResponse = (overrides?: any) => ({
+  severity: ['critical', 'warning', 'info'],
+  status: ['firing', 'resolved'],
+  landscape: ['production', 'staging', 'development'],
+  region: ['us-east-1', 'eu-west-1', 'ap-south-1'],
+  ...overrides,
+});
+
 // ============================================================================
 // TRIGGERED ALERTS API TESTS
 // ============================================================================
@@ -97,7 +106,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlerts(projectname);
 
       expect(result).toEqual(mockResponse);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}`);
       expect(apiClient.get).toHaveBeenCalledTimes(1);
     });
 
@@ -110,7 +119,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlerts(projectname);
 
       expect(result).toEqual(mockResponse);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}`);
     });
 
     it('should handle empty project name', async () => {
@@ -122,7 +131,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlerts(projectname);
 
       expect(result).toEqual(mockResponse);
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-history/alerts/');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts/');
     });
 
     it('should handle API errors', async () => {
@@ -132,7 +141,7 @@ describe('triggeredAlertsApi', () => {
       vi.mocked(apiClient.get).mockRejectedValue(error);
 
       await expect(getTriggeredAlerts(projectname)).rejects.toThrow('Failed to fetch triggered alerts');
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}`);
     });
 
     it('should handle 404 errors for non-existent projects', async () => {
@@ -153,7 +162,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlerts(projectname);
 
       expect(result.alerts).toHaveLength(0);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}`);
     });
   });
 
@@ -172,7 +181,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlert(projectname, fingerprint);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
       expect(apiClient.get).toHaveBeenCalledTimes(1);
     });
 
@@ -186,7 +195,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlert(projectname, fingerprint);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
     });
 
     it('should handle long fingerprints', async () => {
@@ -199,7 +208,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlert(projectname, fingerprint);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
     });
 
     it('should handle API errors', async () => {
@@ -210,7 +219,7 @@ describe('triggeredAlertsApi', () => {
       vi.mocked(apiClient.get).mockRejectedValue(error);
 
       await expect(getTriggeredAlert(projectname, fingerprint)).rejects.toThrow('Alert not found');
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-history/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
     });
 
     it('should handle 404 errors for non-existent alerts', async () => {
@@ -233,7 +242,7 @@ describe('triggeredAlertsApi', () => {
       const result = await getTriggeredAlert(projectname, fingerprint);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-history/alerts//');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts//');
     });
   });
 
@@ -251,7 +260,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toEqual(mockProjects);
       expect(result).toHaveLength(3);
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-history/alerts/project');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts/project');
       expect(apiClient.get).toHaveBeenCalledTimes(1);
     });
 
@@ -264,7 +273,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toEqual(mockProjects);
       expect(result).toHaveLength(0);
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-history/alerts/project');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts/project');
     });
 
     it('should handle single project', async () => {
@@ -285,7 +294,7 @@ describe('triggeredAlertsApi', () => {
       vi.mocked(apiClient.get).mockRejectedValue(error);
 
       await expect(getAlertProjects()).rejects.toThrow('Failed to fetch alert projects');
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-history/alerts/project');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts/project');
     });
 
     it('should handle server errors', async () => {
@@ -314,6 +323,111 @@ describe('triggeredAlertsApi', () => {
   });
 
   // ============================================================================
+  // getTriggeredAlertsFilters TESTS
+  // ============================================================================
+
+  describe('getTriggeredAlertsFilters', () => {
+    it('should fetch alert filters for a project successfully', async () => {
+      const projectname = 'test-project';
+      const mockFilters = createMockTriggeredAlertsFiltersResponse();
+
+      vi.mocked(apiClient.get).mockResolvedValue(mockFilters);
+
+      const result = await getTriggeredAlertsFilters(projectname);
+
+      expect(result).toEqual(mockFilters);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/filters`);
+      expect(apiClient.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle empty filters response', async () => {
+      const projectname = 'test-project';
+      const mockFilters = {};
+
+      vi.mocked(apiClient.get).mockResolvedValue(mockFilters);
+
+      const result = await getTriggeredAlertsFilters(projectname);
+
+      expect(result).toEqual(mockFilters);
+      expect(Object.keys(result)).toHaveLength(0);
+    });
+
+    it('should handle partial filters response', async () => {
+      const projectname = 'test-project';
+      const mockFilters = createMockTriggeredAlertsFiltersResponse({
+        severity: ['critical'],
+        status: ['firing']
+      });
+      delete mockFilters.landscape;
+      delete mockFilters.region;
+
+      vi.mocked(apiClient.get).mockResolvedValue(mockFilters);
+
+      const result = await getTriggeredAlertsFilters(projectname);
+
+      expect(result).toEqual(mockFilters);
+      expect(result.severity).toEqual(['critical']);
+      expect(result.status).toEqual(['firing']);
+      expect(result.landscape).toBeUndefined();
+    });
+
+    it('should handle API errors', async () => {
+      const projectname = 'test-project';
+      const error = new Error('Failed to fetch filters');
+
+      vi.mocked(apiClient.get).mockRejectedValue(error);
+
+      await expect(getTriggeredAlertsFilters(projectname)).rejects.toThrow('Failed to fetch filters');
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/filters`);
+    });
+
+    it('should handle 404 errors for non-existent projects', async () => {
+      const projectname = 'non-existent-project';
+      const error = new Error('Project not found');
+
+      vi.mocked(apiClient.get).mockRejectedValue(error);
+
+      await expect(getTriggeredAlertsFilters(projectname)).rejects.toThrow('Project not found');
+    });
+
+    it('should handle project names with special characters', async () => {
+      const projectname = 'project-with-special_chars.123';
+      const mockFilters = createMockTriggeredAlertsFiltersResponse();
+
+      vi.mocked(apiClient.get).mockResolvedValue(mockFilters);
+
+      const result = await getTriggeredAlertsFilters(projectname);
+
+      expect(result).toEqual(mockFilters);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/filters`);
+    });
+
+    it('should handle filters with many values', async () => {
+      const projectname = 'test-project';
+      const mockFilters = createMockTriggeredAlertsFiltersResponse({
+        severity: Array.from({ length: 20 }, (_, i) => `severity-${i}`),
+        landscape: Array.from({ length: 50 }, (_, i) => `landscape-${i}`)
+      });
+
+      vi.mocked(apiClient.get).mockResolvedValue(mockFilters);
+
+      const result = await getTriggeredAlertsFilters(projectname);
+
+      expect(result.severity).toHaveLength(20);
+      expect(result.landscape).toHaveLength(50);
+    });
+
+    it('should handle server errors', async () => {
+      const projectname = 'test-project';
+      const error = new Error('Internal server error');
+
+      vi.mocked(apiClient.get).mockRejectedValue(error);
+
+      await expect(getTriggeredAlertsFilters(projectname)).rejects.toThrow('Internal server error');
+    });
+  });
+
+  // ============================================================================
   // updateTriggeredAlertLabel TESTS
   // ============================================================================
 
@@ -329,7 +443,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toBeUndefined(); // PUT request returns void
       expect(apiClient.put).toHaveBeenCalledWith(
-        `/alert-history/alerts/${projectname}/${fingerprint}/label`,
+        `/alert-storage/alerts/${projectname}/${fingerprint}/label`,
         payload
       );
       expect(apiClient.put).toHaveBeenCalledTimes(1);
@@ -348,7 +462,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toBeUndefined();
       expect(apiClient.put).toHaveBeenCalledWith(
-        `/alert-history/alerts/${projectname}/${fingerprint}/label`,
+        `/alert-storage/alerts/${projectname}/${fingerprint}/label`,
         payload
       );
     });
@@ -366,7 +480,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toBeUndefined();
       expect(apiClient.put).toHaveBeenCalledWith(
-        `/alert-history/alerts/${projectname}/${fingerprint}/label`,
+        `/alert-storage/alerts/${projectname}/${fingerprint}/label`,
         payload
       );
     });
@@ -382,7 +496,7 @@ describe('triggeredAlertsApi', () => {
       await expect(updateTriggeredAlertLabel(projectname, fingerprint, payload))
         .rejects.toThrow('Failed to update alert label');
       expect(apiClient.put).toHaveBeenCalledWith(
-        `/alert-history/alerts/${projectname}/${fingerprint}/label`,
+        `/alert-storage/alerts/${projectname}/${fingerprint}/label`,
         payload
       );
     });
@@ -430,7 +544,7 @@ describe('triggeredAlertsApi', () => {
 
       expect(result).toBeUndefined();
       expect(apiClient.put).toHaveBeenCalledWith(
-        `/alert-history/alerts/${projectname}/${fingerprint}/label`,
+        `/alert-storage/alerts/${projectname}/${fingerprint}/label`,
         payload
       );
     });
@@ -445,7 +559,7 @@ describe('triggeredAlertsApi', () => {
     const result = await updateTriggeredAlertLabel(projectname, fingerprint, payload);
 
     expect(result).toBeUndefined();
-    expect(apiClient.put).toHaveBeenCalledWith('/alert-history/alerts///label', payload);
+    expect(apiClient.put).toHaveBeenCalledWith('/alert-storage/alerts///label', payload);
   });
 
     it('should handle network errors', async () => {
@@ -484,8 +598,8 @@ describe('triggeredAlertsApi', () => {
       expect(alerts).toEqual(mockAlertsResponse);
 
       expect(apiClient.get).toHaveBeenCalledTimes(2);
-      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/alert-history/alerts/project');
-      expect(apiClient.get).toHaveBeenNthCalledWith(2, `/alert-history/alerts/${projectname}`);
+      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/alert-storage/alerts/project');
+      expect(apiClient.get).toHaveBeenNthCalledWith(2, `/alert-storage/alerts/${projectname}`);
     });
 
     it('should handle mixed success and error scenarios', async () => {

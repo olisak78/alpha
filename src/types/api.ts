@@ -1186,12 +1186,12 @@ export interface ProjectResponse {
 }
 
 // ============================================================================
-// TRIGGERED ALERTS TYPES - Alert history and triggered alerts
+// TRIGGERED ALERTS TYPES - Alert storage and triggered alerts
 // ============================================================================
 
 /**
  * Triggered Alert model
- * Represents a triggered alert from the alert history API
+ * Represents a triggered alert from the alert storage API
  */
 export interface TriggeredAlert {
   fingerprint: string;

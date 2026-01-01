@@ -9,7 +9,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts', './tests/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'lcov'],
       exclude: [
         'node_modules/',
         'tests/',
@@ -25,7 +25,6 @@ export default defineConfig({
         'src/vite-env.d.ts',          // Vite type definitions
         'components.json',            // shadcn/ui config
         '*.config.{js,ts}',           // Root level configs
-        'src/vite-env.d.ts',          // Vite type definitions
       ],
       reportsDirectory: './coverage'
     },
