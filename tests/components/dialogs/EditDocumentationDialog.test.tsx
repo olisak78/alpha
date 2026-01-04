@@ -14,6 +14,13 @@ import type { Documentation } from '../../../src/types/documentation';
 // Mock the hooks
 const mockToast = vi.fn();
 const mockMutateAsync = vi.fn();
+const mockTeamData = {
+  id: 'team1',
+  name: 'Test Team',
+  title: 'Test Team',
+  owner: 'test-owner',
+  organization_id: 'org-123',
+};
 
 vi.mock('../../../src/hooks/use-toast', () => ({
   useToast: vi.fn(() => ({
@@ -25,6 +32,15 @@ vi.mock('../../../src/hooks/api/useDocumentation', () => ({
   useUpdateDocumentation: vi.fn(() => ({
     mutateAsync: mockMutateAsync,
     isPending: false,
+  })),
+}));
+
+// ✅ ADD THIS MOCK
+vi.mock('../../../src/hooks/api/useTeams', () => ({
+  useTeamById: vi.fn(() => ({
+    data: mockTeamData,
+    isLoading: false,
+    error: null,
   })),
 }));
 

@@ -57,7 +57,7 @@ describe('githubApi', () => {
 
       const result = await fetchGitHubPullRequests();
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: undefined,
       });
       expect(result).toEqual(mockResponse);
@@ -81,7 +81,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests(params);
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: {
           state: 'open',
           sort: 'created',
@@ -124,7 +124,7 @@ describe('githubApi', () => {
 
       const result = await fetchGitHubPullRequests({ state: 'open' });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { state: 'open' },
       });
       expect(result.pull_requests).toHaveLength(1);
@@ -232,7 +232,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests({ sort: 'created', direction: 'asc' });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { sort: 'created', direction: 'asc' },
       });
     });
@@ -247,7 +247,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests({ sort: 'updated', direction: 'desc' });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { sort: 'updated', direction: 'desc' },
       });
     });
@@ -262,7 +262,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests({ sort: 'popularity' });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { sort: 'popularity' },
       });
     });
@@ -277,7 +277,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests({ sort: 'long-running' });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { sort: 'long-running' },
       });
     });
@@ -292,7 +292,7 @@ describe('githubApi', () => {
 
       await fetchGitHubPullRequests({ per_page: 25, page: 3 });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/github/pull-requests', {
+      expect(apiClient.get).toHaveBeenCalledWith('/github/githubtools/pull-requests', {
         params: { per_page: 25, page: 3 },
       });
     });
@@ -399,7 +399,7 @@ describe('githubApi', () => {
       await fetchGitHubPullRequests();
 
       expect(apiClient.get).toHaveBeenCalledWith(
-        '/github/pull-requests',
+        '/github/githubtools/pull-requests',
         expect.any(Object)
       );
     });

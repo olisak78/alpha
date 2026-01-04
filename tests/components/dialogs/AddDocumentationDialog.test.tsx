@@ -13,6 +13,13 @@ import { AddDocumentationDialog } from '../../../src/components/dialogs/AddDocum
 // Mock the hooks
 const mockToast = vi.fn();
 const mockMutateAsync = vi.fn();
+const mockTeamData = {
+  id: 'team-123',
+  name: 'Test Team',
+  title: 'Test Team',
+  owner: 'test-owner',
+  organization_id: 'org-123',
+};
 
 vi.mock('../../../src/hooks/use-toast', () => ({
   useToast: vi.fn(() => ({
@@ -24,6 +31,15 @@ vi.mock('../../../src/hooks/api/useDocumentation', () => ({
   useCreateDocumentation: vi.fn(() => ({
     mutateAsync: mockMutateAsync,
     isPending: false,
+  })),
+}));
+
+// ✅ ADD THIS MOCK
+vi.mock('../../../src/hooks/api/useTeams', () => ({
+  useTeamById: vi.fn(() => ({
+    data: mockTeamData,
+    isLoading: false,
+    error: null,
   })),
 }));
 
@@ -57,11 +73,13 @@ describe('AddDocumentationDialog Component', () => {
       
       // Form fields with labels and placeholders
       expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('COE Documentation')).toBeInTheDocument();
+      // ✅ CHANGED: Dynamic placeholder based on team name
+      expect(screen.getByPlaceholderText('Test Team Documentation')).toBeInTheDocument();
       expect(screen.getByLabelText(/github url/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText('https://github.tools.sap/org/repo/tree/main/docs')).toBeInTheDocument();
       expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Documentation for the COE team...')).toBeInTheDocument();
+      // ✅ CHANGED: Dynamic placeholder based on team name
+      expect(screen.getByPlaceholderText('Documentation for the Test Team team...')).toBeInTheDocument();
       
       // Buttons and UI elements
       expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();

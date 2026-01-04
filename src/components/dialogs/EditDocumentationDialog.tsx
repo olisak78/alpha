@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUpdateDocumentation } from "@/hooks/api/useDocumentation";
 import { Loader2 } from "lucide-react";
 import type { Documentation } from "@/types/documentation";
+import { useTeamById } from "@/hooks/api/useTeams"; 
 
 interface EditDocumentationDialogProps {
   open: boolean;
@@ -50,6 +51,9 @@ const validateGitHubUrl = (url: string): boolean => {
 export function EditDocumentationDialog({ open, onOpenChange, documentation }: EditDocumentationDialogProps) {
   const { toast } = useToast();
   const updateDocumentation = useUpdateDocumentation(documentation.id);
+
+  const { data: teamData } = useTeamById(documentation.team_id);
+  const teamDisplayName = teamData?.title || teamData?.name || "Team";
 
   const [formData, setFormData] = useState<FormData>({
     url: "",
@@ -184,7 +188,7 @@ export function EditDocumentationDialog({ open, onOpenChange, documentation }: E
             </Label>
             <Input
               id="edit-title"
-              placeholder="COE Documentation"
+              placeholder={`${teamDisplayName} Documentation`}
               value={formData.title}
               onChange={(e) => handleFieldChange("title", e.target.value)}
               onBlur={() => handleBlur("title")}

@@ -156,6 +156,7 @@ vi.mock('lucide-react', () => ({
   FolderPlus: () => <span data-testid="folder-plus-icon">📁➕</span>,
   Trash2: () => <span data-testid="trash-icon">🗑️</span>,
   X: () => <span data-testid="x-icon">✕</span>,
+  Edit: () => <span data-testid="edit-icon">✏️</span>,
 }));
 
 // Mock Fuse.js
@@ -508,13 +509,13 @@ describe('DocsPage Component', () => {
       // With docsConfig - should show edit button
       const { unmount } = renderWithQueryClient();
       expect(screen.getByText('Edit')).toBeInTheDocument();
-      expect(screen.getByTestId('file-text-icon')).toBeInTheDocument();
+      expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
       unmount();
 
       // Without docsConfig - should not show edit button
       renderWithQueryClient({} as any);
       expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('file-text-icon')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('edit-icon')).not.toBeInTheDocument();
     });
 
   });

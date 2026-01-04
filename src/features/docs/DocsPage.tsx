@@ -13,7 +13,7 @@ import { DocsRawEditor } from './components/DocsRawEditor';
 import { CreateItemDialog, CreateItemType } from './components/CreateItemDialog';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { flattenDocTree, DocTreeNode, createGitHubFile, createGitHubFolder, deleteGitHubFile, deleteGitHubFolder, isFolderEmpty } from '@/services/githubDocsApi';
-import { AlertCircle, Loader2, FileText, Eye, Github, FilePlus, FolderPlus } from 'lucide-react';
+import { AlertCircle, Loader2, FileText, Eye, Github, FilePlus, FolderPlus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Fuse from 'fuse.js';
 import { useQueryClient } from '@tanstack/react-query';
@@ -80,6 +80,7 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
       setFileSHA(fileMetadata.sha);
     }
   }, [fileMetadata]);
+
 
   // Initialize doc tree with lazy children support
   useEffect(() => {
@@ -475,6 +476,7 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, [fileContent]);
 
+
   if (treeError) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-white dark:bg-[#0D0D0D]">
@@ -592,7 +594,7 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
               <div id="docs-content-scroll-container" className="flex-1 overflow-y-auto relative">
                 {/* Action Buttons - Floating */}
                 {selectedPath && fileContent && docsConfig && (
-                  <div className="absolute top-4 right-4 z-10 flex gap-2">
+                  <div className="absolute top-1 right-1 min-[1800px]:top-4 min-[1800px]:right-4 z-10 flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -600,20 +602,21 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
                         const githubUrl = `https://github.tools.sap/${docsConfig.owner}/${docsConfig.repo}/blob/${docsConfig.branch}/${docsConfig.docsPath}/${selectedPath}`;
                         window.open(githubUrl, '_blank', 'noopener,noreferrer');
                       }}
-                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
                       title="Open in GitHub"
                     >
-                      <Github className="h-4 w-4 mr-2" />
-                      Open
+                      <Github className="h-4 w-4 min-[1800px]:mr-2" />
+                      <span className="hidden min-[1800px]:inline">Open</span>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setIsRawMode(true)}
-                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
+                      title="Edit"
                     >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Edit
+                      <Edit className="h-4 w-4 min-[1800px]:mr-2" />
+                      <span className="hidden min-[1800px]:inline">Edit</span>
                     </Button>
                   </div>
                 )}

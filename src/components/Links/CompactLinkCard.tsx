@@ -2,6 +2,12 @@ import { Star, Trash2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "@/types/developer-portal";
 import type { QuickLink } from "@/contexts/QuickLinksContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CompactLinkCardProps {
   linkData: Link | QuickLink;
@@ -14,18 +20,18 @@ interface CompactLinkCardProps {
   onEdit?: (linkId: string) => void;
 }
 
-export const CompactLinkCard = ({ 
-  linkData, 
-  isFavorite, 
-  showStarButton, 
-  showDeleteButton, 
+export const CompactLinkCard = ({
+  linkData,
+  isFavorite,
+  showStarButton,
+  showDeleteButton,
   showEditButton = false,
-  onToggleFavorite, 
-  onDelete, 
+  onToggleFavorite,
+  onDelete,
   onEdit
 }: CompactLinkCardProps) => {
- 
-  const { id, title, url } = linkData;
+
+  const { id, title, url, description } = linkData;
 
   // Create handlers for the action buttons
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -52,13 +58,9 @@ export const CompactLinkCard = ({
     }
   };
 
-  return (
+  const linkContent = (
     <div className="group">
-      <a
-        href={url}
-        target="_blank"
-        rel="noreferrer"
-        className="block px-3 py-2 border rounded hover:shadow-sm hover:border-primary/50 transition-all duration-200 bg-background relative"
+      <a href={url} target="_blank" rel="noreferrer" className="block px-3 py-2 border rounded hover:shadow-sm hover:border-primary/50 transition-all duration-200 bg-background relative"
       >
         <div className="flex items-start gap-2 min-h-[1.5rem]">
           {/* Star on the left */}
@@ -71,14 +73,14 @@ export const CompactLinkCard = ({
               <Star
                 className={cn(
                   "h-4 w-4 transition-all",
-                  isFavorite 
-                    ? "fill-yellow-400 text-yellow-400" 
+                  isFavorite
+                    ? "fill-yellow-400 text-yellow-400"
                     : "text-muted-foreground hover:text-yellow-400"
                 )}
               />
             </button>
           )}
-          
+
           <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors whitespace-nowrap">
             {title}
           </h4>
@@ -93,7 +95,7 @@ export const CompactLinkCard = ({
               <Pencil className="h-4 w-4 text-muted-foreground hover:text-primary" />
             </button>
           )}
-          
+
           {/* Delete button on the right */}
           {showDeleteButton && (
             <button
@@ -106,6 +108,26 @@ export const CompactLinkCard = ({
           )}
         </div>
       </a>
-    </div>
-  );
+    </div>)
+
+  if (description && description.trim()) {
+    return (
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {linkContent}
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs">
+            <p className="text-sm">{description}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  // No description - return link without tooltip
+  return linkContent;
+
+
+  
 };

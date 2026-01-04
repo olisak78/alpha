@@ -28,7 +28,7 @@ function getSystemTheme(): ActualTheme {
 function applyThemeToDocument(actualTheme: ActualTheme): void {
   if (typeof window !== 'undefined') {
     const root = window.document.documentElement;
-    
+
     // Only update if actually different (prevents unnecessary DOM mutations)
     if (!root.classList.contains(actualTheme)) {
       root.classList.remove('light', 'dark');
@@ -44,6 +44,34 @@ function resolveActualTheme(theme: Theme): ActualTheme {
   return theme === 'dark' ? 'dark' : 'light';
 }
 
+/**
+ * Read theme preference from localStorage synchronously
+ * This ensures the initial store state matches what's persisted
+ */
+function getInitialTheme(): Theme {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.state?.theme || 'system';
+      }
+    } catch (e) {
+      console.error('[themeStore] Failed to read initial theme from localStorage:', e);
+    }
+  }
+  return 'system';
+}
+
+/**
+ * Calculate initial actualTheme based on persisted preference
+ * This prevents icon mismatch on page load
+ */
+function getInitialActualTheme(): ActualTheme {
+  const theme = getInitialTheme();
+  return resolveActualTheme(theme);
+}
+
 // ============================================================================
 // STORE DEFINITION
 // ============================================================================
@@ -51,18 +79,17 @@ function resolveActualTheme(theme: Theme): ActualTheme {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: 'system',
-      actualTheme: getSystemTheme(),
-      
+      theme: getInitialTheme(),
+      actualTheme: getInitialActualTheme(),
       setTheme: (newTheme) => {
         const actualTheme = resolveActualTheme(newTheme);
         set({ theme: newTheme, actualTheme });
         applyThemeToDocument(actualTheme);
       },
-      
+
       toggleTheme: () => {
         const { theme, actualTheme } = get();
-        
+
         if (theme === 'system') {
           const systemTheme = getSystemTheme();
           const newTheme = systemTheme === 'dark' ? 'light' : 'dark';
@@ -74,7 +101,7 @@ export const useThemeStore = create<ThemeState>()(
           applyThemeToDocument(newTheme);
         }
       },
-      
+
       _updateActualTheme: (actualTheme) => {
         set({ actualTheme });
         applyThemeToDocument(actualTheme);
@@ -82,7 +109,7 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: THEME_STORAGE_KEY,
-      
+
       // Only persist the theme preference, not actualTheme
       // This means updating actualTheme won't trigger localStorage writes
       partialize: (state) => ({ theme: state.theme }),
@@ -99,16 +126,16 @@ if (typeof window !== 'undefined') {
   const unsubscribe = useThemeStore.persist.onFinishHydration(() => {
     const state = useThemeStore.getState();
     const actualTheme = resolveActualTheme(state.theme);
-    
+
     // Update actualTheme if needed
     // Since actualTheme is not in partialize, this won't trigger a localStorage write
     if (state.actualTheme !== actualTheme) {
       useThemeStore.setState({ actualTheme });
     }
-    
+
     // Apply theme to document
     applyThemeToDocument(actualTheme);
-    
+
     // Unsubscribe after first hydration
     unsubscribe();
   });
@@ -124,15 +151,15 @@ let cleanupListener: (() => void) | null = null;
 export function initializeThemeListener(): () => void {
   // Guard against duplicate initialization
   if (typeof window === 'undefined' || listenerInitialized) {
-    return cleanupListener || (() => {});
+    return cleanupListener || (() => { });
   }
 
   listenerInitialized = true;
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  
+
   const handleSystemThemeChange = (e: MediaQueryListEvent) => {
     const store = useThemeStore.getState();
-    
+
     // Only update if theme preference is 'system'
     if (store.theme === 'system') {
       const newActualTheme = e.matches ? 'dark' : 'light';
@@ -192,7 +219,7 @@ export const useTheme = () => {
   const actualTheme = useThemeStore((state) => state.actualTheme);
   const setTheme = useThemeStore((state) => state.setTheme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  
+
   return { theme, actualTheme, setTheme, toggleTheme };
 };
 
@@ -206,7 +233,7 @@ export const useTheme = () => {
  */
 export const resetThemeStore = () => {
   const actualTheme = getSystemTheme();
-  useThemeStore.setState({ 
+  useThemeStore.setState({
     theme: 'system',
     actualTheme,
   });

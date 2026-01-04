@@ -1,8 +1,9 @@
 import { AuthContextType, User } from '@/types/developer-portal';
 import { buildUserFromMe } from "@/utils/developer-portal-helpers";
-import { authService, checkAuthStatus, logoutUser } from '@/services/authService';
+import { checkDualAuthStatus, logoutUser, DualAuthStatus } from '@/services/authService';
 import { fetchCurrentUser } from '@/hooks/api/useMembers';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useDualAuthStore } from '@/stores/useDualAuthStore';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,45 +14,76 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const {
+    setGithubToolsAuthenticated,
+    setGithubWdfAuthenticated,
+    isBothAuthenticated,
+    reset: resetDualAuth,
+  } = useDualAuthStore();
 
   // Check if user is already authenticated on app load
   useEffect(() => {
     // Don't check auth status if we're on the login page
     // This prevents automatic re-login after logout
     const isLoginPage = window.location.pathname === '/login';
+    console.log('🔍 AuthContext: Initial useEffect', {
+      isLoginPage,
+      pathname: window.location.pathname,
+    });
 
     if (!isLoginPage) {
+      console.log('🔍 AuthContext: Not on login page, checking auth status...');
       checkAuthStatusAndSetUser();
     } else {
       // If on login page, just set loading to false
+      console.log('🔍 AuthContext: On login page, skipping auth check');
       setIsLoading(false);
     }
   }, []);
 
   const checkAuthStatusAndSetUser = async () => {
     try {
+      console.log('🔍 AuthContext: checkAuthStatusAndSetUser started');
       setIsLoading(true);
-      // First, refresh/validate auth to ensure session cookies/tokens are up-to-date
-      const authData = await checkAuthStatus();
+      
+      // Check both authentication statuses
+      const authStatuses = await checkDualAuthStatus();
+      console.log('🔍 AuthContext: Auth statuses received:', authStatuses);
+      
+      // Update Zustand store with authentication statuses
+      setGithubToolsAuthenticated(authStatuses.githubtools);
+      setGithubWdfAuthenticated(authStatuses.githubwdf);
+      console.log('🔍 AuthContext: Updated Zustand store with auth statuses');
 
-      if (authData) {
-        // Then, fetch user from /users/me
+      // Only proceed if both authentications are valid
+      if (authStatuses.githubtools && authStatuses.githubwdf) {
+        console.log('✅ AuthContext: Both auths valid, fetching user...');
+        // Fetch user from /users/me
         const me = await fetchCurrentUser();
+        console.log('🔍 AuthContext: User fetch result:', me ? 'Success' : 'Failed');
+        
         if (me) {
           const user = buildUserFromMe(me);
           setUser(user);
+          console.log('✅ AuthContext: User set successfully:', user.name);
         } else {
           setUser(null);
+          console.log('❌ AuthContext: Failed to fetch user');
         }
       } else {
-        // No valid auth, clear user state
+        // Not fully authenticated, clear user state
+        console.log('❌ AuthContext: Not fully authenticated', authStatuses);
         setUser(null);
       }
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      console.error('❌ AuthContext: Error checking auth status:', error);
       setUser(null);
+      setGithubToolsAuthenticated(false);
+      setGithubWdfAuthenticated(false);
     } finally {
       setIsLoading(false);
+      console.log('🔍 AuthContext: checkAuthStatusAndSetUser completed');
     }
   };
 
@@ -59,13 +91,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
 
-      // Use centralized authentication service with redirect to home
-      await authService({
-        returnUrl: '/',
-        storeReturnUrl: false, // Don't store current URL, always redirect to home
-      });
+      // Wait for both authentications to complete
+      // The LoginPage handles the actual authentication flow
+      // This method is called after both are complete
+      
+      // Verify both authentications
+      const authStatuses = await checkDualAuthStatus();
+      setGithubToolsAuthenticated(authStatuses.githubtools);
+      setGithubWdfAuthenticated(authStatuses.githubwdf);
 
-      // After successful authentication, refresh user state
+      if (!authStatuses.githubtools || !authStatuses.githubwdf) {
+        throw new Error('Both authentications are required to access the portal');
+      }
+
+      // After successful dual authentication, refresh user state
       await refreshAuth();
     } catch (error) {
       console.error('Login error:', error);
@@ -84,6 +123,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Clear user state
       setUser(null);
+      
+      // Reset dual auth store
+      resetDualAuth();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -93,10 +135,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshAuth = async () => {
     try {
-      // Refresh/validate the auth session
-      const authData = await checkAuthStatus();
+      // Check both authentications
+      const authStatuses = await checkDualAuthStatus();
+      setGithubToolsAuthenticated(authStatuses.githubtools);
+      setGithubWdfAuthenticated(authStatuses.githubwdf);
 
-      if (authData) {
+      if (authStatuses.githubtools && authStatuses.githubwdf) {
         // Then fetch current user profile and update UI state
         const me = await fetchCurrentUser();
         if (me) {
@@ -112,9 +156,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           throw new Error('Failed to fetch current user');
         }
       } else {
-        // No valid auth data, clear user
+        // Not fully authenticated
         setUser(null);
-        throw new Error('Authentication failed');
+        throw new Error('Both authentications are required');
       }
     } catch (error) {
       console.error('Refresh auth error:', error);
@@ -123,9 +167,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // User is authenticated only if both auth providers are authenticated
+  const isAuthenticated = !!user && isBothAuthenticated();
+  
+  console.log('🔍 AuthContext: isAuthenticated calculation', {
+    hasUser: !!user,
+    bothAuth: isBothAuthenticated(),
+    isAuthenticated,
+  });
+
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated,
     isLoading,
     login,
     logout,

@@ -1,5 +1,3 @@
-
-
 import { getNewBackendUrl } from "@/constants/developer-portal";
 
 // Get backend URL from runtime environment or fallback to localhost for development
@@ -10,106 +8,107 @@ export interface AuthServiceOptions {
   storeReturnUrl?: boolean;
 }
 
-export const authService = async (options: AuthServiceOptions = {}): Promise<void> => {
-  const { returnUrl, storeReturnUrl = true } = options;
+export type AuthProvider = 'githubtools' | 'githubwdf';
 
-  // Store return URL if requested
-  if (storeReturnUrl) {
-    const urlToStore = returnUrl || window.location.href;
-    sessionStorage.setItem('authReturnUrl', urlToStore);
-  }
+export interface DualAuthStatus {
+  githubtools: boolean;
+  githubwdf: boolean;
+}
 
-  const authUrl = `${backendUrl}/api/auth/githubtools/start`;
+/**
+ * Generic authentication service that handles OAuth popup flow
+ * @param provider - The authentication provider ('githubtools' or 'githubwdf')
+ * @param options - Authentication options
+ */
+const createAuthService = (provider: AuthProvider) => {
+  return async (options: AuthServiceOptions = {}): Promise<void> => {
+    const { returnUrl, storeReturnUrl = true } = options;
 
-  // Open popup for OAuth flow
-  const popup = window.open(
-    authUrl,
-    'auth-popup',
-    'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
-  );
+    // Store return URL if requested
+    if (storeReturnUrl) {
+      const urlToStore = returnUrl || window.location.href;
+      sessionStorage.setItem('authReturnUrl', urlToStore);
+    }
 
-  if (!popup) {
-    // Fallback: redirect to auth URL in same window
-    window.location.href = authUrl;
-    return;
-  }
+    const authUrl = `${backendUrl}/api/auth/${provider}/start`;
 
-  return new Promise<void>((resolve, reject) => {
-    // Listen for the popup to close
-    const checkClosed = setInterval(async () => {
-      if (popup.closed) {
-        clearInterval(checkClosed);
-        window.removeEventListener('message', messageListener);
+    // Open popup for OAuth flow
+    const popup = window.open(
+      authUrl,
+      `auth-popup-${provider}`,
+      'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
+    );
 
-        // Check if authentication was successful by calling refresh
-        try {
-          const response = await fetch(`${backendUrl}/api/auth/refresh`, {
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest',
-            },
-          });
+    if (!popup) {
+      // Fallback: redirect to auth URL in same window
+      window.location.href = authUrl;
+      return;
+    }
 
-          if (response.ok) {
-            // Handle return URL
-            const storedReturnUrl = sessionStorage.getItem('authReturnUrl');
-            if (storedReturnUrl && storeReturnUrl) {
-              sessionStorage.removeItem('authReturnUrl');
-              window.location.href = storedReturnUrl;
-            } else if (returnUrl) {
-              window.location.href = returnUrl;
-            } else {
+    return new Promise<void>((resolve, reject) => {
+      // Listen for the popup to close
+      const checkClosed = setInterval(async () => {
+        if (popup.closed) {
+          clearInterval(checkClosed);
+          window.removeEventListener('message', messageListener);
+
+          // Check if authentication was successful by calling refresh
+          try {
+            const response = await fetch(`${backendUrl}/api/auth/refresh`, {
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+              },
+            });
+
+            if (response.ok) {
+              // Authentication successful
               resolve();
+            } else {
+              reject(new Error(`Authentication failed for ${provider} after popup closed`));
             }
-          } else {
-            reject(new Error('Authentication failed after popup closed'));
+          } catch (error) {
+            reject(error);
           }
-        } catch (error) {
-          reject(error);
         }
-      }
-    }, 1000);
+      }, 1000);
 
-    // Also listen for messages from the popup (if the backend sends them)
-    const messageListener = (event: MessageEvent) => {
-      if (event.origin !== backendUrl) return;
+      // Also listen for messages from the popup (if the backend sends them)
+      const messageListener = (event: MessageEvent) => {
+        if (event.origin !== backendUrl) return;
 
-      if (event.data.type === 'auth-result') {
-        popup.close();
-        clearInterval(checkClosed);
-        window.removeEventListener('message', messageListener);
+        if (event.data.type === 'auth-result') {
+          popup.close();
+          clearInterval(checkClosed);
+          window.removeEventListener('message', messageListener);
 
-        if (event.data.success) {
-          // Handle return URL
-          const storedReturnUrl = sessionStorage.getItem('authReturnUrl');
-          if (storedReturnUrl && storeReturnUrl) {
-            sessionStorage.removeItem('authReturnUrl');
-            window.location.href = storedReturnUrl;
-          } else if (returnUrl) {
-            window.location.href = returnUrl;
-          } else {
+          if (event.data.success) {
             resolve();
+          } else {
+            reject(new Error(`Authentication failed for ${provider}`));
           }
-        } else {
-          reject(new Error('Authentication failed'));
         }
-      }
-    };
+      };
 
-    window.addEventListener('message', messageListener);
+      window.addEventListener('message', messageListener);
 
-    // Cleanup and timeout after 5 minutes
-    setTimeout(() => {
-      if (!popup.closed) {
-        popup.close();
-        clearInterval(checkClosed);
-        window.removeEventListener('message', messageListener);
-        reject(new Error('Authentication timeout'));
-      }
-    }, 300000);
-  });
+      // Cleanup and timeout after 5 minutes
+      setTimeout(() => {
+        if (!popup.closed) {
+          popup.close();
+          clearInterval(checkClosed);
+          window.removeEventListener('message', messageListener);
+          reject(new Error(`Authentication timeout for ${provider}`));
+        }
+      }, 300000);
+    });
+  };
 };
+
+// Create specific auth services for each provider
+export const authService = createAuthService('githubtools');
+export const authServiceWdf = createAuthService('githubwdf');
 
 export const checkAuthStatus = async () => {
   try {
@@ -140,6 +139,57 @@ export const checkAuthStatus = async () => {
   }
 };
 
+/**
+ * Check authentication status for both providers
+ * Returns an object indicating which providers are authenticated
+ */
+export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
+  try {
+    const justLoggedOut = sessionStorage.getItem('justLoggedOut');
+    if (justLoggedOut) {
+      sessionStorage.removeItem('justLoggedOut');
+      console.log('🔍 checkDualAuthStatus: Just logged out, returning false for both');
+      return { githubtools: false, githubwdf: false };
+    }
+
+    console.log('🔍 checkDualAuthStatus: Calling /api/auth/refresh...');
+    const response = await fetch(`${backendUrl}/api/auth/refresh`, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    });
+
+    console.log('🔍 checkDualAuthStatus: Response status:', response.status);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('🔍 checkDualAuthStatus: Response data:', data);
+      
+      // Check if the response includes auth status for both providers
+      // If backend provides explicit status, use it
+      // Otherwise, if backend returned an accessToken, assume both auths are valid
+      // (backend wouldn't issue token unless both authentications succeeded)
+      const hasAccessToken = !!data.accessToken;
+      
+      const authStatus = {
+        githubtools: data.githubtools ?? (hasAccessToken || data.authenticated || false),
+        githubwdf: data.githubwdf ?? (hasAccessToken || data.authenticated || false),
+      };
+      
+      console.log('🔍 checkDualAuthStatus: Parsed auth status:', authStatus);
+      return authStatus;
+    }
+
+    console.log('❌ checkDualAuthStatus: Response not OK, returning false for both');
+    return { githubtools: false, githubwdf: false };
+  } catch (error) {
+    console.error('❌ checkDualAuthStatus: Error:', error);
+    return { githubtools: false, githubwdf: false };
+  }
+};
+
 export const logoutUser = async (): Promise<void> => {
   try {
     await fetch(`${backendUrl}/api/auth/logout`, {
@@ -151,7 +201,7 @@ export const logoutUser = async (): Promise<void> => {
       },
     });
 
-      // Clear session and authentication-related data only
+    // Clear session and authentication-related data only
     try {
       // Always clear all sessionStorage
       sessionStorage.clear();

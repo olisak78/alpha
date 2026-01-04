@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateDocumentation } from "@/hooks/api/useDocumentation";
 import { Loader2 } from "lucide-react";
+import { useTeamById } from "@/hooks/api/useTeams";
 
 interface AddDocumentationDialogProps {
   open: boolean;
@@ -32,19 +33,19 @@ const validateGitHubUrl = (url: string): boolean => {
     if (parsedUrl.host !== "github.tools.sap" && parsedUrl.host !== "github.com") {
       return false;
     }
-    
+
     const parts = parsedUrl.pathname.split('/').filter(p => p);
-    
+
     // Support repository root URLs: /{owner}/{repo}
     if (parts.length === 2) {
       return true;
     }
-    
+
     // Support tree/blob URLs: /{owner}/{repo}/tree/{branch}/{path} or /{owner}/{repo}/blob/{branch}/{path}
     if (parts.length >= 5 && (parts[2] === "tree" || parts[2] === "blob")) {
       return true;
     }
-    
+
     return false;
   } catch {
     return false;
@@ -167,6 +168,13 @@ export function AddDocumentationDialog({ open, onOpenChange, teamId }: AddDocume
     }
   };
 
+  // Fetch team data to get team name
+  const { data: teamData } = useTeamById(teamId);
+
+  // Get team display name (title or name)
+  const teamDisplayName = teamData?.title || teamData?.name || "Team";
+
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
@@ -185,7 +193,7 @@ export function AddDocumentationDialog({ open, onOpenChange, teamId }: AddDocume
             </Label>
             <Input
               id="title"
-              placeholder="COE Documentation"
+              placeholder={`${teamDisplayName} Documentation`}
               value={formData.title}
               onChange={(e) => handleFieldChange("title", e.target.value)}
               onBlur={() => handleBlur("title")}
@@ -222,7 +230,7 @@ export function AddDocumentationDialog({ open, onOpenChange, teamId }: AddDocume
             <Label htmlFor="description">Description (Optional)</Label>
             <Textarea
               id="description"
-              placeholder="Documentation for the COE team..."
+              placeholder={`Documentation for the ${teamDisplayName} team...`}
               value={formData.description}
               onChange={(e) => handleFieldChange("description", e.target.value)}
               rows={3}

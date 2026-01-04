@@ -44,7 +44,7 @@ export const Announcements: React.FC<AnnouncementsProps> = ({ className, title }
                             </svg>
                         </div>
                         <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                            Alpha Version
+                            Beta Version
                         </h3>
                     </div>
 

@@ -6,7 +6,7 @@ import { GitHubContributionsResponse, GitHubAveragePRTimeResponse, GitHubHeatmap
 export async function fetchGitHubPullRequests(
   params?: GitHubPRQueryParams
 ): Promise<GitHubPullRequestsResponse> {
-  return apiClient.get<GitHubPullRequestsResponse>('/github/pull-requests', {
+  return apiClient.get<GitHubPullRequestsResponse>('/github/githubtools/pull-requests', {
     params: params as Record<string, string | number | boolean | undefined>,
   });
 }
@@ -33,5 +33,5 @@ export async function fetchGitHubPRReviewComments(period?: string): Promise<GitH
 
 export async function closePullRequest(params: ClosePullRequestParams): Promise<{ message: string }> {
   const { prNumber, ...body } = params;
-  return apiClient.patch<{ message: string }>(`/github/pull-requests/close/${prNumber}`, body);
+  return apiClient.patch<{ message: string }>(`/github/githubtools/pull-requests/close/${prNumber}`, body);
 }
