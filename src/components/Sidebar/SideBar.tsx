@@ -169,42 +169,46 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
                             if (project === 'Plugin Marketplace') {
                                 return (
                                     <div key={project}>
-                                        <button
-                                            onClick={handleMarketplaceClick}
-                                            className={`group relative flex items-center transition-all duration-200 w-full rounded-md px-2 py-1.5 ${
+                                        <div
+                                            className={`group relative flex items-center transition-all duration-200 w-full rounded-md px-2 py-1.5 cursor-pointer ${
                                                 activeProject === project ? 'font-medium' : 'text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground'
                                             }`}
                                             title={!isExpanded ? project : undefined}
                                         >
-                                            <div className={`flex items-center justify-center flex-shrink-0 h-7 w-7 rounded-full transition-colors duration-200 ${
-                                                activeProject === project 
-                                                    ? 'bg-blue-500 text-white dark:bg-blue-600' 
-                                                    : 'bg-muted text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground'
-                                            }`}>
-                                                <div className="flex items-center justify-center [&>svg]:h-4 [&>svg]:w-4">
-                                                    {getProjectIcon(project, projectsData)}
+                                            <div
+                                                onClick={handleMarketplaceClick}
+                                                className="flex items-center flex-1"
+                                            >
+                                                <div className={`flex items-center justify-center flex-shrink-0 h-7 w-7 rounded-full transition-colors duration-200 ${
+                                                    activeProject === project
+                                                        ? 'bg-blue-500 text-white dark:bg-blue-600'
+                                                        : 'bg-muted text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground'
+                                                }`}>
+                                                    <div className="flex items-center justify-center [&>svg]:h-4 [&>svg]:w-4">
+                                                        {getProjectIcon(project, projectsData)}
+                                                    </div>
                                                 </div>
+                                                <span className={`ml-3 text-sm font-medium truncate transition-all duration-300 ${
+                                                    isExpanded ? 'opacity-100 max-w-[150px]' : 'opacity-0 max-w-0 overflow-hidden'
+                                                }`}>
+                                                    {project}
+                                                </span>
                                             </div>
-                                            <span className={`ml-3 text-sm font-medium truncate transition-all duration-300 ${
-                                                isExpanded ? 'opacity-100 max-w-[150px]' : 'opacity-0 max-w-0 overflow-hidden'
-                                            }`}>
-                                                {project}
-                                            </span>
                                             {isExpanded && subscribedPlugins.length > 0 && (
                                                 <button
                                                     onClick={handleMarketplaceToggle}
                                                     className="ml-auto p-1 rounded hover:bg-accent/70 transition-colors"
                                                     aria-label={isMarketplaceExpanded ? "Collapse plugins" : "Expand plugins"}
                                                 >
-                                                    <ChevronDown 
-                                                        size={14} 
+                                                    <ChevronDown
+                                                        size={14}
                                                         className={`transition-transform duration-200 ${
                                                             isMarketplaceExpanded ? 'rotate-180' : ''
                                                         }`}
                                                     />
                                                 </button>
                                             )}
-                                        </button>
+                                        </div>
                                         
                                         {isExpanded && isMarketplaceExpanded && subscribedPlugins.length > 0 && (
                                             <div className="ml-6 mt-1 space-y-1 border-l border-border pl-3">

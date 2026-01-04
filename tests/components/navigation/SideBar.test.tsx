@@ -191,12 +191,9 @@ describe('SideBar', () => {
     it('should render all static projects', () => {
       const { container } = render(<SideBar {...defaultProps} />);
 
-      // Get all project names from span.truncate elements
-      const buttons = container.querySelectorAll('button');
-      const projectNames = Array.from(buttons).map(button => {
-        const span = button.querySelector('span.truncate');
-        return span?.textContent;
-      }).filter(Boolean);
+      // Get all project names from span.truncate elements (works for both buttons and divs)
+      const spans = container.querySelectorAll('span.truncate');
+      const projectNames = Array.from(spans).map(span => span.textContent).filter(Boolean);
 
       expect(projectNames).toContain('Home');
       expect(projectNames).toContain('Teams');
@@ -222,10 +219,13 @@ describe('SideBar', () => {
 
   describe('Expansion State', () => {
     it('should render expanded sidebar', () => {
-      vi.mocked(useSidebarStore).mockReturnValue({
-        isExpanded: true,
-        toggle: mockToggle,
-      } as any);
+      vi.mocked(useSidebarStore).mockImplementation((selector: any) => {
+        const state = {
+          isExpanded: true,
+          toggle: mockToggle,
+        };
+        return selector ? selector(state) : state;
+      });
 
       const { container } = render(<SideBar {...defaultProps} />);
 
@@ -263,10 +263,13 @@ describe('SideBar', () => {
     });
 
     it('should show "Collapse sidebar" label when expanded', () => {
-      vi.mocked(useSidebarStore).mockReturnValue({
-        isExpanded: true,
-        toggle: mockToggle,
-      } as any);
+      vi.mocked(useSidebarStore).mockImplementation((selector: any) => {
+        const state = {
+          isExpanded: true,
+          toggle: mockToggle,
+        };
+        return selector ? selector(state) : state;
+      });
 
       render(<SideBar {...defaultProps} />);
 

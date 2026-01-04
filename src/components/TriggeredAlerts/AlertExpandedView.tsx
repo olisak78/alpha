@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDateTime, getSeverityColor, getStatusColor } from "@/utils/alertUtils";
+import { getSeverityColor, getStatusColor } from "@/utils/alertUtils";
+import { formatAlertDate } from "@/utils/dateUtils";
 import { ExternalLink } from "lucide-react";
 
 // Generic alert data interface that can handle both alert types
@@ -64,14 +65,14 @@ export function AlertExpandedView({ alertData, projectId, onShowAlertDefinition 
             {alertData.startsAt && (
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground font-medium">Started:</span>
-                <span className="font-mono text-foreground">{formatDateTime(alertData.startsAt)}</span>
+                <span className="font-mono text-foreground">{formatAlertDate(alertData.startsAt)}</span>
               </div>
             )}
 
             {alertData.endsAt && (
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground font-medium">Ended:</span>
-                <span className="font-mono text-foreground">{formatDateTime(alertData.endsAt)}</span>
+                <span className="font-mono text-foreground">{formatAlertDate(alertData.endsAt)}</span>
               </div>
             )}
           </div>

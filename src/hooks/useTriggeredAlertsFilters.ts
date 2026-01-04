@@ -10,14 +10,12 @@ export interface FilterState {
   selectedStatus: string[];
   selectedLandscape: string[];
   selectedRegion: string[];
-  selectedComponent: string[];
   startDate: string;
   endDate: string;
   excludedSeverity: string[];
   excludedStatus: string[];
   excludedLandscape: string[];
   excludedRegion: string[];
-  excludedComponent: string[];
   excludedAlertname: string[];
 }
 
@@ -27,14 +25,12 @@ export interface FilterActions {
   setSelectedStatus: (values: string[]) => void;
   setSelectedLandscape: (values: string[]) => void;
   setSelectedRegion: (values: string[]) => void;
-  setSelectedComponent: (values: string[]) => void;
   setStartDate: (value: string) => void;
   setEndDate: (value: string) => void;
   addExcludedSeverity: (value: string) => void;
   addExcludedStatus: (value: string) => void;
   addExcludedLandscape: (value: string) => void;
   addExcludedRegion: (value: string) => void;
-  addExcludedComponent: (value: string) => void;
   addExcludedAlertname: (value: string) => void;
   handleDateRangeSelect: (range: DateRange | undefined) => void;
   resetFilters: () => void;
@@ -44,19 +40,16 @@ export interface FilterActions {
   removeStatus: () => void;
   removeLandscape: () => void;
   removeRegion: () => void;
-  removeComponent: () => void;
   removeDateRange: () => void;
   removeExcludedSeverity: (value: string) => void;
   removeExcludedStatus: (value: string) => void;
   removeExcludedLandscape: (value: string) => void;
   removeExcludedRegion: (value: string) => void;
-  removeExcludedComponent: (value: string) => void;
   removeExcludedAlertname: (value: string) => void;
   clearAllExcludedSeverity: () => void;
   clearAllExcludedStatus: () => void;
   clearAllExcludedLandscape: () => void;
   clearAllExcludedRegion: () => void;
-  clearAllExcludedComponent: () => void;
   clearAllExcludedAlertname: () => void;
 }
 
@@ -65,7 +58,6 @@ export interface FilterOptions {
   statuses: string[];
   landscapes: string[];
   regions: string[];
-  components: string[];
 }
 
 export interface UseTriggeredAlertsFiltersReturn {
@@ -84,25 +76,60 @@ export interface UseTriggeredAlertsFiltersReturn {
   error: Error | null;
 }
 
-const initialFilterState: FilterState = {
-  searchTerm: '',
-  selectedSeverity: [],
-  selectedStatus: [],
-  selectedLandscape: [],
-  selectedRegion: [],
-  selectedComponent: [],
-  startDate: '',
-  endDate: '',
-  excludedSeverity: [],
-  excludedStatus: [],
-  excludedLandscape: [],
-  excludedRegion: [],
-  excludedComponent: [],
-  excludedAlertname: [],
+const LOCAL_STORAGE_FILTERS_KEY = 'triggeredAlertsFilters';
+
+const getLocalStorageKey = (projectId: string): string => {
+  return `${LOCAL_STORAGE_FILTERS_KEY}_${projectId}`;
+};
+
+const getInitialFilterState = (projectId: string): FilterState => {
+  try {
+    const storageKey = getLocalStorageKey(projectId);
+    const savedFilters = localStorage.getItem(storageKey);
+    if (savedFilters) {
+      const parsedFilters = JSON.parse(savedFilters);
+      // Validate that the parsed object has all required properties
+      const defaultState: FilterState = {
+        searchTerm: '',
+        selectedSeverity: [],
+        selectedStatus: [],
+        selectedLandscape: [],
+        selectedRegion: [],
+        startDate: '',
+        endDate: '',
+        excludedSeverity: [],
+        excludedStatus: [],
+        excludedLandscape: [],
+        excludedRegion: [],
+        excludedAlertname: [],
+      };
+      
+      // Merge saved filters with default state to ensure all properties exist
+      return { ...defaultState, ...parsedFilters };
+    }
+  } catch (error) {
+    console.warn('Failed to load filters from localStorage:', error);
+  }
+  
+  // Return default state if localStorage is empty or invalid
+  return {
+    searchTerm: '',
+    selectedSeverity: [],
+    selectedStatus: [],
+    selectedLandscape: [],
+    selectedRegion: [],
+    startDate: '',
+    endDate: '',
+    excludedSeverity: [],
+    excludedStatus: [],
+    excludedLandscape: [],
+    excludedRegion: [],
+    excludedAlertname: [],
+  };
 };
 
 // Configuration for filter types to reduce code duplication
-type FilterType = 'severity' | 'status' | 'landscape' | 'region' | 'component';
+type FilterType = 'severity' | 'status' | 'landscape' | 'region';
 
 interface FilterConfig {
   selectedKey: keyof FilterState;
@@ -130,31 +157,27 @@ const FILTER_CONFIGS: Record<FilterType, FilterConfig> = {
     selectedKey: 'selectedRegion',
     excludedKey: 'excludedRegion',
     alertProperty: 'region'
-  },
-  component: {
-    selectedKey: 'selectedComponent',
-    excludedKey: 'excludedComponent',
-    alertProperty: 'component'
   }
 };
 
 // Reducer for managing filter state
 type FilterAction = 
-  | { type: 'SET_FILTER'; filterType: FilterType; values: string[] }
-  | { type: 'RESET_FILTER'; filterType: FilterType }
-  | { type: 'ADD_EXCLUDED'; filterType: FilterType; value: string }
-  | { type: 'REMOVE_EXCLUDED'; filterType: FilterType; value: string }
-  | { type: 'CLEAR_ALL_EXCLUDED'; filterType: FilterType }
-  | { type: 'SET_SEARCH_TERM'; value: string }
-  | { type: 'SET_DATE_RANGE'; startDate: string; endDate: string }
-  | { type: 'SET_START_DATE'; value: string }
-  | { type: 'SET_END_DATE'; value: string }
-  | { type: 'RESET_ALL' }
-  | { type: 'ADD_EXCLUDED_ALERTNAME'; value: string }
-  | { type: 'REMOVE_EXCLUDED_ALERTNAME'; value: string }
-  | { type: 'CLEAR_ALL_EXCLUDED_ALERTNAME' };
+  | { type: 'SET_FILTER'; filterType: FilterType; values: string[]; projectId: string }
+  | { type: 'RESET_FILTER'; filterType: FilterType; projectId: string }
+  | { type: 'ADD_EXCLUDED'; filterType: FilterType; value: string; projectId: string }
+  | { type: 'REMOVE_EXCLUDED'; filterType: FilterType; value: string; projectId: string }
+  | { type: 'CLEAR_ALL_EXCLUDED'; filterType: FilterType; projectId: string }
+  | { type: 'SET_SEARCH_TERM'; value: string; projectId: string }
+  | { type: 'SET_DATE_RANGE'; startDate: string; endDate: string; projectId: string }
+  | { type: 'SET_START_DATE'; value: string; projectId: string }
+  | { type: 'SET_END_DATE'; value: string; projectId: string }
+  | { type: 'RESET_ALL'; projectId: string }
+  | { type: 'ADD_EXCLUDED_ALERTNAME'; value: string; projectId: string }
+  | { type: 'REMOVE_EXCLUDED_ALERTNAME'; value: string; projectId: string }
+  | { type: 'CLEAR_ALL_EXCLUDED_ALERTNAME'; projectId: string };
 
 function filterReducer(state: FilterState, action: FilterAction): FilterState {
+  const storageKey = getLocalStorageKey(action.projectId);
   switch (action.type) {
     case 'SET_FILTER': {
       const config = FILTER_CONFIGS[action.filterType];
@@ -168,16 +191,19 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
         const excludedArray = state[config.excludedKey] as string[];
         (newState as any)[config.excludedKey] = excludedArray.filter(item => !action.values.includes(item));
       }
-      
+      // Store the entire state for simplicity and consistency
+      localStorage.setItem(storageKey, JSON.stringify(newState));
       return newState;
     }
     
     case 'RESET_FILTER': {
       const config = FILTER_CONFIGS[action.filterType];
-      return {
+      const newState = {
         ...state,
-        [config.selectedKey]: initialFilterState[config.selectedKey]
+        [config.selectedKey]: []
       };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
     }
     
     case 'ADD_EXCLUDED': {
@@ -186,10 +212,12 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
       
       // If inclusion filter is currently applied with this value, remove it
       if (selectedValues.includes(action.value)) {
-        return {
+        const newState = {
           ...state,
           [config.selectedKey]: selectedValues.filter(item => item !== action.value)
         };
+        localStorage.setItem(storageKey, JSON.stringify(newState));
+        return newState;
       }
       
       // Otherwise, toggle exclusion filter
@@ -198,45 +226,65 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
         ? excludedArray.filter(item => item !== action.value)
         : [...excludedArray, action.value];
       
-      return {
+      const newState = {
         ...state,
         [config.excludedKey]: newExcluded
       };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
     }
     
     case 'REMOVE_EXCLUDED': {
       const config = FILTER_CONFIGS[action.filterType];
       const excludedArray = state[config.excludedKey] as string[];
-      return {
+      const newState = {
         ...state,
         [config.excludedKey]: excludedArray.filter(item => item !== action.value)
       };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
     }
     
     case 'CLEAR_ALL_EXCLUDED': {
       const config = FILTER_CONFIGS[action.filterType];
-      return {
+      const newState = {
         ...state,
-        [config.excludedKey]: initialFilterState[config.excludedKey]
+        [config.excludedKey]: []
       };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
     }
     
-    case 'SET_SEARCH_TERM':
-      return { ...state, searchTerm: action.value };
+    case 'SET_SEARCH_TERM': {
+      const newState = { ...state, searchTerm: action.value };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
-    case 'SET_DATE_RANGE':
-      return { ...state, startDate: action.startDate, endDate: action.endDate };
+    case 'SET_DATE_RANGE': {
+      const newState = { ...state, startDate: action.startDate, endDate: action.endDate };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
-    case 'SET_START_DATE':
-      return { ...state, startDate: action.value };
+    case 'SET_START_DATE': {
+      const newState = { ...state, startDate: action.value };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
-    case 'SET_END_DATE':
-      return { ...state, endDate: action.value };
+    case 'SET_END_DATE': {
+      const newState = { ...state, endDate: action.value };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
     case 'ADD_EXCLUDED_ALERTNAME': {
       // If search term matches this value, just clear it
       if (state.searchTerm === action.value) {
-        return { ...state, searchTerm: '' };
+        const newState = { ...state, searchTerm: '' };
+        localStorage.setItem(storageKey, JSON.stringify(newState));
+        return newState;
       }
       
       // Otherwise, toggle exclusion filter
@@ -244,20 +292,44 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
         ? state.excludedAlertname.filter(item => item !== action.value)
         : [...state.excludedAlertname, action.value];
       
-      return { ...state, excludedAlertname: newExcluded };
+      const newState = { ...state, excludedAlertname: newExcluded };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
     }
     
-    case 'REMOVE_EXCLUDED_ALERTNAME':
-      return {
+    case 'REMOVE_EXCLUDED_ALERTNAME': {
+      const newState = {
         ...state,
         excludedAlertname: state.excludedAlertname.filter(item => item !== action.value)
       };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
-    case 'CLEAR_ALL_EXCLUDED_ALERTNAME':
-      return { ...state, excludedAlertname: [] };
+    case 'CLEAR_ALL_EXCLUDED_ALERTNAME': {
+      const newState = { ...state, excludedAlertname: [] };
+      localStorage.setItem(storageKey, JSON.stringify(newState));
+      return newState;
+    }
     
-    case 'RESET_ALL':
-      return initialFilterState;
+    case 'RESET_ALL': {
+      const defaultState: FilterState = {
+        searchTerm: '',
+        selectedSeverity: [],
+        selectedStatus: [],
+        selectedLandscape: [],
+        selectedRegion: [],
+        startDate: '',
+        endDate: '',
+        excludedSeverity: [],
+        excludedStatus: [],
+        excludedLandscape: [],
+        excludedRegion: [],
+        excludedAlertname: [],
+      };
+      localStorage.setItem(storageKey, JSON.stringify(defaultState));
+      return defaultState;
+    }
     
     default:
       return state;
@@ -265,8 +337,8 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
 }
 
 export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlertsFiltersReturn {
-  // Use reducer for consolidated state management
-  const [filters, dispatch] = useReducer(filterReducer, initialFilterState);
+  // Use reducer for consolidated state management with project-specific initial state
+  const [filters, dispatch] = useReducer(filterReducer, getInitialFilterState(projectId));
 
   // Fetch triggered alerts using the API hook
   const { data: alertsResponse, isLoading, error } = useTriggeredAlerts(projectId);
@@ -275,91 +347,82 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
   // Fetch filter options from API
   const { data: filtersResponse, isLoading: filtersLoading } = useTriggeredAlertsFiltersApi(projectId);
 
-  // Helper function to extract component name from alert
-  const getAlertComponent = useCallback((alert: TriggeredAlert): string => {
-    return alert.component || 'N/A';
-  }, []);
 
   // Generic helper functions using the reducer
   const createFilterSetter = useCallback((filterType: FilterType) => 
-    (values: string[]) => dispatch({ type: 'SET_FILTER', filterType, values }), []);
+    (values: string[]) => dispatch({ type: 'SET_FILTER', filterType, values, projectId }), [projectId]);
 
   const createFilterRemover = useCallback((filterType: FilterType) => 
-    () => dispatch({ type: 'RESET_FILTER', filterType }), []);
+    () => dispatch({ type: 'RESET_FILTER', filterType, projectId }), [projectId]);
 
   const createExclusionAdder = useCallback((filterType: FilterType) => 
-    (value: string) => dispatch({ type: 'ADD_EXCLUDED', filterType, value }), []);
+    (value: string) => dispatch({ type: 'ADD_EXCLUDED', filterType, value, projectId }), [projectId]);
 
   const createExclusionRemover = useCallback((filterType: FilterType) => 
-    (value: string) => dispatch({ type: 'REMOVE_EXCLUDED', filterType, value }), []);
+    (value: string) => dispatch({ type: 'REMOVE_EXCLUDED', filterType, value, projectId }), [projectId]);
 
   const createExclusionClearer = useCallback((filterType: FilterType) => 
-    () => dispatch({ type: 'CLEAR_ALL_EXCLUDED', filterType }), []);
+    () => dispatch({ type: 'CLEAR_ALL_EXCLUDED', filterType, projectId }), [projectId]);
 
   // Create all the action functions
-  const resetFilters = useCallback(() => dispatch({ type: 'RESET_ALL' }), []);
+  const resetFilters = useCallback(() => dispatch({ type: 'RESET_ALL', projectId }), [projectId]);
   
   // Search term actions
   const setSearchTerm = useCallback((value: string) => 
-    dispatch({ type: 'SET_SEARCH_TERM', value }), []);
+    dispatch({ type: 'SET_SEARCH_TERM', value, projectId }), [projectId]);
   const removeSearchTerm = useCallback(() => 
-    dispatch({ type: 'SET_SEARCH_TERM', value: '' }), []);
+    dispatch({ type: 'SET_SEARCH_TERM', value: '', projectId }), [projectId]);
 
   // Date range actions
   const setStartDate = useCallback((value: string) => {
-    dispatch({ type: 'SET_START_DATE', value });
-  }, []);
+    dispatch({ type: 'SET_START_DATE', value, projectId });
+  }, [projectId]);
   const setEndDate = useCallback((value: string) => {
-    dispatch({ type: 'SET_END_DATE', value });
-  }, []);
+    dispatch({ type: 'SET_END_DATE', value, projectId });
+  }, [projectId]);
   const removeDateRange = useCallback(() => 
-    dispatch({ type: 'SET_DATE_RANGE', startDate: '', endDate: '' }), []);
+    dispatch({ type: 'SET_DATE_RANGE', startDate: '', endDate: '', projectId }), [projectId]);
 
   // Filter-specific actions using the generic helpers
   const setSelectedSeverity = createFilterSetter('severity');
   const setSelectedStatus = createFilterSetter('status');
   const setSelectedLandscape = createFilterSetter('landscape');
   const setSelectedRegion = createFilterSetter('region');
-  const setSelectedComponent = createFilterSetter('component');
 
   const removeSeverity = createFilterRemover('severity');
   const removeStatus = createFilterRemover('status');
   const removeLandscape = createFilterRemover('landscape');
   const removeRegion = createFilterRemover('region');
-  const removeComponent = createFilterRemover('component');
 
   const addExcludedSeverity = createExclusionAdder('severity');
   const addExcludedStatus = createExclusionAdder('status');
   const addExcludedLandscape = createExclusionAdder('landscape');
   const addExcludedRegion = createExclusionAdder('region');
-  const addExcludedComponent = createExclusionAdder('component');
 
   const removeExcludedSeverity = createExclusionRemover('severity');
   const removeExcludedStatus = createExclusionRemover('status');
   const removeExcludedLandscape = createExclusionRemover('landscape');
   const removeExcludedRegion = createExclusionRemover('region');
-  const removeExcludedComponent = createExclusionRemover('component');
 
   const clearAllExcludedSeverity = createExclusionClearer('severity');
   const clearAllExcludedStatus = createExclusionClearer('status');
   const clearAllExcludedLandscape = createExclusionClearer('landscape');
   const clearAllExcludedRegion = createExclusionClearer('region');
-  const clearAllExcludedComponent = createExclusionClearer('component');
 
   // Alert name exclusion actions
   const addExcludedAlertname = useCallback((value: string) => 
-    dispatch({ type: 'ADD_EXCLUDED_ALERTNAME', value }), []);
+    dispatch({ type: 'ADD_EXCLUDED_ALERTNAME', value, projectId }), [projectId]);
   const removeExcludedAlertname = useCallback((value: string) => 
-    dispatch({ type: 'REMOVE_EXCLUDED_ALERTNAME', value }), []);
+    dispatch({ type: 'REMOVE_EXCLUDED_ALERTNAME', value, projectId }), [projectId]);
   const clearAllExcludedAlertname = useCallback(() => 
-    dispatch({ type: 'CLEAR_ALL_EXCLUDED_ALERTNAME' }), []);
+    dispatch({ type: 'CLEAR_ALL_EXCLUDED_ALERTNAME', projectId }), [projectId]);
 
   // Date range selection handler
   const handleDateRangeSelect = useCallback((range: DateRange | undefined) => {
     const startDate = range?.from ? format(range.from, "yyyy-MM-dd") : "";
     const endDate = range?.to ? format(range.to, "yyyy-MM-dd") : "";
-    dispatch({ type: 'SET_DATE_RANGE', startDate, endDate });
-  }, []);
+    dispatch({ type: 'SET_DATE_RANGE', startDate, endDate, projectId });
+  }, [projectId]);
 
   // Generic helper for creating filter options
   const createFilterOptions = useCallback((
@@ -382,8 +445,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
   const regions = useMemo(() => 
     createFilterOptions(filtersResponse?.region), [filtersResponse?.region, createFilterOptions]);
 
-  const components = useMemo(() => 
-    createFilterOptions(filtersResponse?.component), [filtersResponse?.component, createFilterOptions]);
 
   // Generic filter matching function
   const createFilterMatcher = useCallback((filterType: FilterType) => {
@@ -392,13 +453,8 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       const selectedValues = filters[config.selectedKey] as string[];
       const excludedArray = filters[config.excludedKey] as string[];
       
-      // Get the alert property value, handling component special case
-      let alertValue: string;
-      if (filterType === 'component') {
-        alertValue = getAlertComponent(alert);
-      } else {
-        alertValue = alert[config.alertProperty] as string;
-      }
+      // Get the alert property value
+      const alertValue = alert[config.alertProperty] as string;
       
       // Check exclusion filter first
       if (excludedArray.length > 0 && excludedArray.includes(alertValue)) return false;
@@ -406,14 +462,13 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       // Then check inclusion filter - if no values selected, show all
       return selectedValues.length === 0 || selectedValues.includes(alertValue);
     };
-  }, [filters, getAlertComponent]);
+  }, [filters]);
 
   // Create individual filter functions using the generic matcher
   const matchesRegionFilter = useMemo(() => createFilterMatcher('region'), [createFilterMatcher]);
   const matchesSeverityFilter = useMemo(() => createFilterMatcher('severity'), [createFilterMatcher]);
   const matchesStatusFilter = useMemo(() => createFilterMatcher('status'), [createFilterMatcher]);
   const matchesLandscapeFilter = useMemo(() => createFilterMatcher('landscape'), [createFilterMatcher]);
-  const matchesComponentFilter = useMemo(() => createFilterMatcher('component'), [createFilterMatcher]);
 
   const matchesTimeRangeFilter = useCallback((alert: TriggeredAlert): boolean => {
     if (!filters.startDate && !filters.endDate) return true;
@@ -446,18 +501,16 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     if (!filters.searchTerm) return true;
     
     const searchLower = filters.searchTerm.toLowerCase();
-    const component = getAlertComponent(alert);
     
     return (
       alert.alertname.toLowerCase().includes(searchLower) ||
-      component.toLowerCase().includes(searchLower) ||
       alert.landscape.toLowerCase().includes(searchLower) ||
       alert.severity.toLowerCase().includes(searchLower) ||
       alert.status.toLowerCase().includes(searchLower)
     );
-  }, [filters.searchTerm, filters.excludedAlertname, getAlertComponent]);
+  }, [filters.searchTerm, filters.excludedAlertname]);
 
-  // Main filter function - combines all individual filters and sorts by time (newest first)
+  // Main filter function - combines all individual filters and sorts by status then time
   const filteredAlerts = useMemo(() => {
     return triggeredAlerts
       .filter(alert => {
@@ -466,13 +519,19 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
           matchesSeverityFilter(alert) &&
           matchesStatusFilter(alert) &&
           matchesLandscapeFilter(alert) &&
-          matchesComponentFilter(alert) &&
           matchesTimeRangeFilter(alert) &&
           matchesSearchFilter(alert)
         );
       })
       .sort((a, b) => {
-        // Sort by startsAt in descending order (newest first)
+        // First, sort by status: firing alerts come first
+        const aIsFiring = a.status.toLowerCase() === 'firing';
+        const bIsFiring = b.status.toLowerCase() === 'firing';
+        
+        if (aIsFiring && !bIsFiring) return -1;
+        if (!aIsFiring && bIsFiring) return 1;
+        
+        // Within the same status group, sort by startsAt in descending order (newest first)
         const dateA = new Date(a.startsAt).getTime();
         const dateB = new Date(b.startsAt).getTime();
         return dateB - dateA;
@@ -483,7 +542,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     matchesSeverityFilter,
     matchesStatusFilter,
     matchesLandscapeFilter,
-    matchesComponentFilter,
     matchesTimeRangeFilter,
     matchesSearchFilter
   ]);
@@ -496,14 +554,12 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       setSelectedStatus,
       setSelectedLandscape,
       setSelectedRegion,
-      setSelectedComponent,
       setStartDate,
       setEndDate,
       addExcludedSeverity,
       addExcludedStatus,
       addExcludedLandscape,
       addExcludedRegion,
-      addExcludedComponent,
       addExcludedAlertname,
       handleDateRangeSelect,
       resetFilters,
@@ -512,19 +568,16 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       removeStatus,
       removeLandscape,
       removeRegion,
-      removeComponent,
       removeDateRange,
       removeExcludedSeverity,
       removeExcludedStatus,
       removeExcludedLandscape,
       removeExcludedRegion,
-      removeExcludedComponent,
       removeExcludedAlertname,
       clearAllExcludedSeverity,
       clearAllExcludedStatus,
       clearAllExcludedLandscape,
       clearAllExcludedRegion,
-      clearAllExcludedComponent,
       clearAllExcludedAlertname,
     },
     options: {
@@ -532,7 +585,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       statuses,
       landscapes,
       regions,
-      components,
     },
     filteredAlerts,
     isLoading,

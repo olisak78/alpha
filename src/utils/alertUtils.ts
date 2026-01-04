@@ -17,11 +17,3 @@ export const getStatusColor = (status: string): string => {
   if (status === 'resolved') return "bg-green-500/10 text-green-600 dark:text-green-400";
   return "bg-slate-500/10 text-slate-700 dark:text-slate-300";
 };
-
-export const formatDateTime = (dateTime: string): string => {
-  const date = new Date(dateTime);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};

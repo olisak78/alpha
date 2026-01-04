@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Activity, ChevronDown, ChevronRight } from 'lucide-react';
+import { formatAlertDate } from '@/utils/dateUtils';
 import type { TriggeredAlert } from '@/types/api';
 import { 
   getAlertComponent, 
   getSeverityColor, 
-  getStatusColor, 
-  formatDateTime 
+  getStatusColor
 } from '@/utils/alertUtils';
 import { AlertExpandedView } from './AlertExpandedView';
 import { useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
@@ -38,12 +38,11 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
       <div className="border rounded-lg overflow-hidden bg-card">
         {/* Table Header */}
         <div className={`grid ${showRegion ? 'grid-cols-10' : 'grid-cols-9'} px-4 py-3 border-b bg-muted/30 text-sm font-medium`}>
-          <div className="col-span-3">Alert Name</div>
+          <div className="col-span-4">Alert Name</div>
           <div className="col-span-1">Severity</div>
           <div className="col-span-1">Start Time</div>
           <div className="col-span-1">End Time</div>
           <div className="col-span-1">Status</div>
-          <div className="col-span-1">Component</div>
           <div className="col-span-1">Landscape</div>
           {showRegion && <div className="col-span-1">Region</div>}
         </div>
@@ -68,7 +67,7 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
                     onClick={() => handleToggleExpand(alertKey)}
                   >
                     {/* Alert Name */}
-                    <div className="col-span-3 flex items-center gap-1 group">
+                    <div className="col-span-4 flex items-center gap-1 group">
                       <div className="flex items-center gap-2">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -98,12 +97,12 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
 
                     {/* Start Time */}
                     <div className="col-span-1 text-xs text-muted-foreground">
-                      {formatDateTime(alert.startsAt)}
+                      {formatAlertDate(alert.startsAt)}
                     </div>
 
                     {/* End Time */}
                     <div className="col-span-1 text-xs text-muted-foreground">
-                      {alert.endsAt ? formatDateTime(alert.endsAt) : '-'}
+                      {alert.endsAt ? formatAlertDate(alert.endsAt) : '-'}
                     </div>
 
                     {/* Status */}
@@ -115,13 +114,6 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
                         filterType="status" 
                         value={alert.status}
                       />
-                    </div>
-
-                    {/* Component */}
-                    <div className="col-span-1 flex items-center gap-1 min-w-0 group">
-                      <span className="truncate text-muted-foreground">
-                        {getAlertComponent(alert)}
-                      </span>                 
                     </div>
 
                     {/* Landscape */}

@@ -108,18 +108,6 @@ export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefini
       });
     }
 
-    // Component filter
-    if (Array.isArray(alertsFiltersData.filters.selectedComponent) && alertsFiltersData.filters.selectedComponent.length > 0) {
-      alertsFiltersData.filters.selectedComponent.forEach((component, index) => {
-        filters.push({
-          key: `component-${index}`,
-          label: `Component: ${component}`,
-          onRemove: () => alertsFiltersData.actions.setSelectedComponent(
-            alertsFiltersData.filters.selectedComponent.filter(c => c !== component)
-          ),
-        });
-      });
-    }
 
     // Date range filter
     if (alertsFiltersData.filters.startDate || alertsFiltersData.filters.endDate) {
@@ -188,16 +176,6 @@ export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefini
       });
     }
 
-    if (Array.isArray(alertsFiltersData.filters.excludedComponent)) {
-      alertsFiltersData.filters.excludedComponent.forEach((value, index) => {
-        filters.push({
-          key: `excludedComponent-${index}`,
-          label: `Not: ${value}`,
-          onRemove: () => alertsFiltersData.actions.removeExcludedComponent(value),
-          isExclusion: true,
-        });
-      });
-    }
 
     if (Array.isArray(alertsFiltersData.filters.excludedAlertname)) {
       alertsFiltersData.filters.excludedAlertname.forEach((value, index) => {

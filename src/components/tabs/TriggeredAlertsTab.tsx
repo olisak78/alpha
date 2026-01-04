@@ -11,7 +11,7 @@ interface TriggeredAlertsTabProps {
 
 // Inner component that uses the context
 function TriggeredAlertsContent() {
-  const { filteredAlerts, isLoading, filtersLoading, error, options } = useTriggeredAlertsContext();
+  const { isLoading, filtersLoading, error, options } = useTriggeredAlertsContext();
 
   // Show loading state
   if (isLoading || filtersLoading) {

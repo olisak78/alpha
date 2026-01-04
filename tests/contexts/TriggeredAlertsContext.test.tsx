@@ -531,14 +531,13 @@ describe('TriggeredAlertsContext', () => {
           ...mockFiltersData.filters,
           excludedLandscape: ['production'],
           excludedRegion: ['us-east-1'],
-          excludedComponent: ['test-component'],
           excludedAlertname: ['Test Alert'],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithAllExcluded);
 
       renderWithProvider(<TestComponent />);
-      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('4');
+      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('3');
     });
 
     it('should handle excluded filter removal actions for all types', () => {
@@ -562,7 +561,6 @@ describe('TriggeredAlertsContext', () => {
           ...mockFiltersData.filters,
           excludedLandscape: ['production'],
           excludedRegion: ['us-east-1'],
-          excludedComponent: ['test-component'],
           excludedAlertname: ['Test Alert'],
         },
       };
@@ -578,12 +576,8 @@ describe('TriggeredAlertsContext', () => {
       screen.getByTestId('remove-excluded-1').click();
       expect(mockFiltersData.actions.removeExcludedRegion).toHaveBeenCalledWith('us-east-1');
 
-      // Test excluded component removal
-      screen.getByTestId('remove-excluded-2').click();
-      expect(mockFiltersData.actions.removeExcludedComponent).toHaveBeenCalledWith('test-component');
-
       // Test excluded alertname removal
-      screen.getByTestId('remove-excluded-3').click();
+      screen.getByTestId('remove-excluded-2').click();
       expect(mockFiltersData.actions.removeExcludedAlertname).toHaveBeenCalledWith('Test Alert');
     });
   });
@@ -596,13 +590,12 @@ describe('TriggeredAlertsContext', () => {
           ...mockFiltersData.filters,
           selectedLandscape: ['production', 'staging'],
           selectedRegion: ['us-east-1', 'eu-west-1'],
-          selectedComponent: ['test-component', 'another-component'],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithAll);
 
       renderWithProvider(<TestComponent />);
-      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('6');
+      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('4');
     });
 
     it('should handle removal actions for all standard filter types', () => {
@@ -626,7 +619,6 @@ describe('TriggeredAlertsContext', () => {
           ...mockFiltersData.filters,
           selectedLandscape: ['production'],
           selectedRegion: ['us-east-1'],
-          selectedComponent: ['test-component'],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithAll);
@@ -640,10 +632,6 @@ describe('TriggeredAlertsContext', () => {
       // Test region removal
       screen.getByTestId('remove-filter-1').click();
       expect(mockFiltersData.actions.setSelectedRegion).toHaveBeenCalledWith([]);
-
-      // Test component removal
-      screen.getByTestId('remove-filter-2').click();
-      expect(mockFiltersData.actions.setSelectedComponent).toHaveBeenCalledWith([]);
     });
   });
 

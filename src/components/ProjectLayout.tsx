@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect, ReactNode, useCallback } from "react";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { LandscapeLinksSection } from "@/components/LandscapeLinksSection";
+import { LandscapeFilter } from "@/components/LandscapeFilter";
 import { ComponentsTabContent } from "@/components/ComponentsTabContent";
 import { HealthDashboard } from "@/components/Health/HealthDashboard";
 import AlertsPage from "@/pages/AlertsPage";
 import MonitoringPage from "@/pages/MonitoringPage";
+import { DeploymentTab } from "@/components/tabs/DeploymentTab";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
 import { useLandscapeSelection, useSelectedLandscapeForProject, useUIActions } from "@/stores/appStateStore";
 import { useTabRouting } from "@/hooks/useTabRouting";
@@ -454,6 +456,31 @@ export function ProjectLayout({
             projectName={projectName}
             alertsUrl={alertsUrl}
           />
+        );
+      case "deployment":
+        return (
+          <>
+            {/* Header with landscape selector */}
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Deployment</h2>
+              <div className="w-80">
+                <LandscapeFilter
+                  selectedLandscape={selectedLandscape}
+                  landscapeGroups={landscapeGroupsRecord}
+                  onLandscapeChange={handleLandscapeChange}
+                  onShowLandscapeDetails={handleShowLandscapeDetails}
+                  showClearButton={false}
+                  showViewAllButton={false}
+                  projectId={projectId}
+                />
+              </div>
+            </div>
+            <DeploymentTab
+              projectId={projectId}
+              selectedLandscape={selectedApiLandscape?.technical_name}
+              landscapeData={selectedApiLandscape}
+            />
+          </>
         );
       default:
         return null;

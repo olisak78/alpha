@@ -7,13 +7,6 @@ import { AlertExpandedView } from '../../../src/components/TriggeredAlerts/Alert
 vi.mock('../../../src/utils/alertUtils', () => ({
   getSeverityColor: vi.fn((severity) => `severity-${severity.toLowerCase()}`),
   getStatusColor: vi.fn((status) => `status-${status.toLowerCase()}`),
-  formatDateTime: vi.fn((dateTime) => {
-    const date = new Date(dateTime);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }),
 }));
 
 // Mock the Badge component
@@ -115,10 +108,14 @@ describe('AlertExpandedView', () => {
       expect(screen.getByText('Started:')).toBeInTheDocument();
       expect(screen.getByText('Ended:')).toBeInTheDocument();
 
-      const dateElements = screen.getAllByText('01/12/2023');
-      expect(dateElements).toHaveLength(2);
+      // Check for the actual formatted date-time strings (UTC)
+      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 11:00')).toBeInTheDocument();
 
-      dateElements.forEach(element => {
+      const startDateElement = screen.getByText('01/12/2023 10:00');
+      const endDateElement = screen.getByText('01/12/2023 11:00');
+
+      [startDateElement, endDateElement].forEach(element => {
         expect(element).toHaveClass(
           'font-mono',
           'text-foreground'
@@ -132,7 +129,8 @@ describe('AlertExpandedView', () => {
 
       expect(screen.getByText('Started:')).toBeInTheDocument();
       expect(screen.queryByText('Ended:')).not.toBeInTheDocument();
-      expect(screen.getAllByText('01/12/2023')).toHaveLength(1);
+      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
+      expect(screen.queryByText('01/12/2023 01:00')).not.toBeInTheDocument();
     });
   });
 
@@ -300,9 +298,9 @@ describe('AlertExpandedView', () => {
       const statusBadge = screen.getByText('FIRING').closest('.status-firing');
       expect(statusBadge).toBeInTheDocument();
 
-      // Date formatting applied
-      const dateElements = screen.getAllByText('01/12/2023');
-      expect(dateElements).toHaveLength(2);
+      // Date formatting applied - check for actual formatted date-time strings (UTC)
+      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 11:00')).toBeInTheDocument();
     });
   });
 });

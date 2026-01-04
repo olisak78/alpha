@@ -84,8 +84,26 @@ describe('useTriggeredAlertsFilters Hook', () => {
   const mockUseTriggeredAlerts = vi.mocked(useTriggeredAlerts);
   const mockUseTriggeredAlertsFiltersApi = vi.mocked(useTriggeredAlertsFiltersApi);
 
+  // Mock localStorage
+  const mockLocalStorage = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Clear localStorage mock
+    mockLocalStorage.getItem.mockReturnValue(null);
+    mockLocalStorage.setItem.mockImplementation(() => {});
+    
+    // Mock localStorage globally
+    Object.defineProperty(window, 'localStorage', {
+      value: mockLocalStorage,
+      writable: true,
+    });
     
     mockUseTriggeredAlerts.mockReturnValue({
       data: createMockAlertsResponse([]),
@@ -119,14 +137,12 @@ describe('useTriggeredAlertsFilters Hook', () => {
       selectedStatus: [],
       selectedLandscape: [],
       selectedRegion: [],
-      selectedComponent: [],
       startDate: '',
       endDate: '',
       excludedSeverity: [],
       excludedStatus: [],
       excludedLandscape: [],
       excludedRegion: [],
-      excludedComponent: [],
       excludedAlertname: [],
     });
   });
@@ -142,7 +158,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.actions).toHaveProperty('setSelectedStatus');
     expect(result.current.actions).toHaveProperty('setSelectedLandscape');
     expect(result.current.actions).toHaveProperty('setSelectedRegion');
-    expect(result.current.actions).toHaveProperty('setSelectedComponent');
     expect(result.current.actions).toHaveProperty('setStartDate');
     expect(result.current.actions).toHaveProperty('setEndDate');
     expect(result.current.actions).toHaveProperty('resetFilters');
@@ -209,7 +224,7 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.options.regions).toEqual([]);
   });
 
-  it('should return empty components array when API filters are unavailable', () => {
+  it('should return empty arrays when API filters are unavailable', () => {
     const mockAlerts = [
       createMockTriggeredAlert({ component: 'api-gateway' }),
       createMockTriggeredAlert({ component: 'user-service' }),
@@ -223,12 +238,18 @@ describe('useTriggeredAlertsFilters Hook', () => {
       error: null,
     } as any);
 
+    mockUseTriggeredAlertsFiltersApi.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: null,
+    } as any);
+
     const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
       wrapper: createWrapper(),
     });
 
-    // Current implementation returns empty array when API filters are unavailable
-    expect(result.current.options.components).toEqual([]);
+    // Current implementation returns empty arrays when API filters are unavailable
+    expect(result.current.options.regions).toEqual([]);
   });
 
   // ============================================================================
@@ -246,7 +267,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
       result.current.actions.setSelectedStatus(['firing']);
       result.current.actions.setSelectedLandscape(['production']);
       result.current.actions.setSelectedRegion(['us-east-1']);
-      result.current.actions.setSelectedComponent(['api-gateway']);
       result.current.actions.setStartDate('2025-01-01');
       result.current.actions.setEndDate('2025-01-31');
     });
@@ -256,7 +276,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.filters.selectedStatus).toEqual(['firing']);
     expect(result.current.filters.selectedLandscape).toEqual(['production']);
     expect(result.current.filters.selectedRegion).toEqual(['us-east-1']);
-    expect(result.current.filters.selectedComponent).toEqual(['api-gateway']);
     expect(result.current.filters.startDate).toBe('2025-01-01');
     expect(result.current.filters.endDate).toBe('2025-01-31');
   });
@@ -284,14 +303,12 @@ describe('useTriggeredAlertsFilters Hook', () => {
       selectedStatus: [],
       selectedLandscape: [],
       selectedRegion: [],
-      selectedComponent: [],
       startDate: '',
       endDate: '',
       excludedSeverity: [],
       excludedStatus: [],
       excludedLandscape: [],
       excludedRegion: [],
-      excludedComponent: [],
       excludedAlertname: [],
     });
   });
@@ -338,12 +355,11 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.filteredAlerts).toHaveLength(1);
     expect(result.current.filteredAlerts[0].alertname).toBe('HighCPUUsage');
 
-    // Test search filtering by component
+    // Test search filtering by landscape
     act(() => {
-      result.current.actions.setSearchTerm('user');
+      result.current.actions.setSearchTerm('production');
     });
-    expect(result.current.filteredAlerts).toHaveLength(1);
-    expect(result.current.filteredAlerts[0].component).toBe('user-service');
+    expect(result.current.filteredAlerts).toHaveLength(2); // Both alerts have production landscape
 
     // Test severity filtering
     act(() => {
@@ -591,11 +607,7 @@ describe('useTriggeredAlertsFilters Hook', () => {
     });
     expect(result.current.filteredAlerts).toHaveLength(4); // Should return all alerts
 
-    // Test missing component filtering
-    act(() => {
-      result.current.actions.setStartDate('');
-      result.current.actions.setSelectedComponent('N/A');
-    });
-    expect(result.current.filteredAlerts).toHaveLength(2); // Both undefined and empty string components
+    // Test invalid date handling should return all alerts
+    expect(result.current.filteredAlerts).toHaveLength(4); // Should return all alerts
   });
 });

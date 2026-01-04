@@ -311,11 +311,11 @@ describe('DynamicProjectPage', () => {
         expect(tabs).toEqual(['components', 'monitoring']);
       });
 
-      it('should have all three tabs when both health and monitoring are configured', () => {
+      it('should have all four tabs when both health and monitoring are configured for cis20', () => {
         render(<DynamicProjectPage projectName="cis20" />);
 
         const tabs = screen.getByTestId('tabs').textContent?.split(',') || [];
-        expect(tabs).toEqual(['components', 'health', 'monitoring']);
+        expect(tabs).toEqual(['components', 'health', 'monitoring', 'deployment']);
       });
     });
   });
@@ -326,7 +326,7 @@ describe('DynamicProjectPage', () => {
 
       expect(screen.getByTestId('project-name')).toHaveTextContent('CIS 2.0');
       expect(screen.getByTestId('project-id')).toHaveTextContent('cis20');
-      expect(screen.getByTestId('tabs')).toHaveTextContent('components,health,monitoring');
+      expect(screen.getByTestId('tabs')).toHaveTextContent('components,health,monitoring,deployment');
     });
 
     it('should render correctly for platform project', () => {
@@ -377,7 +377,7 @@ describe('DynamicProjectPage', () => {
           projectName: 'CIS 2.0',
           projectId: 'cis20',
           defaultTab: 'components',
-          tabs: ['components', 'health', 'monitoring'],
+          tabs: ['components', 'health', 'monitoring', 'deployment'],
           componentsTitle: 'CIS 2.0 Components',
           emptyStateMessage: 'No CIS 2.0 components found for this organization.',
           system: 'cis20',

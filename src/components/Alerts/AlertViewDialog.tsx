@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertFile } from "@/hooks/api/useAlerts";
-import { formatDateTime, getSeverityColor, getStatusColor } from "@/utils/alertUtils";
+import { getSeverityColor, getStatusColor } from "@/utils/alertUtils";
+import { formatAlertDate } from "@/utils/dateUtils";
 
 // Generic alert data interface that can handle both alert types
 interface GenericAlertData {
@@ -124,12 +125,12 @@ export function AlertViewDialog({
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Started:</span>
-                  <span className="text-sm text-muted-foreground">{formatDateTime(alertData.startsAt)}</span>
+                  <span className="text-sm text-muted-foreground">{formatAlertDate(alertData.startsAt)}</span>
                 </div>
                 {alertData.endsAt && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Ended:</span>
-                    <span className="text-sm text-muted-foreground">{formatDateTime(alertData.endsAt)}</span>
+                    <span className="text-sm text-muted-foreground">{formatAlertDate(alertData.endsAt)}</span>
                   </div>
                 )}
               </div>

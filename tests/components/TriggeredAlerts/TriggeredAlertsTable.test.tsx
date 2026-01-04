@@ -10,12 +10,21 @@ vi.mock('../../../src/utils/alertUtils', () => ({
   getAlertComponent: vi.fn((alert) => alert.component || 'test-component'),
   getSeverityColor: vi.fn((severity) => `severity-${severity.toLowerCase()}`),
   getStatusColor: vi.fn((status) => `status-${status.toLowerCase()}`),
-  formatDateTime: vi.fn((dateTime) => {
-    const date = new Date(dateTime);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+}));
+
+// Mock the dateUtils module
+vi.mock('../../../src/utils/dateUtils', () => ({
+  formatAlertDate: vi.fn((dateString) => {
+    const date = new Date(dateString);
+    
+    // Extract UTC components
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   }),
 }));
 
@@ -48,18 +57,16 @@ vi.mock('lucide-react', () => ({
 const mockHookReturn = {
   filters: {
     searchTerm: '',
-    selectedSeverity: 'all',
-    selectedStatus: 'all',
-    selectedLandscape: 'all',
-    selectedRegion: 'all',
-    selectedComponent: 'all',
+    selectedSeverity: [],
+    selectedStatus: [],
+    selectedLandscape: [],
+    selectedRegion: [],
     startDate: '',
     endDate: '',
     excludedSeverity: [],
     excludedStatus: [],
     excludedLandscape: [],
     excludedRegion: [],
-    excludedComponent: [],
     excludedAlertname: [],
   },
   actions: {
@@ -191,7 +198,6 @@ describe('TriggeredAlertsTable', () => {
     expect(screen.getByText('Start Time')).toBeInTheDocument();
     expect(screen.getByText('End Time')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Component')).toBeInTheDocument();
     expect(screen.getByText('Landscape')).toBeInTheDocument();
     expect(screen.getByText('Region')).toBeInTheDocument();
   });
@@ -210,7 +216,6 @@ describe('TriggeredAlertsTable', () => {
     expect(screen.getByText('firing')).toBeInTheDocument();
     expect(screen.getByText('production')).toBeInTheDocument();
     expect(screen.getByText('us-east-1')).toBeInTheDocument();
-    expect(screen.getByText('test-component')).toBeInTheDocument();
   });
 
   it('should handle multiple alerts and missing data', () => {
@@ -299,9 +304,12 @@ describe('TriggeredAlertsTable', () => {
 
     renderWithProvider(<TriggeredAlertsTable />);
 
-    // The mock formatDateTime returns DD/MM/YYYY format - there are multiple instances (start and end time)
-    const dateElements = screen.getAllByText('01/12/2023');
-    expect(dateElements.length).toBeGreaterThan(0);
+    // The formatAlertDate function returns DD/MM/YYYY HH:mm format in UTC
+    const startTimeElements = screen.getAllByText('01/12/2023 10:00');
+    expect(startTimeElements.length).toBeGreaterThan(0);
+    
+    const endTimeElements = screen.getAllByText('01/12/2023 11:00');
+    expect(endTimeElements.length).toBeGreaterThan(0);
   });
 
   it('should apply severity and status colors via utility functions', () => {

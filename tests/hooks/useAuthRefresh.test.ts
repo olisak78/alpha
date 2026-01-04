@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useAuthRefresh } from '@/hooks/useAuthRefresh';
 import * as authService from '@/services/authService';
 
@@ -224,7 +224,9 @@ describe('useAuthRefresh', () => {
       expect(result.current.isAuthenticated).toBe(false);
 
       // Retry
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
@@ -251,7 +253,10 @@ describe('useAuthRefresh', () => {
       });
 
       // Start retry
-      const retryPromise = result.current.retry();
+      let retryPromise: Promise<void>;
+      await act(async () => {
+        retryPromise = result.current.retry();
+      });
 
       // Should be loading during retry
       await waitFor(() => {
@@ -260,7 +265,9 @@ describe('useAuthRefresh', () => {
 
       // Resolve the auth check
       resolveAuth!(true);
-      await retryPromise;
+      await act(async () => {
+        await retryPromise!;
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -282,7 +289,9 @@ describe('useAuthRefresh', () => {
       expect(result.current.authError).toContain('First error');
 
       // Retry
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.authError).toBe(null);
@@ -302,7 +311,9 @@ describe('useAuthRefresh', () => {
       });
 
       // Retry fails
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(false);
@@ -325,13 +336,17 @@ describe('useAuthRefresh', () => {
       });
 
       // First retry
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(false);
       });
 
       // Second retry
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
       });
@@ -349,10 +364,12 @@ describe('useAuthRefresh', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      const retryResult = result.current.retry();
-
-      expect(retryResult).toBeInstanceOf(Promise);
-      await retryResult;
+      let retryResult: Promise<void>;
+      await act(async () => {
+        retryResult = result.current.retry();
+        expect(retryResult).toBeInstanceOf(Promise);
+        await retryResult;
+      });
     });
   });
 
@@ -448,7 +465,9 @@ describe('useAuthRefresh', () => {
         expect(result.current.isAuthenticated).toBe(true);
       });
 
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(false);
@@ -466,7 +485,9 @@ describe('useAuthRefresh', () => {
         expect(result.current.isAuthenticated).toBe(false);
       });
 
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
@@ -484,7 +505,9 @@ describe('useAuthRefresh', () => {
         expect(result.current.authError).toBeTruthy();
       });
 
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
 
       await waitFor(() => {
         expect(result.current.authError).toBe(null);
@@ -549,16 +572,18 @@ describe('useAuthRefresh', () => {
       expect(resolvers.length).toBe(1);
 
       // Multiple simultaneous retries
-      const retry1 = result.current.retry();
-      const retry2 = result.current.retry();
-      const retry3 = result.current.retry();
+      await act(async () => {
+        const retry1 = result.current.retry();
+        const retry2 = result.current.retry();
+        const retry3 = result.current.retry();
 
-      expect(resolvers.length).toBe(4); // 1 initial + 3 retries
+        expect(resolvers.length).toBe(4); // 1 initial + 3 retries
 
-      // Resolve all
-      resolvers.forEach(resolve => resolve(true));
+        // Resolve all
+        resolvers.forEach(resolve => resolve(true));
 
-      await Promise.all([retry1, retry2, retry3]);
+        await Promise.all([retry1, retry2, retry3]);
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
@@ -584,7 +609,10 @@ describe('useAuthRefresh', () => {
       const { result } = renderHook(() => useAuthRefresh());
 
       // Start retry while initial check is still pending
-      const retryPromise = result.current.retry();
+      let retryPromise: Promise<void>;
+      await act(async () => {
+        retryPromise = result.current.retry();
+      });
 
       // Resolve initial check
       initialResolve!(false);
@@ -596,7 +624,9 @@ describe('useAuthRefresh', () => {
       // Resolve retry
       retryResolve!(true);
 
-      await retryPromise;
+      await act(async () => {
+        await retryPromise!;
+      });
 
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
@@ -699,14 +729,18 @@ describe('useAuthRefresh', () => {
       });
 
       // Session expires
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(false);
         expect(result.current.authError).toBe('Session expired. Please log in again.');
       });
 
       // Re-authenticate
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
         expect(result.current.authError).toBe(null);
@@ -726,7 +760,9 @@ describe('useAuthRefresh', () => {
       });
 
       // Retry succeeds
-      await result.current.retry();
+      await act(async () => {
+        await result.current.retry();
+      });
       await waitFor(() => {
         expect(result.current.isAuthenticated).toBe(true);
         expect(result.current.authError).toBe(null);
