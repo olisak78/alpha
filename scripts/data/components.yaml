@@ -1,0 +1,1317 @@
+components:
+  - name: cloud-automation-terraform
+    title: Cloud Automation Terraform
+    description: cloud-automation-terraform managed by team-lior & team-zohar
+    owner: team-zohar
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/cloud-automation-terraform
+      technology: docker
+  - name: terraform-provider-cis
+    title: Terraform Provider Cis
+    description: terraform-provider-cis managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-cis
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-cis
+      technology: go
+  - name: terraform-provider-destination
+    title: Terraform Provider Destination
+    description: terraform-provider-destination managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-destination
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-destination
+      technology: go
+  - name: cloud-automation-progress-monitor
+    title: Cloud Automation Progress Monitor
+    description: cloud-automation-progress-monitor managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/cloud-automation-progress-monitor
+      sonar:
+        project_id: cfs.cloud.automation:cloud-automation-progress-monitor
+      technology: go
+  - name: terraform-provider-cloudfoundry
+    title: Terraform Provider Cloudfoundry
+    description: terraform-provider-cloudfoundry managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-cloudfoundry
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-cloudfoundry
+      technology: go
+  - name: cloud-automation-operator
+    title: Cloud Automation Operator
+    description: cloud-automation-operator managed by team-lior & team-zohar
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/cloud-automation-operator
+      sonar:
+        project_id: cfs.cloud.automation:cloud-automation-operator
+      technology: docker
+  - name: terraform-provider-sm
+    title: Terraform Provider Sm
+    description: terraform-provider-sm managed by team-zohar
+    owner: team-zohar
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-sm
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-sm
+      technology: go
+  - name: terraform-provider-common
+    title: Terraform Provider Common
+    description: terraform-provider-common managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-common
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-common
+      technology: go
+  - name: terraform-provider-rest
+    title: Terraform Provider Rest
+    description: terraform-provider-rest managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-rest
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-rest
+      technology: go
+  - name: cloud-automation-content
+    title: Cloud Automation Content
+    description: cloud-automation-content managed by team-lior & team-zohar
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/cloud-automation-content
+      technology: chart
+  - name: terraform-provider-spc
+    title: Terraform Provider Spc
+    description: terraform-provider-spc managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-spc
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-spc
+      technology: go
+  - name: terraform-provider-xsuaa
+    title: Terraform Provider Xsuaa
+    description: terraform-provider-xsuaa managed by team-zohar
+    owner: team-zohar
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-xsuaa
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-xsuaa
+      technology: go
+  - name: terraform-provider-sci
+    title: Terraform Provider Sci
+    description: terraform-provider-sci managed by team-zohar
+    owner: team-zohar
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-sci
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-sci
+      technology: go
+  - name: terraform-provider-sample
+    title: Terraform Provider Sample
+    description: terraform-provider-sample managed by team-lior
+    owner: team-lior
+    project: ca
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/terraform-provider-sample
+      sonar:
+        project_id: cfs.cloud.automation:terraform-provider-sample
+      technology: go
+  - name: cloud-automation-registry
+    title: Cloud Automation Registry
+    description: cloud-automation-registry managed by team-lior & team-zohar
+    owner: team-lior
+    project: ca
+    metadata:
+      github:
+        url: https://github.tools.sap/cfs-cloud-automation/cloud-automation-registry
+      sonar:
+        project_id: cfs.cloud.automation:cloud-automation-registry
+      technology: docker
+  - name: accounts-service
+    title: Accounts Service
+    description: accounts-service managed by team-lior
+    owner: team-lior
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/accounts-service
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/accounts-service
+      sonar:
+        project_id: com.sap.core.commercial.service:accounts-service
+      technology: java
+      health: true
+  - name: account-context-service
+    title: Account Context Service
+    description: account-context-service managed by team-zohar
+    owner: team-zohar
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/account-context-service
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/account-context-service
+      sonar:
+        project_id: com.sap.core.commercial.service:account-context-service
+      technology: java
+      health: true
+  - name: cis-common
+    title: Cis Common
+    description: cis-common managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cis-common
+      sonar:
+        project_id: com.sap.core.commercial.service:cis-common
+      technology: java
+  - name: cis-parent
+    title: Cis Parent
+    description: cis-parent managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cis-parent
+      technology: java
+  - name: cis-service-broker
+    title: Cis Service Broker
+    description: cis-service-broker managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cis-service-broker
+      sonar:
+        project_id: com.sap.core.commercial.service:cis-service-broker
+      technology: java
+      health: true
+  - name: cloud-automation-service
+    title: Cp Formations
+    description: cp-formations managed by team-lior & team-zohar
+    owner: team-lior
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://gkecfscis2ci.jaas-gcp.cloud.sap.corp/job/cp-formations/
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cp-formations
+      sonar:
+        project_id: com.sap.core.commercial.service:cp-formations
+      technology: java
+      health: true
+  - name: order-processing
+    title: Order Processing
+    description: order-processing managed by team-lior
+    owner: team-lior
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://gkecfscis2ci.jaas-gcp.cloud.sap.corp/job/order-processing/
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/order-processing
+      sonar:
+        project_id: com.sap.core.commercial.service:order-processing
+      technology: java
+      health: true
+  - name: active-monitoring-service
+    title: Active Monitoring Service
+    description: active-monitoring-service managed by team-coe
+    owner: team-coe
+    project: cis20
+    metadata:
+      central-service: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/active-monitoring-service
+      sonar:
+        project_id: com.sap.core.commercial.service:active-monitoring-service
+      technology: java_docker
+      health: true
+  - name: entitlements-service
+    title: Entitlements Service
+    description: entitlements-service managed by team-zohar
+    owner: team-zohar
+    project: cis20
+    metadata:
+      central-service: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/entitlements-service
+      sonar:
+        project_id: com.sap.core.commercial.service:entitlements-service
+      technology: java
+      health: true
+  - name: account-budgets-service
+    title: Account Budgets Service
+    description: account-budgets-service managed by team-lior
+    owner: team-lior
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/account-budgets-service
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/account-budgets-service
+      sonar:
+        project_id: com.sap.core.commercial.service:account-budgets-service
+      technology: java
+      health: true
+  - name: events-service
+    title: Events Service
+    description: events-service managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/events-service
+      sonar:
+        project_id: com.sap.core.commercial.service:events-service
+      technology: java
+      health: true
+  - name: external-provider-registry
+    title: External Provider Registry
+    description: external-provider-registry managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      central-service: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/external-provider-registry
+      sonar:
+        project_id: com.sap.core.commercial.service:external-provider-registry
+      technology: java
+      health: true
+  - name: operation-console
+    title: Operation Console
+    description: operation-console managed by team-naomi
+    owner: team-naomi
+    project: cis20
+    metadata:
+      subdomain: operator
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/operation-console
+      sonar:
+        project_id: com.sap.core.commercial.service:operation-console
+      technology: nodejs
+      health: true
+  - name: operation-console-service-manager
+    title: Operation Console Service Manager
+    description: operation-console-service-manager managed by team-naomi
+    owner: team-naomi
+    project: cis20
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/operation-console-service-manager
+      sonar:
+        project_id: com.sap.core.commercial.service:operation-console-service-manager
+      technology: nodejs
+  - name: saas-manager
+    title: Saas Registry
+    description: saas-registry managed by team-zohar
+    owner: team-zohar
+    project: cis20
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/saas-registry
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/saas-registry
+      sonar:
+        project_id: com.sap.core.commercial.service:saas-registry
+      technology: java
+      health: true
+  - name: tenant-onboarding
+    title: Tenant Onboarding Gateway
+    description: tenant-onboarding-gateway managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/tenant-onboarding-gateway
+      sonar:
+        project_id: com.sap.core.commercial.service:tenant-onboarding-gateway
+      technology: java
+      health: true
+  - name: cross-registry-service
+    title: Cross Registry Service
+    description: cross-registry-service managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      central-service: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cross-registry-service
+      sonar:
+        project_id: com.sap.core.commercial.service:cross-registry-service
+      technology: java
+      health: true
+  - name: cloudfoundry-client
+    title: Cloudfoundry Client
+    description: cloudfoundry-client managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cloudfoundry-client
+      sonar:
+        project_id: com.sap.core.commercial.service:cloudfoundry-client
+      technology: java
+  - name: cloudfoundry-environment-broker
+    title: Cloudfoundry Environment Broker
+    description: cloudfoundry-environment-broker managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cloudfoundry-environment-broker
+      sonar:
+        project_id: com.sap.core.commercial.service:cloudfoundry-environment-broker
+      technology: java
+      health: true
+  - name: provisioning-service
+    title: Provisioning Service
+    description: provisioning-service managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/provisioning-service
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/provisioning-service
+      sonar:
+        project_id: com.sap.core.commercial.service:provisioning-service
+      technology: java
+      health: true
+  - name: cis-cli-backend
+    title: Cis Cli Backend
+    description: cis-cli-backend managed by team-zohar
+    owner: team-zohar
+    project: cis20
+    metadata:
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/cis-cli-backend
+      sonar:
+        project_id: com.sap.core.commercial.service:cis-cli-backend
+      technology: java
+      health: true
+  - name: subscription-management-dashboard
+    title: Subscription Management Dashboard
+    description: subscription-management-dashboard managed by team-naomi
+    owner: team-naomi
+    project: cis20
+    metadata:
+      subdomain: sap-provisioning
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/subscription-management-dashboard
+      sonar:
+        project_id: com.sap.core.commercial.service:subscription-management-dashboard
+      technology: nodejs
+      health: true
+  - name: task-management
+    title: Task Management
+    description: task-management managed by team-eli
+    owner: team-eli
+    project: cis20
+    metadata:
+      central-service: true
+      ci:
+        qos:
+          jenkins_url: https://cis2ciqbs.jaas-gcp.cloud.sap.corp/job/task-management
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/task-management
+      sonar:
+        project_id: com.sap.core.commercial.service:task-management
+      technology: java
+      health: true
+  - name: workflow-adapter
+    title: Workflow Adapter
+    description: workflow-adapter managed by team-yael
+    owner: team-yael
+    project: cis20
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.wdf.sap.corp/cp-cfs-services/workflow-adapter
+      sonar:
+        project_id: com.sap.core.commercial.service:workflow-adapter
+      technology: java
+  - name: aws-opensearch-controller
+    title: Aws Opensearch Controller
+    description: aws-opensearch-controller
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-opensearch-controller
+  - name: pre-deploy
+    title: Pre Deploy
+    description: pre-deploy
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/pre-deploy
+  - name: workspace-server
+    title: Workspace Server
+    description: workspace-server managed by team-naomi
+    owner: team-naomi
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/workspace-server
+      github:
+        url: https://github.tools.sap/atom-cfs/workspace-server
+      sonar:
+        project_id: cfs.atom:workspace-server
+      technology: go
+  - name: commercial-integration
+    title: Commercial Integration
+    description: commercial-integration managed by team-zohar
+    owner: team-zohar
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/commercial-integration
+      github:
+        url: https://github.tools.sap/atom-cfs/commercial-integration
+      sonar:
+        project_id: cfs.atom:commercial-integration
+      technology: go-package
+  - name: unified-account-extension
+    title: Unified Account Extension
+    description: unified-account-extension managed by team-lior
+    project: usrv
+    owner: team-lior
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-account-extension
+  - name: unified-platform-providers-resources
+    title: Unified Platform Providers Resources
+    description: unified-platform-providers-resources managed by team-avihai
+    project: usrv
+    owner: team-avihai
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-platform-providers-resources
+  - name: cert-management
+    title: Cert Management
+    description: cert-management managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/cert-management
+  - name: workspace-app
+    title: Workspace App
+    description: workspace-app managed by team-naomi
+    owner: team-naomi
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/workspace-app
+      github:
+        url: https://github.tools.sap/atom-cfs/workspace-app
+      technology: node-js
+  - name: workspace-uilib
+    title: Workspace Uilib
+    description: workspace-uilib managed by team-naomi
+    owner: team-naomi
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/workspace-uilib
+      github:
+        url: https://github.tools.sap/atom-cfs/workspace-uilib
+      technology: node-js-package
+  - name: service-management
+    title: Service Management
+    description: service-management managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/service-management
+      github:
+        url: https://github.tools.sap/atom-cfs/service-management
+      sonar:
+        project_id: cfs.atom:service-management
+      technology: go-package
+  - name: prometheus-another-cloudwatch-exporter
+    title: Prometheus Another Cloudwatch Exporter
+    description: prometheus-another-cloudwatch-exporter managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/prometheus-another-cloudwatch-exporter
+  - name: atom-oauth2-proxy
+    title: Atom Oauth2 Proxy
+    description: atom-oauth2-proxy managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/atom-oauth2-proxy
+      github:
+        url: https://github.tools.sap/atom-cfs/atom-oauth2-proxy
+  - name: deploy-cycle-charts
+    title: Deploy Cycle Charts
+    description: deploy-cycle-charts managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/deploy-cycle-charts
+      github:
+        url: https://github.tools.sap/atom-cfs/deploy-cycle-charts
+      technology: charts
+  - name: healthcheck
+    title: Healthcheck
+    description: healthcheck managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/healthcheck
+      github:
+        url: https://github.tools.sap/atom-cfs/healthcheck
+      sonar:
+        project_id: cfs.atom:healthcheck
+      technology: go
+  - name: feature-toggle-manager
+    title: Feature Toggle Manager
+    description: feature-toggle-manager managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /feature-toggle-operator-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/feature-toggle-manager
+      github:
+        url: https://github.tools.sap/atom-cfs/feature-toggle-manager
+      sonar:
+        project_id: cfs.atom:feature-toggle-manager
+      technology: go
+  - name: btp-solution-operator
+    title: Btp Solution Operator
+    description: btp-solution-operator managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /btp-solution-operator-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/btp-solution-operator
+      github:
+        url: https://github.tools.sap/atom-cfs/btp-solution-operator
+      sonar:
+        project_id: cfs.atom:btp-solution-operator
+      technology: go
+  - name: commercial-integration-manager
+    title: Commercial Integration Manager
+    description: commercial-integration-manager managed by team-zohar
+    owner: team-zohar
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /commercial-integration-manager-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/commercial-integration-manager
+      github:
+        url: https://github.tools.sap/atom-cfs/commercial-integration-manager
+      sonar:
+        project_id: cfs.atom:commercial-integration-manager
+      technology: go
+  - name: feature-toggle-extension
+    title: Feature Toggle Extension
+    description: feature-toggle-extension managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/feature-toggle-extension
+      github:
+        url: https://github.tools.sap/atom-cfs/feature-toggle-extension
+      technology: go-package
+  - name: uctl-providers
+    title: Uctl Providers
+    description: uctl-providers managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/uctl-providers
+      sonar:
+        project_id: cfs.atom:uctl-providers
+      technology: go-package
+  - name: feature-toggle-client
+    title: Feature Toggle Client
+    description: feature-toggle-client managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/feature-toggle-client
+      github:
+        url: https://github.tools.sap/atom-cfs/feature-toggle-client
+      sonar:
+        project_id: cfs.atom:feature-toggle-client
+      technology: go-package
+  - name: cloud-automation
+    title: Cloud Automation
+    description: cloud-automation managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/cloud-automation/
+      github:
+        url: https://github.tools.sap/unified-services/cloud-automation
+      sonar:
+        project_id: cfs.atom:cloud-automation
+      technology: go-package
+  - name: workspace-server-extension
+    title: Workspace Server Extension
+    description: workspace-server-extension managed by team-naomi
+    project: usrv
+    owner: team-naomi
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/workspace-server-extension
+  - name: auditlog
+    title: Auditlog
+    description: auditlog managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/auditlog
+      sonar:
+        project_id: cfs.atom:auditlog
+      technology: go-package
+  - name: cloud-automation-java
+    title: Cloud Automation Java
+    description: cloud-automation-java managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/unified-services/cloud-automation-java
+      technology: java-package
+  - name: jaeger
+    title: Jaeger
+    description: jaeger managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/jaeger
+  - name: aws-pod-identity-webhook
+    title: Aws Pod Identity Webhook
+    description: aws-pod-identity-webhook
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-pod-identity-webhook
+  - name: opentelemetry-collector
+    title: Opentelemetry Collector
+    description: opentelemetry-collector
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/opentelemetry-collector
+      github:
+        url: https://github.tools.sap/atom-cfs/opentelemetry-collector
+  - name: kyverno-atom-wrapper
+    title: Kyverno Atom Wrapper
+    description: kyverno-atom-wrapper managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/kyverno-atom-wrapper
+      github:
+        url: https://github.tools.sap/atom-cfs/kyverno-atom-wrapper
+      technology: go-package
+  - name: aws-s3-controller
+    title: Aws S3 Controller
+    description: aws-s3-controller
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-s3-controller
+  - name: istio-operator-extension
+    title: Istio Operator Extension
+    description: istio-operator-extension managed by team-alex
+    project: usrv
+    owner: team-alex
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/istio-operator-extension
+  - name: unleash
+    title: Unleash
+    description: unleash managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/unleash
+  - name: gate-keeper
+    title: Gate Keeper
+    description: gate-keeper managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/gate-keeper
+  - name: unified-account
+    title: Unified Account
+    description: unified-account managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /unified-account-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/unified-account
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-account
+      sonar:
+        project_id: cfs.atom:unified-account
+      technology: go
+  - name: unified-platform-providers
+    title: Unified Platform Providers
+    description: unified-platform-providers managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/unified-platform-providers
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-platform-providers
+      technology: charts
+  - name: btp-subaccount
+    title: Btp Subaccount
+    description: btp-subaccount managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/btp-subaccount
+      github:
+        url: https://github.tools.sap/atom-cfs/btp-subaccount
+      sonar:
+        project_id: cfs.atom:btp-subaccount
+      technology: go
+  - name: btp-subaccount-operator
+    title: Btp Subaccount Operator
+    description: btp-subaccount-operator managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /btp-subaccount-operator-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/btp-subaccount-operator
+      github:
+        url: https://github.tools.sap/atom-cfs/btp-subaccount-operator
+      sonar:
+        project_id: cfs.atom:btp-subaccount-operator
+      technology: go
+  - name: aws-elasticache-controller
+    title: Aws Elasticache Controller
+    description: aws-elasticache-controller
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-elasticache-controller
+  - name: feature-toggle-extension-configurations
+    title: Feature Toggle Extension Configurations
+    description: feature-toggle-extension-configurations managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/feature-toggle-extension-configurations
+  - name: unified-service-orchestration-resources
+    title: Unified Service Orchestration Resources
+    description: unified-service-orchestration-resources managed by team-avihai
+    project: usrv
+    owner: team-avihai
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-service-orchestration-resources
+  - name: atom-istio-operator
+    title: Atom Istio Operator
+    description: atom-istio-operator managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/atom-istio-operator
+      technology: chart
+  - name: service-management-java
+    title: Service Management Java
+    description: service-management-java managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/service-management-java
+      technology: java-package
+  - name: aws-rds-controller
+    title: Aws Rds Controller
+    description: aws-rds-controller
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-rds-controller
+  - name: commercial-integration-resources
+    title: Commercial Integration Resources
+    description: commercial-integration-resources managed by team-zohar
+    project: usrv
+    owner: team-zohar
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/commercial-integration-resources
+  - name: atom-rtd-governance
+    title: Atom Rtd Governance
+    description: atom-rtd-governance
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/atom-rtd-governance
+      github:
+        url: https://github.tools.sap/atom-cfs/atom-rtd-governance
+  - name: aws-rds-controller-k8s-wrapper
+    title: Aws Rds Controller K8s Wrapper
+    description: aws-rds-controller-k8s-wrapper managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/aws-rds-controller-k8s-wrapper
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-rds-controller-k8s-wrapper
+      technology: go-package
+  - name: btp-bridge-operator
+    title: Btp Bridge Operator
+    description: btp-bridge-operator managed by team-yael
+    owner: team-yael
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/btp-bridge-operator
+      github:
+        url: https://github.tools.sap/atom-cfs/btp-bridge-operator
+      sonar:
+        project_id: cfs.atom:btp-bridge-operator
+      technology: go
+  - name: aws-iam-controller
+    title: Aws Iam Controller
+    description: aws-iam-controller
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/aws-iam-controller
+  - name: secrets-store-csi-driver
+    title: Secrets Store Csi Driver
+    description: secrets-store-csi-driver
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/secrets-store-csi-driver
+      github:
+        url: https://github.tools.sap/atom-cfs/secrets-store-csi-driver
+  - name: unified-cloud-automation
+    title: Unified Cloud Automation
+    description: unified-cloud-automation managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /unified-cloud-automation-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/unified-cloud-automation
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-cloud-automation
+      sonar:
+        project_id: cfs.atom:unified-cloud-automation
+      technology: go
+  - name: e2e-initial-content
+    title: E2e Initial Content
+    description: e2e-initial-content managed by team-yael
+    owner: team-yael
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/e2e-initial-content
+      github:
+        url: https://github.tools.sap/atom-cfs/e2e-initial-content
+      technology: chart
+  - name: atom-initial-content
+    title: Atom Initial Content
+    description: atom-initial-content managed by team-zohar
+    owner: team-zohar
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/atom-initial-content
+      github:
+        url: https://github.tools.sap/atom-cfs/atom-initial-content
+  - name: istio-operator
+    title: Istio Operator
+    description: istio-operator managed by team-alex
+    owner: team-alex
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/istio-operator
+      github:
+        url: https://github.tools.sap/atom-cfs/istio-operator
+      technology: go-package
+  - name: initial-content
+    title: Initial Content
+    description: initial-content
+    project: usrv
+    owner: team-developer-portal-technical
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/initial-content
+  - name: kyverno
+    title: Kyverno
+    description: kyverno managed by team-coe
+    project: usrv
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/kyverno
+  - name: unified-service-orchestration
+    title: Unified Service Orchestration
+    description: unified-service-orchestration managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      health: true
+      health_suffix: /unified-service-orchestration-health
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/unified-service-orchestration
+      github:
+        url: https://github.tools.sap/atom-cfs/unified-service-orchestration
+      sonar:
+        project_id: cfs.atom:unified-service-orchestration
+      technology: go
+  - name: uctl
+    title: Uctl
+    description: uctl managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/atom-cfs/uctl
+      sonar:
+        project_id: cfs.atom:uctl
+      technology: go-package
+  - name: atom-unleash
+    title: Atom Unleash
+    description: atom-unleash managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/atom-unleash
+      github:
+        url: https://github.tools.sap/atom-cfs/atom-unleash
+      technology: chart
+  - name: generic-broker
+    title: Generic Broker
+    description: generic-broker managed by team-yael
+    owner: team-yael
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/generic-broker
+      github:
+        url: https://github.tools.sap/atom-cfs/generic-broker
+      sonar:
+        project_id: cfs.atom:generic-broker
+      technology: go
+  - name: common
+    title: Common
+    description: common managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/common
+      github:
+        url: https://github.tools.sap/atom-cfs/common
+      sonar:
+        project_id: cfs.atom:common
+      technology: go-package
+  - name: commercial-integration-java
+    title: Commercial Integration Java
+    description: commercial-integration-java managed by team-zohar
+    owner: team-zohar
+    project: usrv
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/commercial-integration-java
+      technology: java-package
+  - name: platform-providers
+    title: Platform Providers
+    description: platform-providers managed by team-avihai
+    owner: team-avihai
+    project: usrv
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/platform-providers
+      technology: go-package
+  - name: DevOps
+    title: DevOps
+    description: DevOps managed by team-eyal
+    owner: team-eyal
+    project: usrv
+    metadata:
+      github:
+        url: https://github.tools.sap/atom-cfs/DevOps
+  - name: account-java
+    title: Account Java
+    description: account-java managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      github:
+        url: https://github.tools.sap/unified-services/account-java
+      technology: java-package
+  - name: account
+    title: Account
+    description: account managed by team-lior
+    owner: team-lior
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/account
+      github:
+        url: https://github.tools.sap/unified-services/account
+      sonar:
+        project_id: cfs.atom:account
+      technology: go-package
+  - name: internal-monitoring
+    title: Internal Monitoring
+    description: internal-monitoring managed by team-coe
+    owner: team-coe
+    project: usrv
+    metadata:
+      isLibrary: true
+      ci:
+        qos:
+          jenkins_url: https://atom.jaas-gcp.cloud.sap.corp/job/internal-monitoring
+      github:
+        url: https://github.tools.sap/atom-cfs/internal-monitoring
+      technology: node-js
+  - name: developer-portal-backend
+    title: Developer Portal Backend
+    description: Backend side of the developer portal project managed by team-coe
+    owner: team-coe
+    project: developer-portal
+    metadata:
+      health: true
+      subdomain: backend
+      github:
+        url: https://github.tools.sap/cfs-platform-engineering/developer-portal-backend
+      technology: go
+  - name: developer-portal-frontend
+    title: Developer Portal Frontend
+    description: Frontend side of the developer portal project managed by team-coe
+    owner: team-coe
+    project: developer-portal
+    metadata:
+      health: true
+      github:
+        url: https://github.tools.sap/cfs-platform-engineering/developer-portal-frontend
+      technology: react
+  - name: cis-web
+    title: CIS - Web
+    description: Commercial Infrastructure Service main project
+    owner: team-zohar
+    project: neo
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://gkeo2pproductiveci.jaas-gcp.cloud.sap.corp/job/CIS_QOS
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/com.sap.core.commercial.service
+      technology: java
+  - name: cis-admin
+    title: CIS - Admin
+    description: Commercial Infrastructure Service Administrator UI
+    owner: team-zohar
+    project: neo
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://gkeo2pproductiveci.jaas-gcp.cloud.sap.corp/job/CIS_QOS
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/com.sap.core.commercial.service
+      technology: java
+  - name: cis-cmd
+    title: CIS - Command Line
+    description: Commercial Infrastructure Service Command Line (Neo SDK)
+    owner: team-zohar
+    project: neo
+    metadata:
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/commInfra/com.sap.cloud.commercial.cmd
+      technology: java
+  - name: cis-metadata
+    title: CIS - Metadata
+    description: Commercial Infrastructure Service services metadata
+    owner: team-zohar
+    project: neo
+    metadata:
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/commInfra/com.sap.core.commercial.service.metadata
+      technology: text
+  - name: cis-metadata-services
+    title: CIS - Metadata Services Translation
+    description: Commercial Infrastructure Service services metadata (i18n)
+    owner: team-zohar
+    project: neo
+    metadata:
+      ci:
+        qos:
+          jenkins_url: https://cfsprodflows.jaas-gcp.cloud.sap.corp/job/services-metadata-factory
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/commInfra/com.sap.core.commercial.service.metadata.services
+      technology: text
+  - name: cis-cmd-tunnel
+    title: CIS - Command Tunnel
+    description: Commercial Infrastructure Service Command Tunnel (Neo SDK)
+    owner: team-zohar
+    project: neo
+    metadata:
+      github:
+        url: https://git.wdf.sap.corp/admin/repos/NGJP/JPaaS/Infrastruc/com.sap.core.service.commandtunnel
+      technology: java
+  - name: dynatrace-exporter
+    title: Dynatrace Exporter
+    description: dynatrace-exporter managed by team-coe
+    project: btp-monitoring
+    owner: team-coe
+    metadata:
+      github:
+        url: https://github.tools.sap/btp-monitoring/dynatrace-exporter
+        technology: python
