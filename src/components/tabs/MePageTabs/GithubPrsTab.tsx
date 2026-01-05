@@ -3,18 +3,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Wrench, Database, List, X, Trash2 } from "lucide-react";
-import { GitHubPullRequestsResponse, GitHubPullRequest as PRType } from "@/types/developer-portal";
+import { Loader2, Wrench, Database, List, Trash2 } from "lucide-react";
+import { GitHubPullRequest as PRType, GitHubPRQueryParams } from "@/types/developer-portal";
 import QuickFilterButtons, { FilterOption } from "@/components/QuickFilterButtons";
 import { useClosePullRequest } from "@/hooks/api/useClosePullRequest";
 import { ClosePRDialog } from "@/components/dialogs/ClosePRDialog";
+import { useQuery } from "@tanstack/react-query";
+import { fetchGitHubPullRequests, fetchGitHubWdfPullRequests, fetchBothGitHubPullRequests } from "@/services/githubApi";
+import { queryKeys } from "@/lib/queryKeys";
 
 type GithubFilterType = "tools" | "wdf" | "both";
 
 interface GithubPrsTabProps {
-  data: GitHubPullRequestsResponse | undefined;
-  isLoading: boolean;
-  error: Error | null;
   prStatus: 'open' | 'closed' | 'all';
   setPrStatus: Dispatch<SetStateAction<'open' | 'closed' | 'all'>>;
   prPage: number;
@@ -23,9 +23,6 @@ interface GithubPrsTabProps {
 }
 
 export default function GithubPrsTab({
-  data,
-  isLoading,
-  error,
   prStatus,
   setPrStatus,
   prPage,
@@ -48,11 +45,37 @@ export default function GithubPrsTab({
   // Close PR mutation
   const closePRMutation = useClosePullRequest();
 
+  // Query params for PR fetching
+  const queryParams: GitHubPRQueryParams = {
+    state: prStatus,
+    page: prPage,
+    per_page: perPage,
+    sort: 'updated',
+    direction: 'desc',
+  };
+
+  // Fetch data based on selected filter
+  const { data, isLoading, error } = useQuery({
+    queryKey: [...queryKeys.github.pullRequests(queryParams), filter],
+    queryFn: () => {
+      switch (filter) {
+        case 'tools':
+          return fetchGitHubPullRequests(queryParams);
+        case 'wdf':
+          return fetchGitHubWdfPullRequests(queryParams);
+        case 'both':
+          return fetchBothGitHubPullRequests(queryParams);
+        default:
+          return fetchGitHubPullRequests(queryParams);
+      }
+    },
+  });
+
   // Filter options for repository type
   const repoFilterOptions: FilterOption<GithubFilterType>[] = [
     { value: "tools", label: "Tools", icon: Wrench },
-    { value: "wdf", label: "WDF", icon: Database, isDisabled: true, tooltip: "WDF is not supported yet" },
-    { value: "both", label: "Both", icon: List, isDisabled: true },
+    { value: "wdf", label: "WDF", icon: Database },
+    { value: "both", label: "Both", icon: List },
   ];
 
   // Extract PRs and total from response
@@ -62,10 +85,10 @@ export default function GithubPrsTab({
   // Calculate total pages from API total
   const prTotalPages = Math.max(1, Math.ceil(total / perPage));
 
-  // Reset to page 1 when filter changes
+  // Reset to page 1 when filter or status changes
   useEffect(() => {
     setPrPage(1);
-  }, [prStatus]);
+  }, [prStatus, filter, setPrPage]);
 
   /**
    * Get badge variant based on PR state
@@ -164,7 +187,7 @@ export default function GithubPrsTab({
 
             {/* Data Rows */}
             {!isLoading && !error && pullRequests.map((pr) => (
-              <TableRow key={pr.id}>
+              <TableRow key={`${pr.repository.full_name}-${pr.id}`}>
                 <TableCell className="font-medium">
                   {pr.repository.full_name || pr.repository.name || 'Unknown'}
                 </TableCell>

@@ -729,3 +729,323 @@ groups:
     });
   });
 });
+
+// New tests for enhanced replaceAlertInContent functionality
+describe('AlertEditorDialog - Enhanced Alert Matching', () => {
+  const mockOnOpenChange = vi.fn();
+  const mockToast = vi.fn();
+  const mockMutateAsync = vi.fn();
+  const mockUseCreateAlertPR = vi.mocked(useCreateAlertPR);
+  const mockUseToast = vi.mocked(useToast);
+
+  let queryClient: QueryClient;
+
+  const renderWithQueryClient = (ui: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {ui}
+      </QueryClientProvider>
+    );
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    mockUseToast.mockReturnValue({ 
+      toast: mockToast,
+      dismiss: vi.fn(),
+      toasts: []
+    });
+    mockUseCreateAlertPR.mockReturnValue({
+      mutateAsync: mockMutateAsync,
+      isPending: false,
+      isError: false,
+      error: null,
+    } as any);
+  });
+
+  const createMockAlert = (name: string, expr: string, severity: string, forDuration?: string) => ({
+    alert: name,
+    expr,
+    labels: { severity },
+    ...(forDuration && { for: forDuration }),
+    annotations: {}
+  });
+
+  const createMockFile = (content: string) => ({
+    name: 'test-alerts.yml',
+    category: 'monitoring',
+    content
+  });
+
+  describe('Multiple alerts with same name but different properties', () => {
+    it('should replace the correct alert when multiple alerts have same name but different severity', async () => {
+      const user = userEvent.setup();
+      const yamlContent = `
+groups:
+  - name: test-alerts
+    rules:
+      - alert: HighCPU
+        expr: cpu_usage > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High CPU usage - Warning
+      - alert: HighCPU
+        expr: cpu_usage > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: High CPU usage - Critical
+`;
+
+      // We're editing the critical alert (second one)
+      const alert = createMockAlert('HighCPU', 'cpu_usage > 95', 'critical', '2m');
+      const file = createMockFile(yamlContent);
+
+      mockMutateAsync.mockResolvedValue({ prUrl: 'https://github.com/test/pr/1' });
+
+      renderWithQueryClient(
+        <AlertEditorDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          alert={alert}
+          file={file}
+          projectId="test-project"
+        />
+      );
+
+      // Modify the expression
+      const exprTextarea = screen.getByDisplayValue('cpu_usage > 95');
+      await user.clear(exprTextarea);
+      await user.type(exprTextarea, 'cpu_usage > 98');
+
+      const createPRButton = screen.getByText('Create Pull Request');
+      await user.click(createPRButton);
+
+      await waitFor(() => {
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          fileName: 'test-alerts.yml',
+          content: expect.stringMatching(
+            // Should contain the updated critical alert but preserve the warning alert
+            /cpu_usage > 80[\s\S]*severity: warning[\s\S]*cpu_usage > 98[\s\S]*severity: critical/
+          ),
+          message: '[Update-Rule] HighCPU',
+          description: expect.any(String)
+        });
+      });
+    });
+
+    it('should replace the correct alert when multiple alerts have same name but different expressions', async () => {
+      const user = userEvent.setup();
+      const yamlContent = `
+groups:
+  - name: test-alerts
+    rules:
+      - alert: HighMemory
+        expr: memory_usage > 80
+        labels:
+          severity: warning
+      - alert: HighMemory
+        expr: memory_usage > 95
+        labels:
+          severity: warning
+`;
+
+      // We're editing the second alert (memory_usage > 95)
+      const alert = createMockAlert('HighMemory', 'memory_usage > 95', 'warning');
+      const file = createMockFile(yamlContent);
+
+      mockMutateAsync.mockResolvedValue({ prUrl: 'https://github.com/test/pr/1' });
+
+      renderWithQueryClient(
+        <AlertEditorDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          alert={alert}
+          file={file}
+          projectId="test-project"
+        />
+      );
+
+      // Modify the expression
+      const exprTextarea = screen.getByDisplayValue('memory_usage > 95');
+      await user.clear(exprTextarea);
+      await user.type(exprTextarea, 'memory_usage > 98');
+
+      const createPRButton = screen.getByText('Create Pull Request');
+      await user.click(createPRButton);
+
+      await waitFor(() => {
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          fileName: 'test-alerts.yml',
+          content: expect.stringMatching(
+            // Should preserve first alert and update second alert
+            /memory_usage > 80[\s\S]*memory_usage > 98/
+          ),
+          message: '[Update-Rule] HighMemory',
+          description: expect.any(String)
+        });
+      });
+    });
+
+    it('should replace the correct alert when multiple alerts have same name but different for duration', async () => {
+      const user = userEvent.setup();
+      const yamlContent = `
+groups:
+  - name: test-alerts
+    rules:
+      - alert: DiskSpace
+        expr: disk_usage > 90
+        for: 10m
+        labels:
+          severity: warning
+      - alert: DiskSpace
+        expr: disk_usage > 90
+        for: 5m
+        labels:
+          severity: warning
+`;
+
+      // We're editing the second alert (for: 5m)
+      const alert = createMockAlert('DiskSpace', 'disk_usage > 90', 'warning', '5m');
+      const file = createMockFile(yamlContent);
+
+      mockMutateAsync.mockResolvedValue({ prUrl: 'https://github.com/test/pr/1' });
+
+      renderWithQueryClient(
+        <AlertEditorDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          alert={alert}
+          file={file}
+          projectId="test-project"
+        />
+      );
+
+      // Modify the duration
+      const durationInput = screen.getByDisplayValue('5m');
+      await user.clear(durationInput);
+      await user.type(durationInput, '2m');
+
+      const createPRButton = screen.getByText('Create Pull Request');
+      await user.click(createPRButton);
+
+      await waitFor(() => {
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          fileName: 'test-alerts.yml',
+          content: expect.stringMatching(
+            // Should preserve first alert (for: 10m) and update second alert (for: 2m)
+            /for: 10m[\s\S]*for: 2m/
+          ),
+          message: '[Update-Rule] DiskSpace',
+          description: expect.any(String)
+        });
+      });
+    });
+  });
+
+  describe('Edge cases and error handling', () => {
+    it('should handle case when no matching alert is found', async () => {
+      const user = userEvent.setup();
+      const yamlContent = `
+groups:
+  - name: test-alerts
+    rules:
+      - alert: ExistingAlert
+        expr: some_metric > 50
+        labels:
+          severity: info
+`;
+
+      // Try to edit an alert that doesn't exist
+      const alert = createMockAlert('NonExistentAlert', 'some_metric > 100', 'warning');
+      const file = createMockFile(yamlContent);
+
+      mockMutateAsync.mockResolvedValue({ prUrl: 'https://github.com/test/pr/1' });
+
+      renderWithQueryClient(
+        <AlertEditorDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          alert={alert}
+          file={file}
+          projectId="test-project"
+        />
+      );
+
+      const createPRButton = screen.getByText('Create Pull Request');
+      await user.click(createPRButton);
+
+      await waitFor(() => {
+        // Should still call mutateAsync with original content (no changes made)
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          fileName: 'test-alerts.yml',
+          content: yamlContent, // Original content unchanged
+          message: '[Update-Rule] NonExistentAlert',
+          description: expect.any(String)
+        });
+      });
+    });
+
+    it('should fall back to first match when exact match cannot be determined', async () => {
+      const user = userEvent.setup();
+      const yamlContent = `
+groups:
+  - name: test-alerts
+    rules:
+      - alert: AmbiguousAlert
+        expr: metric_a > 50
+        labels:
+          severity: warning
+      - alert: AmbiguousAlert
+        expr: metric_b > 50
+        labels:
+          severity: warning
+`;
+
+      // Create an alert that matches name and severity but has a different expression
+      // that doesn't exactly match either of the existing ones
+      const alert = createMockAlert('AmbiguousAlert', 'metric_c > 50', 'warning');
+      const file = createMockFile(yamlContent);
+
+      mockMutateAsync.mockResolvedValue({ prUrl: 'https://github.com/test/pr/1' });
+
+      // Spy on console.warn to verify fallback behavior
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      renderWithQueryClient(
+        <AlertEditorDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          alert={alert}
+          file={file}
+          projectId="test-project"
+        />
+      );
+
+      const createPRButton = screen.getByText('Create Pull Request');
+      await user.click(createPRButton);
+
+      await waitFor(() => {
+        // Should have logged a warning about multiple matches
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Multiple alerts named "AmbiguousAlert" found, but could not determine exact match')
+        );
+        
+        // Should still proceed with the operation
+        expect(mockMutateAsync).toHaveBeenCalled();
+      });
+
+      consoleSpy.mockRestore();
+    });
+  });
+});

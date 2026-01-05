@@ -260,7 +260,7 @@ export interface Project {
   health?: {
     endpoint?: string;
   };
-  monitoring?:boolean;
+  monitoring?: boolean;
   'components-metrics'?: boolean
 }
 
@@ -306,7 +306,7 @@ export interface Component {
   qos?: string; // Quality of Service info
   sonar?: string; // Sonar dashboard URL
   owner_id: string; // UUID
-  metadata?:ComponentMetadata;
+  metadata?: ComponentMetadata;
   'is-library'?: boolean; // Indicates if component is a library
   health?: boolean;
   'central-service'?: boolean;
@@ -336,17 +336,17 @@ export interface Landscape {
   title?: string;
   domain?: string;
   environment?: string;
-  git?: string;                 
-  concourse?: string;            
-  kibana?: string;                
-  dynatrace?: string;             
-  cockpit?: string;                
-  'operation-console'?: string;   
+  git?: string;
+  concourse?: string;
+  kibana?: string;
+  dynatrace?: string;
+  cockpit?: string;
+  'operation-console'?: string;
   type?: string;
-  grafana?: string;               
-  prometheus?: string;            
-  gardener?: string;              
-  plutono?: string;               
+  grafana?: string;
+  prometheus?: string;
+  gardener?: string;
+  plutono?: string;
 }
 
 /**
@@ -601,6 +601,18 @@ export interface UpdateComponentDeploymentRequest {
   build_time?: string;
   git_properties?: Record<string, unknown>;
   build_properties?: Record<string, unknown>;
+}
+
+export interface GitHubProviderContribution {
+  provider_name: 'githubtools' | 'githubwdf';
+  total_contributions: number;
+}
+
+export interface GitHubContributionsResponse {
+  total_contributions: number;
+  from: string;
+  to: string;
+  Providers: GitHubProviderContribution[];
 }
 
 // ============================================================================
@@ -1206,7 +1218,7 @@ export interface TriggeredAlert {
   annotations: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  component?:string
+  component?: string
 }
 
 /**
@@ -1217,9 +1229,9 @@ export interface TriggeredAlertsResponse {
   data: TriggeredAlert[];
 }
 
-interface AlertLabel{
-  key:string;
-  value:string;
+interface AlertLabel {
+  key: string;
+  value: string;
 }
 
 export interface TriggeredAlertsLabelUpdatePayload {

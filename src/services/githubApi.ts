@@ -11,6 +11,40 @@ export async function fetchGitHubPullRequests(
   });
 }
 
+export async function fetchGitHubWdfPullRequests(
+  params?: GitHubPRQueryParams
+): Promise<GitHubPullRequestsResponse> {
+  return apiClient.get<GitHubPullRequestsResponse>('/github/githubwdf/pull-requests', {
+    params: params as Record<string, string | number | boolean | undefined>,
+  });
+}
+
+export async function fetchBothGitHubPullRequests(
+  params?: GitHubPRQueryParams
+): Promise<GitHubPullRequestsResponse> {
+  // Fetch from both endpoints in parallel
+  const [toolsResponse, wdfResponse] = await Promise.all([
+    fetchGitHubPullRequests(params),
+    fetchGitHubWdfPullRequests(params),
+  ]);
+
+  // Combine the pull requests from both sources
+  const combinedPRs = [...toolsResponse.pull_requests, ...wdfResponse.pull_requests];
+  
+  // Sort by updated_at in descending order (most recent first)
+  combinedPRs.sort((a, b) => {
+    const dateA = new Date(a.updated_at).getTime();
+    const dateB = new Date(b.updated_at).getTime();
+    return dateB - dateA;
+  });
+
+  // Return combined response
+  return {
+    pull_requests: combinedPRs,
+    total: toolsResponse.total + wdfResponse.total,
+  };
+}
+
 export async function fetchGitHubContributions(): Promise<GitHubContributionsResponse> {
   return apiClient.get<GitHubContributionsResponse>('/github/contributions');
 }

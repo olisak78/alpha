@@ -27,63 +27,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Don't check auth status if we're on the login page
     // This prevents automatic re-login after logout
     const isLoginPage = window.location.pathname === '/login';
-    console.log('🔍 AuthContext: Initial useEffect', {
-      isLoginPage,
-      pathname: window.location.pathname,
-    });
 
     if (!isLoginPage) {
-      console.log('🔍 AuthContext: Not on login page, checking auth status...');
       checkAuthStatusAndSetUser();
     } else {
       // If on login page, just set loading to false
-      console.log('🔍 AuthContext: On login page, skipping auth check');
       setIsLoading(false);
     }
   }, []);
 
   const checkAuthStatusAndSetUser = async () => {
     try {
-      console.log('🔍 AuthContext: checkAuthStatusAndSetUser started');
       setIsLoading(true);
       
       // Check both authentication statuses
       const authStatuses = await checkDualAuthStatus();
-      console.log('🔍 AuthContext: Auth statuses received:', authStatuses);
       
       // Update Zustand store with authentication statuses
       setGithubToolsAuthenticated(authStatuses.githubtools);
       setGithubWdfAuthenticated(authStatuses.githubwdf);
-      console.log('🔍 AuthContext: Updated Zustand store with auth statuses');
 
       // Only proceed if both authentications are valid
       if (authStatuses.githubtools && authStatuses.githubwdf) {
-        console.log('✅ AuthContext: Both auths valid, fetching user...');
         // Fetch user from /users/me
         const me = await fetchCurrentUser();
-        console.log('🔍 AuthContext: User fetch result:', me ? 'Success' : 'Failed');
-        
         if (me) {
           const user = buildUserFromMe(me);
           setUser(user);
-          console.log('✅ AuthContext: User set successfully:', user.name);
         } else {
           setUser(null);
-          console.log('❌ AuthContext: Failed to fetch user');
         }
       } else {
         // Not fully authenticated, clear user state
-        console.log('❌ AuthContext: Not fully authenticated', authStatuses);
         setUser(null);
       }
     } catch (error) {
-      console.error('❌ AuthContext: Error checking auth status:', error);
       setUser(null);
       setGithubToolsAuthenticated(false);
       setGithubWdfAuthenticated(false);
     } finally {
       setIsLoading(false);
-      console.log('🔍 AuthContext: checkAuthStatusAndSetUser completed');
     }
   };
 
@@ -170,11 +153,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // User is authenticated only if both auth providers are authenticated
   const isAuthenticated = !!user && isBothAuthenticated();
   
-  console.log('🔍 AuthContext: isAuthenticated calculation', {
-    hasUser: !!user,
-    bothAuth: isBothAuthenticated(),
-    isAuthenticated,
-  });
 
   const value: AuthContextType = {
     user,

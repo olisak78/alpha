@@ -97,7 +97,7 @@ describe('authService', () => {
 
       expect(window.open).toHaveBeenCalledWith(
         `${NEW_BACKEND_URL}/api/auth/githubtools/start`,
-        'auth-popup',
+        'auth-popup-githubtools',
         'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
       );
     });

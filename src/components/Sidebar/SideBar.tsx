@@ -119,7 +119,6 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
     };
 
     const handlePluginClick = (plugin: { id: string; name: string; title: string; slug: string; icon?: string }) => {
-        console.log('[SideBar] Plugin clicked:', plugin.slug);
         onProjectChange(`plugins/${plugin.slug}`);
     };
 

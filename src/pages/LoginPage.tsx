@@ -26,27 +26,14 @@ const LoginPage: React.FC = () => {
     isBothAuthenticated,
   } = useDualAuthStore();
 
-  console.log('🔐 LoginPage RENDER:', {
-    isAuthenticated,
-    isLoading,
-    isGithubToolsAuthenticated,
-    isGithubWdfAuthenticated,
-    bothAuth: isBothAuthenticated(),
-  });
-
   // Redirect to home when both authentications are complete
   useEffect(() => {
-    console.log('🔄 LoginPage useEffect - Auth Status:', {
-      isGithubToolsAuthenticated,
-      isGithubWdfAuthenticated,
-      isBothAuthenticated: isBothAuthenticated(),
-    });
     
     if (isBothAuthenticated() && isGithubToolsAuthenticated && isGithubWdfAuthenticated) {
-      console.log('✅ Both authentications complete! Redirecting in 1 second...');
+      // Clear the justLoggedOut flag before redirect
+      sessionStorage.removeItem('justLoggedOut');
       // Small delay to show success message
       const timer = setTimeout(() => {
-        console.log('🚀 Executing redirect to /');
         window.location.href = '/';
       }, 1000);
       return () => clearTimeout(timer);
@@ -60,24 +47,24 @@ const LoginPage: React.FC = () => {
 
   const handleGithubToolsLogin = async () => {
     if (isGithubToolsAuthenticated) {
-      console.log('⏭️  GitHub Tools already authenticated, skipping');
       return;
     }
     
     try {
-      console.log('🔵 Starting GitHub Tools authentication...');
       setGithubToolsLoading(true);
       setGithubToolsError(null);
+      
+      // Clear the justLoggedOut flag when starting login
+      sessionStorage.removeItem('justLoggedOut');
       
       await authService({
         returnUrl: undefined,
         storeReturnUrl: false,
       });
       
-      console.log('✅ GitHub Tools authentication successful!');
       setGithubToolsAuthenticated(true);
     } catch (error) {
-      console.error('❌ GitHub Tools login failed:', error);
+      console.error('SAP GitHub Tools login failed:', error);
       setGithubToolsError(error instanceof Error ? error.message : 'Authentication failed');
     } finally {
       setGithubToolsLoading(false);
@@ -86,24 +73,24 @@ const LoginPage: React.FC = () => {
 
   const handleGithubWdfLogin = async () => {
     if (isGithubWdfAuthenticated) {
-      console.log('⏭️  GitHub WDF already authenticated, skipping');
       return;
     }
     
     try {
-      console.log('🟢 Starting GitHub WDF authentication...');
       setGithubWdfLoading(true);
       setGithubWdfError(null);
+      
+      // Clear the justLoggedOut flag when starting login
+      sessionStorage.removeItem('justLoggedOut');
       
       await authServiceWdf({
         returnUrl: undefined,
         storeReturnUrl: false,
       });
       
-      console.log('✅ GitHub WDF authentication successful!');
       setGithubWdfAuthenticated(true);
     } catch (error) {
-      console.error('❌ GitHub WDF login failed:', error);
+      console.error('SAP GitHub WDF login failed:', error);
       setGithubWdfError(error instanceof Error ? error.message : 'Authentication failed');
     } finally {
       setGithubWdfLoading(false);
@@ -153,12 +140,12 @@ const LoginPage: React.FC = () => {
               ) : isGithubToolsAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  GitHub Tools - Authenticated
+                  SAP GitHub Tools - Authenticated
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Github className="h-5 w-5" />
-                  Sign in with GitHub Tools
+                  Sign in with SAP GitHub Tools
                 </div>
               )}
             </Button>
@@ -186,12 +173,12 @@ const LoginPage: React.FC = () => {
               ) : isGithubWdfAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  GitHub WDF - Authenticated
+                  SAP GitHub WDF - Authenticated
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Github className="h-5 w-5" />
-                  Sign in with GitHub WDF
+                  Sign in with SAP GitHub WDF
                 </div>
               )}
             </Button>
@@ -203,28 +190,7 @@ const LoginPage: React.FC = () => {
             )}
           </div>
 
-          {/* Completion Message */}
-          {showCompletionMessage && (
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <p className="text-sm text-blue-800 dark:text-blue-200 text-center">
-                {isGithubToolsAuthenticated && !isGithubWdfAuthenticated && (
-                  <>✓ GitHub Tools authenticated. Please sign in with GitHub WDF to continue.</>
-                )}
-                {isGithubWdfAuthenticated && !isGithubToolsAuthenticated && (
-                  <>✓ GitHub WDF authenticated. Please sign in with GitHub Tools to continue.</>
-                )}
-              </p>
-            </div>
-          )}
-
-          {/* Both Complete - Redirecting Message */}
-          {isBothAuthenticated() && (
-            <div className="mt-6 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-              <p className="text-sm text-green-800 dark:text-green-200 text-center font-medium">
-                ✓ Both authentications complete. Redirecting to portal...
-              </p>
-            </div>
-          )}
+          {/* Removed blue and green alert boxes as requested */}
 
           <div className="text-center text-sm text-muted-foreground mt-6">
             <p>

@@ -1,12 +1,23 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/LoginPage';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock AuthContext
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: vi.fn(),
+}));
+
+// Mock useDualAuthStore
+vi.mock('@/stores/useDualAuthStore', () => ({
+  useDualAuthStore: vi.fn(),
+}));
+
+// Mock authService functions
+vi.mock('@/services/authService', () => ({
+  authService: vi.fn(),
+  authServiceWdf: vi.fn(),
 }));
 
 // Mock react-router-dom Navigate
@@ -30,7 +41,6 @@ vi.mock('@/components/ui/card', () => ({
 vi.mock('@/components/ui/button', () => ({
   Button: vi.fn(({ children, onClick, disabled, className, variant }) => (
     <button
-      data-testid="login-button"
       onClick={onClick}
       disabled={disabled}
       className={className}
@@ -44,24 +54,70 @@ vi.mock('@/components/ui/button', () => ({
 // Mock lucide-react
 vi.mock('lucide-react', () => ({
   Github: vi.fn(() => <div data-testid="github-icon">GitHub Icon</div>),
+  CheckCircle2: vi.fn(() => <div data-testid="check-icon">Check Icon</div>),
+  AlertCircle: vi.fn(() => <div data-testid="alert-icon">Alert Icon</div>),
 }));
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useDualAuthStore } from '@/stores/useDualAuthStore';
+import { authService, authServiceWdf } from '@/services/authService';
 import { Navigate } from 'react-router-dom';
 
 describe('LoginPage', () => {
-  const mockLogin = vi.fn();
+  const mockSetGithubToolsAuthenticated = vi.fn();
+  const mockSetGithubWdfAuthenticated = vi.fn();
+  const mockSetGithubToolsLoading = vi.fn();
+  const mockSetGithubWdfLoading = vi.fn();
+  const mockSetGithubToolsError = vi.fn();
+  const mockSetGithubWdfError = vi.fn();
+  const mockIsBothAuthenticated = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Clear sessionStorage
+    sessionStorage.clear();
 
+    // Default useAuth mock
     vi.mocked(useAuth).mockReturnValue({
-      login: mockLogin,
       isAuthenticated: false,
       isLoading: false,
       user: null,
+      login: vi.fn(),
       logout: vi.fn(),
     });
+
+    // Default useDualAuthStore mock
+    vi.mocked(useDualAuthStore).mockReturnValue({
+      isGithubToolsAuthenticated: false,
+      isGithubWdfAuthenticated: false,
+      isGithubToolsLoading: false,
+      isGithubWdfLoading: false,
+      githubToolsError: null,
+      githubWdfError: null,
+      setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+      setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+      setGithubToolsLoading: mockSetGithubToolsLoading,
+      setGithubWdfLoading: mockSetGithubWdfLoading,
+      setGithubToolsError: mockSetGithubToolsError,
+      setGithubWdfError: mockSetGithubWdfError,
+      isBothAuthenticated: mockIsBothAuthenticated,
+      reset: vi.fn(),
+    });
+
+    // Default authService mocks
+    vi.mocked(authService).mockResolvedValue(undefined);
+    vi.mocked(authServiceWdf).mockResolvedValue(undefined);
+    
+    // Default isBothAuthenticated returns false
+    mockIsBothAuthenticated.mockReturnValue(false);
+
+    // Mock timers
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   const renderWithRouter = (ui: React.ReactElement) => {
@@ -71,68 +127,73 @@ describe('LoginPage', () => {
   describe('Rendering', () => {
     it('should render login card', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByTestId('card')).toBeInTheDocument();
     });
 
     it('should render card header', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByTestId('card-header')).toBeInTheDocument();
     });
 
     it('should render card title', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByTestId('card-title')).toBeInTheDocument();
       expect(screen.getByText('Welcome to Developer Portal')).toBeInTheDocument();
     });
 
-    it('should render card description', () => {
+    it('should render card description with default text', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByTestId('card-description')).toBeInTheDocument();
-      expect(screen.getByText('Choose your preferred login method to access the portal')).toBeInTheDocument();
+      expect(screen.getByText('Complete both authentications to access the portal')).toBeInTheDocument();
     });
 
     it('should render card content', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByTestId('card-content')).toBeInTheDocument();
     });
 
-    it('should render login button', () => {
+    it('should render both login buttons with SAP prefix', () => {
       renderWithRouter(<LoginPage />);
-
-      expect(screen.getByTestId('login-button')).toBeInTheDocument();
+      expect(screen.getByText('Sign in with SAP GitHub Tools')).toBeInTheDocument();
+      expect(screen.getByText('Sign in with SAP GitHub WDF')).toBeInTheDocument();
     });
 
-    it('should render GitHub icon in button', () => {
+    it('should render GitHub icons in buttons', () => {
       renderWithRouter(<LoginPage />);
-
-      expect(screen.getByTestId('github-icon')).toBeInTheDocument();
-    });
-
-    it('should render button text', () => {
-      renderWithRouter(<LoginPage />);
-
-      expect(screen.getByText('Sign in with GitHub Tools')).toBeInTheDocument();
+      const githubIcons = screen.getAllByTestId('github-icon');
+      expect(githubIcons).toHaveLength(2);
     });
 
     it('should render terms of service text', () => {
       renderWithRouter(<LoginPage />);
-
       expect(screen.getByText(/By signing in, you agree to our terms of service and privacy policy/)).toBeInTheDocument();
     });
   });
 
   describe('Authentication State - Redirect', () => {
-    it('should redirect to home when already authenticated', () => {
+    it('should redirect to home when both authentications complete', () => {
+      mockIsBothAuthenticated.mockReturnValue(true);
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: true,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: true,
         isLoading: false,
         user: { id: '1', name: 'Test User' },
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -142,12 +203,29 @@ describe('LoginPage', () => {
       expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/');
     });
 
-    it('should not render login card when authenticated', () => {
+    it('should not render login card when fully authenticated', () => {
+      mockIsBothAuthenticated.mockReturnValue(true);
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: true,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: true,
         isLoading: false,
         user: { id: '1', name: 'Test User' },
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -157,11 +235,28 @@ describe('LoginPage', () => {
     });
 
     it('should call Navigate with replace prop', () => {
+      mockIsBothAuthenticated.mockReturnValue(true);
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: true,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: true,
         isLoading: false,
         user: { id: '1', name: 'Test User' },
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -177,13 +272,13 @@ describe('LoginPage', () => {
     });
   });
 
-  describe('Loading State - Initial Auth Check', () => {
+  describe('Loading State', () => {
     it('should show loading spinner when auth is loading', () => {
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: false,
         isLoading: true,
         user: null,
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -194,10 +289,10 @@ describe('LoginPage', () => {
 
     it('should show loading spinner element when auth is loading', () => {
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: false,
         isLoading: true,
         user: null,
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -209,10 +304,10 @@ describe('LoginPage', () => {
 
     it('should not render login card when auth is loading', () => {
       vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
         isAuthenticated: false,
         isLoading: true,
         user: null,
+        login: vi.fn(),
         logout: vi.fn(),
       });
 
@@ -220,308 +315,246 @@ describe('LoginPage', () => {
 
       expect(screen.queryByTestId('card')).not.toBeInTheDocument();
     });
+  });
 
-    it('should apply correct styling to loading container', () => {
-      vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
-        isAuthenticated: false,
-        isLoading: true,
-        user: null,
-        logout: vi.fn(),
+
+  describe('Alert Boxes Removed', () => {
+    it('should not display blue alert box after one authentication', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
       });
 
-      const { container } = renderWithRouter(<LoginPage />);
+      renderWithRouter(<LoginPage />);
 
-      const loadingContainer = container.querySelector('.min-h-screen');
-      expect(loadingContainer).toHaveClass('flex', 'items-center', 'justify-center', 'bg-background');
+      // Should NOT show blue completion message
+      expect(screen.queryByText(/authenticated. Please sign in/)).not.toBeInTheDocument();
+    });
+
+    it('should not display green alert box after both authentications', () => {
+      mockIsBothAuthenticated.mockReturnValue(true);
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: true,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
+
+      renderWithRouter(<LoginPage />);
+
+      // Should NOT show green redirecting message
+      expect(screen.queryByText(/Both authentications complete/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Redirecting to portal/)).not.toBeInTheDocument();
     });
   });
 
-  describe('Login Flow', () => {
-    it('should call login when button is clicked', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockResolvedValue(undefined);
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      expect(mockLogin).toHaveBeenCalledTimes(1);
-    });
-
-    it('should show loading state when login is in progress', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      expect(screen.getByText('Connecting...')).toBeInTheDocument();
-    });
-
-    it('should disable button during login', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      expect(loginButton).toBeDisabled();
-    });
-
-    it('should show spinner during login', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-
-      const { container } = renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      const spinner = container.querySelector('.animate-spin');
-      expect(spinner).toBeInTheDocument();
-    });
-
-    it('should re-enable button after successful login', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockResolvedValue(undefined);
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(loginButton).not.toBeDisabled();
-      });
-    });
-
-    it('should hide loading text after login completes', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockResolvedValue(undefined);
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText('Connecting...')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should log error when login fails', async () => {
-      const user = userEvent.setup();
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const error = new Error('Login failed');
-      mockLogin.mockRejectedValue(error);
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Login failed:', error);
+  describe('Error Display', () => {
+    it('should display Tools error message', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: false,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: 'Tools authentication failed',
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
       });
 
-      consoleErrorSpy.mockRestore();
-    });
-
-    it('should re-enable button after login fails', async () => {
-      const user = userEvent.setup();
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      mockLogin.mockRejectedValue(new Error('Login failed'));
-
       renderWithRouter(<LoginPage />);
 
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
+      expect(screen.getByText('Tools authentication failed')).toBeInTheDocument();
+    });
 
-      await waitFor(() => {
-        expect(loginButton).not.toBeDisabled();
+    it('should display WDF error message', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: false,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: 'WDF authentication failed',
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
       });
 
-      consoleErrorSpy.mockRestore();
-    });
-
-    it('should handle multiple failed login attempts', async () => {
-      const user = userEvent.setup();
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      mockLogin.mockRejectedValue(new Error('Login failed'));
-
       renderWithRouter(<LoginPage />);
 
-      const loginButton = screen.getByTestId('login-button');
-      
-      await user.click(loginButton);
-      await waitFor(() => expect(mockLogin).toHaveBeenCalledTimes(1));
-
-      await user.click(loginButton);
-      await waitFor(() => expect(mockLogin).toHaveBeenCalledTimes(2));
-
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
-
-      consoleErrorSpy.mockRestore();
+      expect(screen.getByText('WDF authentication failed')).toBeInTheDocument();
     });
   });
 
   describe('Button States', () => {
-    it('should render button with default variant', () => {
+    it('should disable Tools button when loading', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: false,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: true,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
+
       renderWithRouter(<LoginPage />);
 
-      const loginButton = screen.getByTestId('login-button');
-      expect(loginButton).toHaveAttribute('data-variant', 'default');
+      const toolsButton = screen.getByText('Connecting...');
+      expect(toolsButton.closest('button')).toBeDisabled();
     });
 
-    it('should render button with full width class', () => {
+    it('should disable Tools button when authenticated', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
+
       renderWithRouter(<LoginPage />);
 
-      const loginButton = screen.getByTestId('login-button');
-      expect(loginButton).toHaveClass('w-full');
+      const toolsButton = screen.getByText(/SAP GitHub Tools - Authenticated/);
+      expect(toolsButton.closest('button')).toBeDisabled();
     });
 
-    it('should not be disabled initially', () => {
+    it('should change Tools button variant when authenticated', () => {
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: false,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
+
       renderWithRouter(<LoginPage />);
 
-      const loginButton = screen.getByTestId('login-button');
-      expect(loginButton).not.toBeDisabled();
+      const toolsButton = screen.getByText(/SAP GitHub Tools - Authenticated/).closest('button');
+      expect(toolsButton).toHaveAttribute('data-variant', 'outline');
+    });
+  });
+
+  describe('Redirect Timing', () => {
+   
+
+    it('should clear justLoggedOut flag before redirect', async () => {
+      sessionStorage.setItem('justLoggedOut', 'true');
+      mockIsBothAuthenticated.mockReturnValue(true);
+      vi.mocked(useDualAuthStore).mockReturnValue({
+        isGithubToolsAuthenticated: true,
+        isGithubWdfAuthenticated: true,
+        isGithubToolsLoading: false,
+        isGithubWdfLoading: false,
+        githubToolsError: null,
+        githubWdfError: null,
+        setGithubToolsAuthenticated: mockSetGithubToolsAuthenticated,
+        setGithubWdfAuthenticated: mockSetGithubWdfAuthenticated,
+        setGithubToolsLoading: mockSetGithubToolsLoading,
+        setGithubWdfLoading: mockSetGithubWdfLoading,
+        setGithubToolsError: mockSetGithubToolsError,
+        setGithubWdfError: mockSetGithubWdfError,
+        isBothAuthenticated: mockIsBothAuthenticated,
+        reset: vi.fn(),
+      });
+
+      renderWithRouter(<LoginPage />);
+
+      // Advance timers slightly to allow React effects to run
+      // sessionStorage is cleared before the 1000ms setTimeout
+      await vi.advanceTimersByTimeAsync(0);
+      
+      // sessionStorage should be cleared immediately after effect runs
+      expect(sessionStorage.getItem('justLoggedOut')).toBeNull();
     });
   });
 
   describe('UI Styling', () => {
     it('should apply correct container styling', () => {
       const { container } = renderWithRouter(<LoginPage />);
-
       const mainContainer = container.querySelector('.min-h-screen');
       expect(mainContainer).toHaveClass('flex', 'items-center', 'justify-center', 'bg-background', 'p-4');
     });
 
     it('should apply correct card styling', () => {
       renderWithRouter(<LoginPage />);
-
       const card = screen.getByTestId('card');
       expect(card).toHaveClass('w-full', 'max-w-md');
     });
 
     it('should apply text-center to header', () => {
       renderWithRouter(<LoginPage />);
-
       const header = screen.getByTestId('card-header');
       expect(header).toHaveClass('text-center');
     });
 
     it('should apply correct title styling', () => {
       renderWithRouter(<LoginPage />);
-
       const title = screen.getByTestId('card-title');
       expect(title).toHaveClass('text-2xl', 'font-bold');
     });
 
     it('should apply space-y-4 to card content', () => {
       renderWithRouter(<LoginPage />);
-
       const content = screen.getByTestId('card-content');
       expect(content).toHaveClass('space-y-4');
-    });
-  });
-
-  describe('Integration', () => {
-    it('should call useAuth hook', () => {
-      renderWithRouter(<LoginPage />);
-
-      expect(useAuth).toHaveBeenCalled();
-    });
-
-    it('should use login function from useAuth', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockResolvedValue(undefined);
-
-      renderWithRouter(<LoginPage />);
-
-      await user.click(screen.getByTestId('login-button'));
-
-      expect(mockLogin).toHaveBeenCalled();
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle rapid button clicks', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      
-      // Click multiple times rapidly
-      await user.click(loginButton);
-      await user.click(loginButton);
-      await user.click(loginButton);
-
-      // Should only call login once because button becomes disabled
-      await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    it('should handle login promise that never resolves', async () => {
-      const user = userEvent.setup();
-      mockLogin.mockImplementation(() => new Promise(() => {})); // Never resolves
-
-      renderWithRouter(<LoginPage />);
-
-      const loginButton = screen.getByTestId('login-button');
-      await user.click(loginButton);
-
-      // Button should remain disabled
-      expect(loginButton).toBeDisabled();
-      expect(screen.getByText('Connecting...')).toBeInTheDocument();
-    });
-
-    it('should handle switching from loading to authenticated', () => {
-      const { rerender } = renderWithRouter(<LoginPage />);
-
-      // Initially loading
-      vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
-        isAuthenticated: false,
-        isLoading: true,
-        user: null,
-        logout: vi.fn(),
-      });
-
-      rerender(
-        <MemoryRouter>
-          <LoginPage />
-        </MemoryRouter>
-      );
-
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
-
-      // Then authenticated
-      vi.mocked(useAuth).mockReturnValue({
-        login: mockLogin,
-        isAuthenticated: true,
-        isLoading: false,
-        user: { id: '1', name: 'Test User' },
-        logout: vi.fn(),
-      });
-
-      rerender(
-        <MemoryRouter>
-          <LoginPage />
-        </MemoryRouter>
-      );
-
-      expect(screen.getByTestId('navigate')).toBeInTheDocument();
     });
   });
 });

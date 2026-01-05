@@ -137,12 +137,10 @@ export async function loadPluginBundle(
     // Check if it's a GitHub URL
     if (isGitHubUrl(componentPath)) {
         // Fetch from API endpoint
-        console.log('[PluginViewPage] Loading plugin from API:', plugin.id);
         const uiResponse = await fetchPluginUI(plugin.id);
         return loadPluginFromContent(uiResponse.content);
     } else {
         // Load directly from URL
-        console.log('[PluginViewPage] Loading plugin from URL:', componentPath);
         return loadPluginFromUrl(componentPath, signal);
     }
 }

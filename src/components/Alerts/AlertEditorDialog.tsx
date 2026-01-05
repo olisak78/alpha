@@ -245,42 +245,105 @@ export function AlertEditorDialog({
   // Helper function to replace alert in the original content
   // Uses surgical text-based replacement to preserve original formatting
   const replaceAlertInContent = (content: string, oldAlertName: string | undefined, newAlert: any): string => {
-    if (!oldAlertName) {
+    if (!oldAlertName || !originalAlert) {
       return content;
     }
 
-    // Find and extract the specific alert block
+    // Find and extract the specific alert block by matching multiple properties
     const lines = content.split('\n');
     let alertStartIdx = -1;
     let alertEndIdx = -1;
     let baseIndent = '';
 
+    // Find all potential alert matches by name first
+    const potentialMatches: Array<{startIdx: number, endIdx: number, indent: string}> = [];
+    
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       // Find alert start
       if (line.match(new RegExp(`^(\\s*)-\\s*alert:\\s*${oldAlertName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`))) {
-        alertStartIdx = i;
-        baseIndent = line.match(/^(\s*)-/)?.[1] || '';
-        continue;
-      }
-
-      // Find alert end (next alert or end of list)
-      if (alertStartIdx >= 0 && alertEndIdx < 0) {
-        if (line.match(/^\s*-\s*alert:/) || (line.trim() && !line.startsWith(baseIndent + '  ') && !line.startsWith(baseIndent + '-'))) {
-          alertEndIdx = i;
-          break;
+        const startIdx = i;
+        const indent = line.match(/^(\s*)-/)?.[1] || '';
+        
+        // Find the end of this alert block
+        let endIdx = -1;
+        for (let j = i + 1; j < lines.length; j++) {
+          const nextLine = lines[j];
+          if (nextLine.match(/^\s*-\s*alert:/) || (nextLine.trim() && !nextLine.startsWith(indent + '  ') && !nextLine.startsWith(indent + '-'))) {
+            endIdx = j;
+            break;
+          }
         }
+        
+        if (endIdx < 0) {
+          endIdx = lines.length;
+        }
+        
+        potentialMatches.push({ startIdx, endIdx, indent });
+      }
+    }
+
+    // If only one match, use it (backward compatibility)
+    if (potentialMatches.length === 1) {
+      alertStartIdx = potentialMatches[0].startIdx;
+      alertEndIdx = potentialMatches[0].endIdx;
+      baseIndent = potentialMatches[0].indent;
+    } else if (potentialMatches.length > 1) {
+      // Multiple matches found - need to find the exact one by comparing properties
+      for (const match of potentialMatches) {
+        
+        // Parse this alert block to compare with originalAlert
+        try {
+          // Extract key properties from the block for comparison
+          const blockLines = lines.slice(match.startIdx, match.endIdx);
+          let blockExpr = '';
+          let blockSeverity = '';
+          let blockFor = '';
+          
+          for (const blockLine of blockLines) {
+            const exprMatch = blockLine.match(/^\s+expr:\s*(.+)$/);
+            if (exprMatch) {
+              blockExpr = exprMatch[1].trim();
+            }
+            
+            const severityMatch = blockLine.match(/^\s+severity:\s*(.+)$/);
+            if (severityMatch) {
+              blockSeverity = severityMatch[1].trim();
+            }
+            
+            const durationMatch = blockLine.match(/^\s+for:\s*(.+)$/);
+            if (durationMatch) {
+              blockFor = durationMatch[1].trim();
+            }
+          }
+          
+          // Compare with original alert properties (before any edits)
+          const exprMatches = blockExpr === (originalAlert.expr || '');
+          const severityMatches = blockSeverity === (originalAlert.labels?.severity || '');
+          const forMatches = blockFor === (originalAlert.for || '');
+          
+          // If this block matches the original alert's key properties, use it
+          if (exprMatches && severityMatches && forMatches) {
+            alertStartIdx = match.startIdx;
+            alertEndIdx = match.endIdx;
+            baseIndent = match.indent;
+            break;
+          }
+        } catch (error) {
+          console.warn('Error parsing alert block for comparison:', error);
+          continue;
+        }
+      }
+      
+      // If no exact match found, fall back to first match with a warning
+      if (alertStartIdx < 0) {
+        console.warn(`Multiple alerts named "${oldAlertName}" found, but could not determine exact match.`);
       }
     }
 
     if (alertStartIdx < 0) {
       console.warn(`Could not find alert "${oldAlertName}" in content`);
       return content;
-    }
-
-    // If we didn't find an explicit end, go to the end of file
-    if (alertEndIdx < 0) {
-      alertEndIdx = lines.length;
     }
 
     // Manually build YAML for the alert to maintain proper structure

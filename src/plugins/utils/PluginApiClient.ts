@@ -133,14 +133,10 @@ export class PluginApiClient implements IPluginApiClient {
         }
       });
     }
-
-    console.log(`[PluginApiClient] Direct request: ${method} ${urlWithParams.toString()}`);
-
     // Get the access token from the main API client
     let authToken: string | null = null;
     try {
       authToken = await apiClient.getToken();
-      console.log('[PluginApiClient] Got auth token for direct request');
     } catch (error) {
       console.warn('[PluginApiClient] Failed to get auth token:', error);
       // Continue without token - the backend will handle auth error
@@ -210,8 +206,6 @@ export class PluginApiClient implements IPluginApiClient {
   ): Promise<T> {
     const proxyUrl = this.buildProxyUrl(path);
     
-    console.log(`[PluginApiClient] Portal request: ${method} ${proxyUrl}`);
-
     // Merge the path query param with any additional params
     const mergedParams = { ...options?.params };
 
@@ -256,7 +250,6 @@ export class PluginApiClient implements IPluginApiClient {
     // Unwrap proxy response envelope if present
     // The proxy wraps responses in { data, pluginSuccess, statusCode, responseTime }
     if (response && typeof response === 'object' && 'pluginSuccess' in response && 'data' in response) {
-      console.log('[PluginApiClient] Unwrapping proxy response envelope');
       if (!response.pluginSuccess) {
         throw new Error(response.error || 'Plugin request failed');
       }

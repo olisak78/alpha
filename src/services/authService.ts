@@ -148,11 +148,9 @@ export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
     const justLoggedOut = sessionStorage.getItem('justLoggedOut');
     if (justLoggedOut) {
       sessionStorage.removeItem('justLoggedOut');
-      console.log('🔍 checkDualAuthStatus: Just logged out, returning false for both');
       return { githubtools: false, githubwdf: false };
     }
 
-    console.log('🔍 checkDualAuthStatus: Calling /api/auth/refresh...');
     const response = await fetch(`${backendUrl}/api/auth/refresh`, {
       credentials: 'include',
       headers: {
@@ -161,11 +159,8 @@ export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
       },
     });
 
-    console.log('🔍 checkDualAuthStatus: Response status:', response.status);
-
     if (response.ok) {
       const data = await response.json();
-      console.log('🔍 checkDualAuthStatus: Response data:', data);
       
       // Check if the response includes auth status for both providers
       // If backend provides explicit status, use it
@@ -178,14 +173,11 @@ export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
         githubwdf: data.githubwdf ?? (hasAccessToken || data.authenticated || false),
       };
       
-      console.log('🔍 checkDualAuthStatus: Parsed auth status:', authStatus);
       return authStatus;
     }
 
-    console.log('❌ checkDualAuthStatus: Response not OK, returning false for both');
     return { githubtools: false, githubwdf: false };
   } catch (error) {
-    console.error('❌ checkDualAuthStatus: Error:', error);
     return { githubtools: false, githubwdf: false };
   }
 };

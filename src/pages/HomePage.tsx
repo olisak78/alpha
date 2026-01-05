@@ -27,16 +27,18 @@ import { useGitHubPRs } from "@/hooks/api/useGitHubPRs";
 import { useGitHubContributions } from "@/hooks/api/useGitHubContributions";
 import { useGitHubPRReviewComments } from "@/hooks/api/useGitHubPRReviewComments";
 import { StatItem } from '@/types/api';
-import { Area, AreaChart, ResponsiveContainer} from 'recharts';
+import { Area, AreaChart, ResponsiveContainer } from 'recharts';
 import { useGitHubAveragePRTime } from '@/hooks/api/useGitHubAveragePRtime';
 import { QUICK_ACCESS_TAB_KEY } from '@/constants/developer-portal';
 import { useHeaderNavigation } from '@/contexts/HeaderNavigationContext';
+import { GitHubContributionsStat } from '@/components/stats/GitHubContributionsStat';
+
 
 
 export default function HomePage() {
   const { user } = useAuth();
   const { setTabs } = useHeaderNavigation();
-  
+
   // Clear header tabs on mount since HomePage doesn't use them
   useEffect(() => {
     setTabs([]);
@@ -90,7 +92,7 @@ export default function HomePage() {
   } = useGitHubContributions();
   const totalContributions = contributionsData?.total_contributions || 0;
 
-   // Get GitHub average PR time from API
+  // Get GitHub average PR time from API
   const {
     data: avgPRTimeData,
     isLoading: isAvgPRTimeLoading,
@@ -115,22 +117,14 @@ export default function HomePage() {
   // Announcements expand/collapse state
   const [isAnnouncementsExpanded, setIsAnnouncementsExpanded] = useState(false);
 
-    // Persistent tab selection state
+  // Persistent tab selection state
   const [activeQuickAccessTab, setActiveQuickAccessTab] = useState<string>(() => {
     return sessionStorage.getItem(QUICK_ACCESS_TAB_KEY) || 'links';
   });
-   // Persist tab selection to sessionStorage
+  // Persist tab selection to sessionStorage
   useEffect(() => {
     sessionStorage.setItem(QUICK_ACCESS_TAB_KEY, activeQuickAccessTab);
   }, [activeQuickAccessTab]);
-
-  const { data: prData, isLoading: isPrLoading, error: prError } = useGitHubPRs({
-    state: prStatus,
-    page: prPage,
-    per_page: perPage,
-    sort: 'updated',
-    direction: 'desc',
-  });
 
   // Stats for the top section
   const displayName = useMemo(() => {
@@ -145,21 +139,7 @@ export default function HomePage() {
 
   // Stats for the top section
   const stats: StatItem[] = [
-    {
-      id: 1,
-      title: 'GitHub Contributions',
-      value: (() => {
-        if (isContributionsLoading) return "Loading...";
-        if (contributionsError) return "N/A";
-        return totalContributions.toLocaleString();
-      })(),
-      description: "GitHub Tools only",
-      tooltip: "Total GitHub contributions in the last year",
-      icon: <GitBranch className="h-6 w-6" />,
-      color: 'text-blue-500',
-      isLoading: isContributionsLoading,
-      isError: !!contributionsError
-    },
+
     {
       id: 2,
       title: 'Jira Issues Resolved',
@@ -218,6 +198,12 @@ export default function HomePage() {
 
         {/* Stats Grid - 4 columns */}
         <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* New GitHub Contributions component */}
+          <GitHubContributionsStat
+            data={contributionsData}
+            isLoading={isContributionsLoading}
+            isError={!!contributionsError}
+          />
           {stats.map((stat) => (
             <Card key={stat.id} className="border-slate-200 dark:border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -262,8 +248,8 @@ export default function HomePage() {
                         <AreaChart data={stat.chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                           <defs>
                             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <Area
@@ -383,9 +369,6 @@ export default function HomePage() {
 
                   <TabsContent value="github-prs" className="mt-0 tab-content-height overflow-y-auto">
                     <GithubPrsTab
-                      data={prData}
-                      isLoading={isPrLoading}
-                      error={prError}
                       prStatus={prStatus}
                       setPrStatus={setPrStatus}
                       prPage={prPage}
