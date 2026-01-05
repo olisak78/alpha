@@ -1,0 +1,152 @@
+[
+  {
+    "landscape": "cf-cn40-canary",
+    "gitProperties": {
+      "git.commit.id": "7fae35c8e8855196d12f9f3831c56536ede3f78a",
+      "git.build.time": "2025-08-06T10:25:42+0000",
+      "git.commit.time": "2025-08-06T10:22:18+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754475942.156,
+      "version": "3.1205.7",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-integrate",
+    "gitProperties": {
+      "git.commit.id": "6ead24b6b6633963b78c5d9396812081bac8d23b",
+      "git.build.time": "2025-08-05T14:18:29+0000",
+      "git.commit.time": "2025-08-05T14:15:45+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754403509.847,
+      "version": "3.1205.6",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-001-integrate",
+    "gitProperties": {
+      "git.commit.id": "5dac13a5a5522852867a4c8285701971aab8c12a",
+      "git.build.time": "2025-08-04T08:32:15+0000",
+      "git.commit.time": "2025-08-04T08:29:32+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754285535.291,
+      "version": "3.1205.4",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-eu20-integrate",
+    "gitProperties": {
+      "git.commit.id": "4cbb02a4a4411741756a3b7174590860a9a7b09b",
+      "git.build.time": "2025-08-02T12:14:08+0000",
+      "git.commit.time": "2025-08-02T12:11:25+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754151248.673,
+      "version": "3.1205.2",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-us30-integrate",
+    "gitProperties": {
+      "git.commit.id": "8gfb46d9e9966207e23a0a4942d67647fef4a89b",
+      "git.build.time": "2025-08-06T15:33:51+0000",
+      "git.commit.time": "2025-08-06T15:30:27+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754494431.789,
+      "version": "3.1205.8",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-us50-integrate",
+    "gitProperties": {
+      "git.commit.id": "9hgc57e0f0a77318f34b1b5053e78758gfg5b90c",
+      "git.build.time": "2025-08-07T08:19:26+0000",
+      "git.commit.time": "2025-08-07T08:16:03+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754554766.924,
+      "version": "3.1205.9",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-eu10-canary",
+    "gitProperties": {
+      "git.commit.id": "0ihd68f1g1b88429g45c2c6164f89869hgh6c01d",
+      "git.build.time": "2025-08-07T11:42:18+0000",
+      "git.commit.time": "2025-08-07T11:38:54+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754566938.735,
+      "version": "3.1205.10",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-eu21",
+    "gitProperties": {
+      "git.commit.id": "1jie79g2h2c99540h56d3d7275g90980ihi7d02e",
+      "git.build.time": "2025-08-02T14:25:37+0000",
+      "git.commit.time": "2025-08-02T14:22:13+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754158337.842,
+      "version": "3.1204.25",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-eu12",
+    "gitProperties": {
+      "git.commit.id": "2kfj80h3i3d00651i67e4e8386h01091jhj8e03f",
+      "git.build.time": "2025-08-01T16:48:15+0000",
+      "git.commit.time": "2025-08-01T16:44:51+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1754081295.618,
+      "version": "3.1204.20",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  },
+  {
+    "landscape": "cf-us10",
+    "gitProperties": {
+      "git.commit.id": "3lak91j4j4e11762j78f5f9497j12102kjk9f04g",
+      "git.build.time": "2025-07-30T09:15:33+0000",
+      "git.commit.time": "2025-07-30T09:12:09+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "billing-service",
+      "time": 1753969933.954,
+      "version": "3.1204.15",
+      "name": "Commercial Infrastructure Service - Billing Service"
+    }
+  }
+]

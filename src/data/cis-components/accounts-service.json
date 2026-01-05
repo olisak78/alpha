@@ -1,0 +1,152 @@
+[
+  {
+    "landscape": "cf-cn40-canary",
+    "gitProperties": {
+      "git.commit.id": "6aeb24d9d7744085c01e8e2820b45425cdc2e67f",
+      "git.build.time": "2025-08-05T13:14:06+0000",
+      "git.commit.time": "2025-08-05T13:11:53+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754399627.954,
+      "version": "2.2120.5",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-integrate",
+    "gitProperties": {
+      "git.commit.id": "5dfc18a8c6533074b90d7e1709a34314bdc1f56e",
+      "git.build.time": "2025-08-04T16:22:18+0000",
+      "git.commit.time": "2025-08-04T16:19:45+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754313738.821,
+      "version": "2.2120.4",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-001-integrate",
+    "gitProperties": {
+      "git.commit.id": "4ceb07b7b5422963a89c6d0608923203acb0e45d",
+      "git.build.time": "2025-08-03T11:08:32+0000",
+      "git.commit.time": "2025-08-03T11:05:17+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754227712.643,
+      "version": "2.2120.3",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-eu20-integrate",
+    "gitProperties": {
+      "git.commit.id": "3bda96a6a4311852978b5c9507812092bac9d34c",
+      "git.build.time": "2025-08-01T09:45:11+0000",
+      "git.commit.time": "2025-08-01T09:42:28+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754055911.532,
+      "version": "2.2120.1",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-us30-integrate",
+    "gitProperties": {
+      "git.commit.id": "7feb35c8e8855196d12f9f3831c56536ede3f78a",
+      "git.build.time": "2025-08-06T10:25:42+0000",
+      "git.commit.time": "2025-08-06T10:22:18+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754475942.156,
+      "version": "2.2120.6",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-us50-integrate",
+    "gitProperties": {
+      "git.commit.id": "8gfb46d9e9966207e23a0a4942d67647fef4a89b",
+      "git.build.time": "2025-08-06T15:33:51+0000",
+      "git.commit.time": "2025-08-06T15:30:27+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754494431.789,
+      "version": "2.2120.7",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-eu10-canary",
+    "gitProperties": {
+      "git.commit.id": "9hgc57e0f0a77318f34b1b5053e78758gfg5b90c",
+      "git.build.time": "2025-08-07T08:19:26+0000",
+      "git.commit.time": "2025-08-07T08:16:03+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754554766.924,
+      "version": "2.2120.8",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-eu21",
+    "gitProperties": {
+      "git.commit.id": "0ihd68f1g1b88429g45c2c6164f89869hgh6c01d",
+      "git.build.time": "2025-08-02T11:42:18+0000",
+      "git.commit.time": "2025-08-02T11:38:54+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754148538.735,
+      "version": "2.2119.15",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-eu12",
+    "gitProperties": {
+      "git.commit.id": "1jie79g2h2c99540h56d3d7275g90980ihi7d02e",
+      "git.build.time": "2025-08-01T14:25:37+0000",
+      "git.commit.time": "2025-08-01T14:22:13+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1754072737.842,
+      "version": "2.2119.12",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  },
+  {
+    "landscape": "cf-us10",
+    "gitProperties": {
+      "git.commit.id": "2kfj80h3i3d00651i67e4e8386h01091jhj8e03f",
+      "git.build.time": "2025-07-30T16:48:15+0000",
+      "git.commit.time": "2025-07-30T16:44:51+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "accounts-service",
+      "time": 1753997295.618,
+      "version": "2.2119.8",
+      "name": "Commercial Infrastructure Service - Accounts Service"
+    }
+  }
+]

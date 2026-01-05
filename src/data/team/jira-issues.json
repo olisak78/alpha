@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "key": "TEAM-101",
+    "summary": "Fix null pointer when creating new account",
+    "type": "Bug",
+    "status": "In Progress",
+    "priority": "High",
+    "assigneeId": "u2",
+    "created": "2025-07-20T10:12:00Z",
+    "updated": "2025-08-09T08:30:00Z",
+    "url": "https://jira.example.com/browse/TEAM-101"
+  },
+  {
+    "id": "2",
+    "key": "TEAM-102",
+    "summary": "Add bulk import for user records",
+    "type": "Task",
+    "status": "Open",
+    "priority": "Medium",
+    "assigneeId": "u3",
+    "created": "2025-07-18T15:00:00Z",
+    "updated": "2025-08-08T13:20:00Z",
+    "url": "https://jira.example.com/browse/TEAM-102"
+  },
+  {
+    "id": "3",
+    "key": "TEAM-103",
+    "summary": "Epic: Migrate to new CI pipeline",
+    "type": "Epic",
+    "status": "Open",
+    "priority": "Critical",
+    "assigneeId": "u1",
+    "created": "2025-07-10T09:00:00Z",
+    "updated": "2025-08-06T09:45:00Z",
+    "url": "https://jira.example.com/browse/TEAM-103"
+  },
+  {
+    "id": "4",
+    "key": "TEAM-104",
+    "summary": "Backlog: Create end-to-end tests for provisioning",
+    "type": "Backlog",
+    "status": "Open",
+    "priority": "Low",
+    "assigneeId": "u4",
+    "created": "2025-06-30T11:20:00Z",
+    "updated": "2025-08-01T07:00:00Z",
+    "url": "https://jira.example.com/browse/TEAM-104"
+  },
+  {
+    "id": "5",
+    "key": "TEAM-105",
+    "summary": "Bug: API 500 on /v1/orders when payload missing field",
+    "type": "Bug",
+    "status": "In Review",
+    "priority": "Blocker",
+    "assigneeId": "u2",
+    "created": "2025-07-25T12:00:00Z",
+    "updated": "2025-08-09T09:00:00Z",
+    "url": "https://jira.example.com/browse/TEAM-105"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ci-cd",
+    "name": "CI/CD & Build",
+    "iconName": "Code",
+    "color": "bg-blue-500"
+  },
+  {
+    "id": "security",
+    "name": "Security & Compliance",
+    "iconName": "Shield",
+    "color": "bg-red-500"
+  },
+  {
+    "id": "monitoring",
+    "name": "Monitoring & Observability",
+    "iconName": "Monitor",
+    "color": "bg-green-500"
+  },
+  {
+    "id": "project",
+    "name": "Project Management",
+    "iconName": "Users",
+    "color": "bg-purple-500"
+  },
+  {
+    "id": "documentation",
+    "name": "Documentation & Knowledge",
+    "iconName": "FileText",
+    "color": "bg-amber-500"
+  },
+  {
+    "id": "development",
+    "name": "Development Tools",
+    "iconName": "Wrench",
+    "color": "bg-indigo-500"
+  },
+  {
+    "id": "infrastructure",
+    "name": "Infrastructure & Cloud",
+    "iconName": "Cloud",
+    "color": "bg-cyan-500"
+  },
+  {
+    "id": "testing",
+    "name": "Testing & QA",
+    "iconName": "TestTube",
+    "color": "bg-emerald-500"
+  },
+  {
+    "id": "community",
+    "name": "Community & Support",
+    "iconName": "HelpCircle",
+    "color": "bg-orange-500"
+  }
+]

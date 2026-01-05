@@ -1,0 +1,612 @@
+{
+    "ac-bksrv-1": {
+        "domain": "bks.ali.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/backingservices/landscape-ac-bksrv-1"
+    },
+    "ali-cfr-dev06": {
+        "domain": "dev06.cfr-ali.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-ali-cfr-dev06/"
+    },
+    "aws-bksrv-2": {
+        "domain": "awsbks.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/backingservices/landscape-aws-bksrv-2"
+    },
+    "aws-cfcore-dev": {
+        "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/100816a8-85dc-4623-8533-90c5ec24df5e",
+        "domain": "aws-cfcore-dev.cfsre.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-cfcore-dev"
+    },
+    "aws-cfn04": {
+        "domain": "aws-cfn04.aws.cfn.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-cfn04"
+    },
+    "aws-cfn07": {
+        "domain": "aws-cfn07.aws.cfn.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-cfn07"
+    },
+    "aws-crypto01": {
+        "domain": "crypto01.aws.crypto.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-crypto01"
+    },
+    "aws-dev10": {
+        "apm-infra-environment": "https://canary.eu12.apm.services.cloud.sap/e/4361b192-6658-4c9d-9301-ac002ccc3e07",
+        "domain": "dev10-bosh.aws.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-dev10"
+    },
+    "az-bksrv-1": {
+        "domain": "az-bksrv-1.sf-azure.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/backingservices/landscape-az-bksrv-1"
+    },
+    "azure-cfn06": {
+        "domain": "azure-cfn06.cfn-azure.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-azure-cfn06"
+    },
+    "azure-cfr02": {
+        "domain": "azure-cfr02.cfc42-azure.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-azure-cfr02"
+    },
+    "ccee-bksrv-1": {
+        "domain": "ccee-bksrv-1.ccee.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/backingservices/landscape-ccee-bksrv-1"
+    },
+    "ccee-cfn08": {
+        "domain": "ccee-cfn08.ccee.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-ccee-cfn08"
+    },
+    "cf-ae01": {
+        "apm-infra-environment": "https://live.ae1.apm.services.cloud.sap/e/c76f031a-1922-4004-9388-7a50aec8e5ff",
+        "domain": "ae01.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ae01-landscape"
+    },
+    "cf-ap01": {
+        "apm-infra-environment": "https://live.ap1.apm.services.cloud.sap/e/a39b1af0-f4f8-4046-951f-5810a3136778",
+        "domain": "ap01.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap01-landscape"
+    },
+    "cf-ap10": {
+        "apm-infra-environment": "https://live.ap10.apm.services.cloud.sap/e/0aa71c72-b361-4fcf-b881-3ce91517e7dc",
+        "domain": "ap10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap10-landscape"
+    },
+    "cf-ap11": {
+        "apm-infra-environment": "https://live.ap11.apm.services.cloud.sap/e/b194eb8a-867e-4ab9-b8e8-372bfddfc30a",
+        "domain": "ap11.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap11-landscape"
+    },
+    "cf-ap12": {
+        "apm-infra-environment": "https://live.ap12.apm.services.cloud.sap/e/d0c73872-58b0-4af6-a267-9c8f096bba30",
+        "domain": "ap12.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap12-landscape"
+    },
+    "cf-ap20": {
+        "apm-infra-environment": "https://live.ap20.apm.services.cloud.sap/e/e93f13c8-1bb3-435f-a0fb-f489f65245d3",
+        "domain": "ap20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap20-landscape"
+    },
+    "cf-ap21": {
+        "apm-infra-environment": "https://live.ap21.apm.services.cloud.sap/e/249e49c5-1ad9-4955-a7fb-49a9e8d41439",
+        "domain": "ap21.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap21-landscape"
+    },
+    "cf-ap30": {
+        "apm-infra-environment": "https://live.ap30.apm.services.cloud.sap/e/3022937b-cd89-44e8-bc77-5e79873f5fd7",
+        "domain": "ap30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap30-landscape"
+    },
+    "cf-ap31": {
+        "apm-infra-environment": "https://live.ap31.apm.services.cloud.sap/e/6dcbce33-95ba-494d-a9e9-c2a45ac305e2",
+        "domain": "ap31.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ap31-landscape"
+    },
+    "cf-br10": {
+        "apm-infra-environment": "https://live.br10.apm.services.cloud.sap/e/3c6e79c1-b583-4c01-8cf2-ddf8686a46b1",
+        "domain": "br10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-br10-landscape"
+    },
+    "cf-br20": {
+        "apm-infra-environment": "https://live.br20.apm.services.cloud.sap/e/5753f6c4-a2b9-4f96-9622-5e0d3d2b64ec",
+        "domain": "br20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-br20-landscape"
+    },
+    "cf-br30": {
+        "apm-infra-environment": "https://live.br30.apm.services.cloud.sap/e/1cabe793-ebf2-4756-8462-e2bb4de4c935",
+        "domain": "br30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-br30-landscape"
+    },
+    "cf-ca10": {
+        "apm-infra-environment": "https://live.ca10.apm.services.cloud.sap/e/b349e002-8cb3-4b1d-a86b-b0db024f6c90",
+        "domain": "ca10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ca10-landscape"
+    },
+    "cf-ca20": {
+        "apm-infra-environment": "https://live.ca20.apm.services.cloud.sap/e/6bb4518d-5cd2-451a-b1cc-7f78de2aa16f",
+        "domain": "ca20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ca20-landscape"
+    },
+    "cf-ch20": {
+        "apm-infra-environment": "https://live.ch20.apm.services.cloud.sap/e/71b251e0-c877-4dad-a4d2-ed9b6aa12715",
+        "domain": "ch20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-ch20-landscape"
+    },
+    "cf-cn01": {
+        "domain": "cn01.platform.sapcloud.cn",
+        "landscape-repository": "https://github.tools.sap/cpops/landscape-cn01-live"
+    },
+    "cf-cn20": {
+        "apm-infra-environment": "https://live.cn20.apm.services.sapcloud.cn/e/8e04de8c-5923-4ae8-82ac-cf090313f9ba",
+        "domain": "cn20.platform.sapcloud.cn",
+        "landscape-repository": "https://github.tools.sap/cpops/landscape-cn20-live"
+    },
+    "cf-cn20-canary": {
+        "apm-infra-environment": "https://canary.cn20.apm.services.sapcloud.cn/e/3fc7c8d5-4b3c-48f0-8d02-6b0eb6f08fdb",
+        "domain": "canaryaz.vlab-sapcloudplatformdev.cn",
+        "landscape-repository": "https://github.tools.sap/cpops/landscape-cn20-canary"
+    },
+    "cf-cn20-staging": {
+        "domain": "stagingaz.vlab-sapcloudplatformdev.cn",
+        "landscape-repository": "https://github.tools.sap/cpops/landscape-cn20-staging"
+    },
+    "cf-cn40": {
+    "apm-infra-environment": "https://ircs.cn40.apm.services.sapcloud.cn/e/ff0e512e-d9cf-4eae-af87-66a7a54047e2",
+    "domain": "cn40.platform.sapcloud.cn",
+    "landscape-repository": "https://git.sp-int.cndatacom.com/sapcloudops/landscape-ac-live-cn40-cf.git"
+  },
+  "cf-cn40-canary": {
+    "apm-infra-environment": "https://canary.cn40.apm.services.sapcloud.cn/e/6ff1c7c6-1df1-4dfc-8a3b-4a65b6b2d8cd",
+    "domain": "canaryac.vlab-sapcloudplatformdev.cn",
+    "landscape-repository": "https://github.tools.sap/cpops/landscape-ac-canary"
+  },
+  "cf-cn40-hotfix": {
+    "apm-infra-environment": "https://hotfix.cn40.apm.services.sapcloud.cn/e/d56f90fe-523e-4f9d-849d-4ac0df697d1b",
+    "domain": "hotfixac.vlab-sapcloudplatformdev.cn",
+    "landscape-repository": "https://github.tools.sap/cpops/landscape-ac-hotfix"
+  },
+  "cf-eu01": {
+    "apm-infra-environment": "https://live.eu1.apm.services.cloud.sap/e/9a4c808a-eb1e-496b-a2ea-ab61b401d1ac",
+    "domain": "eu01.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu01-landscape"
+  },
+  "cf-eu01-canary": {
+    "apm-infra-environment": "https://canary.eu1.apm.services.cloud.sap/e/df7437a5-ee71-4580-806d-4dd012674823",
+    "domain": "eu01-canary.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu01-canary-landscape"
+  },
+  "cf-eu01-hotfix": {
+    "domain": "eu01-hotfix.hanavlab.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu01-hotfix-landscape"
+  },
+  "cf-eu01-integrate": {
+    "apm-infra-environment": "https://canary.eu1.apm.services.cloud.sap/e/a1c43ff6-358c-47ca-97bb-c3e1a1e7a125",
+    "domain": "eu01-integrate.hanavlab.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu01-integrate-landscape"
+  },
+  "cf-eu01-staging": {
+    "apm-infra-environment": "https://staging.eu1.apm.services.cloud.sap/e/4bc12d60-7caa-45a2-85c1-e09185e853b8",
+    "domain": "stagingccee.hanavlab.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cloudfoundry/cf-eu01-staging-landscape"
+  },
+  "cf-eu02": {
+    "apm-infra-environment": "https://live.eu2.apm.services.cloud.sap/e/3a6c272e-c6f6-4bed-8dd7-2c0193e61d30",
+    "domain": "eu02.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu02-landscape"
+  },
+    "cf-eu10": {
+        "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/100816a8-85dc-4623-8533-90c5ec24df5e",
+        "domain": "eu10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-landscape"
+    },
+     "cf-eu10-002": {
+    "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/bce1748b-d959-40b2-a5b5-79ee6446f3e9",
+    "domain": "eu10-002.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-002-landscape"
+  },
+  "cf-eu10-003": {
+    "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/110aab93-b611-49a1-ba6b-878fe90f0ae4",
+    "domain": "eu10-003.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-003-landscape"
+  },
+  "cf-eu10-004": {
+    "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/6caf0e69-52fe-49ef-931e-61fbb2c0ae47",
+    "domain": "eu10-004.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-004-landscape"
+  },
+  "cf-eu10-005": {
+    "apm-infra-environment": "https://live.eu10.apm.services.cloud.sap/e/691ca225-8698-49b8-8822-29f2f6e80041",
+    "domain": "eu10-005.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-005-landscape"
+  },
+  "cf-eu10-canary": {
+    "apm-infra-environment": "https://canary.eu10.apm.services.cloud.sap/e/3c24485f-e6cd-4212-8020-290cde919b36",
+    "domain": "sap.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu10-canary-landscape"
+  },
+    "cf-eu11": {
+        "apm-infra-environment": "https://live.eu11.apm.services.cloud.sap/e/95d7bcbc-0d16-4f18-b7bc-7d3e24f723dc",
+        "domain": "eu11.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu11-landscape"
+    },
+    
+  "cf-eu12": {
+    "apm-infra-environment": "https://canary.eu12.apm.services.cloud.sap/e/33877c4a-9c15-4a93-833b-6da12d4587aa",
+    "domain": "eu12.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu12-landscape"
+  },
+  "cf-eu12-001": {
+    "apm-infra-environment": "https://canary.eu12.apm.services.cloud.sap/e/eb5b8511-7f6a-4448-a9ad-9beece8e8bfe",
+    "domain": "eu12-001.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu12-001-landscape"
+  },
+  "cf-eu12-002": {
+    "apm-infra-environment": "https://canary.eu12.apm.services.cloud.sap/e/a6e8850e-7119-43be-8d6b-1092676ebf71",
+    "domain": "eu12-002.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu12-002-landscape"
+  },
+  "cf-eu13": {
+    "apm-infra-environment": "https://live.eu13.apm.services.cloud.sap/e/ce947f72-16c6-4d24-b996-91fba4151c8c",
+    "domain": "eu13.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu13-landscape"
+  },
+    "cf-eu20": {
+        "apm-infra-environment": "https://live.eu20.apm.services.cloud.sap/e/71b251e0-c877-4dad-a4d2-ed9b6aa12715",
+        "domain": "eu20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu20-landscape"
+    },
+    "cf-eu20-001": {
+    "apm-infra-environment": "https://live.eu20.apm.services.cloud.sap/e/306f0df9-ddf5-467b-b2a1-eea3a4a5a1b7/",
+    "domain": "eu20-001.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu20-001-landscape"
+  },
+  "cf-eu20-002": {
+    "domain": "eu20-002.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu20-002-landscape"
+  },
+  "cf-eu20-integrate": {
+    "apm-infra-environment": "https://canary.eu21.apm.services.cloud.sap/e/0afd3a1a-2644-4088-b274-9e8adcb1467f",
+    "domain": "eu20-integrate.hanavlab.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu20-integrate-landscape"
+  },
+  "cf-eu20-staging": {
+    "apm-infra-environment": "https://staging.eu20.apm.services.cloud.sap/e/b7ecc45a-af75-4947-924d-fa7d62311093",
+    "domain": "stagingazure.hanavlab.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-azure-staging"
+  },
+  "cf-eu21": {
+    "apm-infra-environment": "https://canary.eu21.apm.services.cloud.sap/e/d236c273-b35c-4606-8bdc-efda3ad45860",
+    "domain": "eu21.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu21-landscape"
+  },
+  "cf-eu22": {
+    "domain": "eu22.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu22-landscape"
+  },
+  "cf-eu23-canary": {
+    "domain": "eu23-canary.hana.ondemand.com",
+    "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu23-canary-landscape"
+  },
+    "cf-eu30": {
+        "apm-infra-environment": "https://live.eu30.apm.services.cloud.sap/e/8054b821-a4ed-46e0-b5a2-f7ab5b16e5ca",
+        "domain": "eu30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu30-landscape"
+    },
+    "cf-eu31": {
+        "apm-infra-environment": "https://live.eu31.apm.services.cloud.sap/e/68939597-758b-4631-ba51-2903dd5547d8",
+        "domain": "eu31.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-eu31-landscape"
+    },
+    "cf-eu40-staging": {
+        "apm-infra-environment": "https://staging.eu40.apm.services.cloud.sap/e/7f0705c3-2fc8-4c06-bb49-b28310b923a5",
+        "domain": "stagingac.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-ac-staging2"
+    },
+    "cf-il30": {
+        "apm-infra-environment": "https://live.il30.apm.services.cloud.sap/e/0218928c-6785-4d06-8743-e342cbd395c8",
+        "domain": "il30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-il30-landscape"
+    },
+    "cf-in30": {
+        "apm-infra-environment": "https://live.in30.apm.services.cloud.sap/e/871bcfb2-48b4-499c-9381-474e5adb937f",
+        "domain": "in30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-in30-landscape"
+    },
+    "cf-jp01": {
+        "apm-infra-environment": "https://live.jp1.apm.services.cloud.sap/e/526f2a2b-6d43-4377-9a28-64da482e649b",
+        "domain": "jp01.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-jp01-landscape"
+    },
+    "cf-jp10": {
+        "apm-infra-environment": "https://live.jp10.apm.services.cloud.sap/e/3dbfa3c7-58ba-4052-a441-3c6a732b5ae3",
+        "domain": "jp10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-jp10-landscape"
+    },
+    "cf-jp20": {
+        "apm-infra-environment": "https://live.jp20.apm.services.cloud.sap/e/249e49c5-1ad9-4955-a7fb-49a9e8d41439",
+        "domain": "jp20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-jp20-landscape"
+    },
+    "cf-jp30": {
+        "apm-infra-environment": "https://live.jp30.apm.services.cloud.sap/e/28ffd354-6478-4024-a63b-29fe8cf8af7c",
+        "domain": "jp30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-jp30-landscape"
+    },
+    "cf-jp31": {
+        "apm-infra-environment": "https://live.jp31.apm.services.cloud.sap/e/a99b4c6c-01cb-40a8-afcd-df6f899852c8",
+        "domain": "jp31.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-jp31-landscape"
+    },
+    "cf-lmaa-dev": {
+        "domain": "lmaa-dev.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-lmaa-dev-landscape"
+    },
+    "cf-sa30": {
+        "apm-infra-environment": "https://live.sa30.apm.services.cloud.sap/e/1cabe793-ebf2-4756-8462-e2bb4de4c935",
+        "domain": "sa30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-sa30-landscape"
+    },
+    "cf-sa31": {
+        "apm-infra-environment": "https://live.sa31.apm.services.cloud.sap/e/59c8eb59-0e07-4d70-bcf1-6dbffa9e7f45",
+        "domain": "sa31.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-sa31-landscape"
+    },
+    "cf-uk20": {
+        "domain": "uk20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-uk20-landscape"
+    },
+    "cf-us01": {
+        "apm-infra-environment": "https://live.us1.apm.services.cloud.sap/e/a31c3f5a-109e-481b-81fe-8dd468a32f59",
+        "domain": "us01.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us01-landscape"
+    },
+    "cf-us02": {
+        "apm-infra-environment": "https://live.us2.apm.services.cloud.sap/e/a2781537-c495-43a3-963c-c0c79a0476df",
+        "domain": "us02.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us02-landscape"
+    },
+    "cf-us10": {
+        "apm-infra-environment": "https://live.us10.apm.services.cloud.sap/e/1a1b25b8-4d5b-4c81-b3d0-f81b8d7840e6",
+        "domain": "us10.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-landscape"
+    },
+    "cf-us10-001": {
+        "apm-infra-environment": "https://live.us10.apm.services.cloud.sap/e/fbae27e1-7c36-4aa5-b576-b9e1e812c4b1",
+        "domain": "us10-001.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-001-landscape"
+    },
+    "cf-us10-001-integrate": {
+        "apm-infra-environment": "https://hotfix.us10.apm.services.cloud.sap/e/5d704fff-ba83-4d03-8d6d-492bbadeb858",
+        "domain": "us10-001-integrate.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-001-integrate-landscape"
+    },
+    "cf-us10-002": {
+        "apm-infra-environment": "https://live.us10.apm.services.cloud.sap/e/05ea2f59-3943-4b7a-93a9-8b93b7f906ec",
+        "domain": "us10-002.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-002-landscape"
+    },
+    "cf-us10-002-hotfix": {
+        "apm-infra-environment": "https://hotfix.us10.apm.services.cloud.sap/e/e0f64175-23c3-4c12-8661-406b53bdddda",
+        "domain": "us10-002-hotfix.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-002-hotfix-landscape"
+    },
+    "cf-us10-002-integrate": {
+        "apm-infra-environment": "https://hotfix.us10.apm.services.cloud.sap/e/98fc1ef0-e6b1-4d23-b77f-7deb064c734a",
+        "domain": "us10-002-integrate.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-002-integrate-landscape"
+    },
+    "cf-us10-002-staging": {
+        "apm-infra-environment": "https://staging.us10.apm.services.cloud.sap/e/2b1519fd-82c3-4ace-9d13-d8435c164b89",
+        "domain": "stagingaws3.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-staging3"
+    },
+    "cf-us10-hotfix": {
+        "apm-infra-environment": "https://hotfix.us10.apm.services.cloud.sap/e/57a5446f-2a00-40f8-952c-a3ec1aeb81f7",
+        "domain": "hotfixaws.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-hotfix-landscape"
+    },
+    "cf-us10-integrate": {
+        "apm-infra-environment": "https://hotfix.us10.apm.services.cloud.sap/e/2c6c42a2-1174-4672-b909-d76a1af7b465",
+        "domain": "us10-integrate.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us10-integrate-landscape"
+    },
+    "cf-us10-staging": {
+        "apm-infra-environment": "https://staging.us10.apm.services.cloud.sap/e/121ba5cc-bee6-4007-9103-80b0f498503e",
+        "domain": "stagingaws.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-aws-staging"
+    },
+    "cf-us11": {
+        "apm-infra-environment": "https://live.us11.apm.services.cloud.sap/e/1f6d0d8d-2d7d-4751-b41f-c7f4817cd1e4",
+        "domain": "us11.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us11-landscape"
+    },
+    "cf-us20": {
+        "apm-infra-environment": "https://live.us20.apm.services.cloud.sap/e/6bb4518d-5cd2-451a-b1cc-7f78de2aa16f",
+        "domain": "us20.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us20-landscape"
+    },
+    "cf-us21": {
+        "apm-infra-environment": "https://live.us21.apm.services.cloud.sap/e/b349e002-8cb3-4b1d-a86b-b0db024f6c90",
+        "domain": "us21.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us21-landscape"
+    },
+    "cf-us22": {
+        "apm-infra-environment": "https://live.us22.apm.services.cloud.sap/e/b6802014-2e00-4659-b2a7-b36574c7e198",
+        "domain": "us22.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us22-landscape"
+    },
+    "cf-us30": {
+        "apm-infra-environment": "https://live.us30.apm.services.cloud.sap/e/3022937b-cd89-44e8-bc77-5e79873f5fd7",
+        "domain": "us30.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us30-landscape"
+    },
+    "cf-us30-integrate": {
+        "apm-infra-environment": "https://canary.us31.apm.services.cloud.sap/e/dd9d6f15-a5c0-464c-8cc8-9523c5b09d7e",
+        "domain": "us30-integrate.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us30-integrate-landscape"
+    },
+    "cf-us30-staging": {
+        "apm-infra-environment": "https://staging.eu30.apm.services.cloud.sap/e/fa851a4b-0aff-4d0c-b0f3-e96928bdd1dc",
+        "domain": "staginggcp.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-gcp-staging"
+    },
+    "cf-us31": {
+        "apm-infra-environment": "https://canary.us31.apm.services.cloud.sap/e/605e9429-4c57-4484-a057-135e59bae01c/",
+        "domain": "us31.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us31-landscape"
+    },
+    "cf-us32": {
+        "apm-infra-environment": "https://live.us32.apm.services.cloud.sap/e/83f9abf7-dc66-49d2-9523-866bcd45cd02/",
+        "domain": "us32.hana.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us32-landscape"
+    },
+    "cf-us50-canary": {
+        "apm-infra-environment": "https://canary.us50.apm.services.cloud.sap/e/46ef8887-c2f6-49ec-b2a5-884d625584ba",
+        "domain": "canary.scp.sapns2.us",
+        "landscape-repository": "https://scp-dev.nonprod.scs.sap/scp-canary/landscape-awsgc-canary"
+    },
+    "cf-us50-integrate": {
+        "apm-infra-environment": "https://canary.us50.apm.services.cloud.sap/e/874c3f02-2c98-40c2-9cec-8a4d33c30003",
+        "domain": "us50-integrate.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-us50-integrate-landscape"
+    },
+    "cf-us50-staging": {
+        "apm-infra-environment": "https://staging.us50.apm.services.cloud.sap/e/37e5dc37-f2d5-466c-966b-baf61e020ca3",
+        "domain": "stagingawsgc.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/cf-us50-staging-landscape"
+    },
+    "cf-us60-staging": {
+        "apm-infra-environment": "",
+        "domain": "staginggdch.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/cf-us60-staging-landscape"
+    },
+    "cf-us60-staging1": {
+        "apm-infra-environment": "https://staging.us60.apm.services.cloud.sap/e/f43c1ee7-1546-40ea-bb55-fc6e08c14b38",
+        "domain": "staging1gdch.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-gdch-staging1"
+    },
+    "cf-zz01-test": {
+        "domain": "zz01-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz01-test-landscape"
+    },
+    "cf-zz02-test": {
+        "domain": "zz02-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz02-test-landscape"
+    },
+    "cf-zz03-test": {
+        "domain": "zz03-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz03-test-landscape"
+    },
+    "cf-zz49-test": {
+        "domain": "cf-zz49-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/cf-zz49-test-landscape"
+    },
+    "cf-zz78-test": {
+        "domain": "zz78-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz78-test-landscape"
+    },
+    "cf-zz79-test": {
+        "domain": "zz79-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz79-test-landscape"
+    },
+    "cf-zz82-test": {
+        "domain": "zz82-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz82-test-landscape"
+    },
+    "cf-zz83-test": {
+        "domain": "zz83-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz83-test-landscape"
+    },
+    "cf-zz84-test": {
+        "domain": "zz84-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz84-test-landscape"
+    },
+    "cf-zz85-test": {
+        "domain": "zz85-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz85-test-landscape"
+    },
+    "cf-zz86-test": {
+        "domain": "zz86-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz86-test-landscape"
+    },
+    "cf-zz87-test": {
+        "domain": "zz87-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz87-test-landscape"
+    },
+    "cf-zz88-test": {
+        "domain": "zz88-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz88-test-landscape"
+    },
+    "cf-zz89-001-test": {
+        "domain": "zz89-001-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz89-001-test-landscape"
+    },
+    "cf-zz89-test": {
+        "domain": "zz89-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz89-test-landscape"
+    },
+    "cf-zz98-test": {
+        "domain": "zz98-test.vlab-sapcloudplatformdev.cn",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz98-test-landscape"
+    },
+    "cf-zz99-001-test": {
+        "domain": "zz99-001-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz99-001-test-landscape"
+    },
+    "cf-zz99-test": {
+        "domain": "zz99-test.hanavlab.ondemand.com",
+        "landscape-repository": "https://github.tools.sap/cf-live-realm/cf-zz99-test-landscape"
+    },
+    "cfc42-dev05": {
+        "domain": "cfc42-dev05.ccee.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-cfc42-dev05/"
+    },
+    "cfc42-dev11": {
+        "domain": "cfc42-dev11.aws.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-cfc42-dev11/"
+    },
+    "cfc42-dev31": {
+        "domain": "cfc42-dev31.gcp.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-cfc42-dev31"
+    },
+    "cfi-gcp-lod-tc": {
+        "domain": "cfi-gcp-lod-tc.gcp.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-testcycle-automation-gcp"
+    },
+    "cfr-dev01": {
+        "domain": "cfr-dev01.cfr-aws.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cfr/landscape-cfr-dev01/"
+    },
+    "cfscaleaws": {
+        "domain": "scale.perfteam.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/engsrvperformance/landscape-ccperfaws"
+    },
+    "concourse-dev": {
+        "domain": "concourse-dev.concourse-azure.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/concourse/landscape-concourse-dev"
+    },
+    "gcp-bksrv-1": {
+        "domain": "gcpbks.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/backingservices/landscape-gcp-bksrv-1"
+    },
+    "gcp-cfn03": {
+        "domain": "gcp-cfn03.gcp.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-gcp-cfn03"
+    },
+    "gdch-lancer-dev-maz": {
+        "domain": "lancer-maz.dog.s.gpcdemolabs.com",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-gdch-lancer-maz"
+    },
+    "mena-ccee-dev": {
+        "domain": "mena-ccee-andr.ccee.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/cloudfoundry/landscape-mena-ccee-andr"
+    },
+    "perfx-log02": {
+        "domain": "log02.aws.logging.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/perfx/landscape-aws-log02"
+    },
+    "perfx-log03": {
+        "domain": "log03.aws.logging.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/perfx/landscape-aws-log03"
+    },
+    "vasst-aws-dev": {
+        "domain": "vasst-aws-dev.vasst.sapcloud.io",
+        "landscape-repository": "https://github.tools.sap/vasts/landscape-vasst-aws-dev"
+    }
+}

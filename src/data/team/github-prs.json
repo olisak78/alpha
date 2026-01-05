@@ -1,0 +1,152 @@
+[
+  {
+    "id": "pr-1",
+    "title": "Fix NPE in order processing pipeline",
+    "status": "open",
+    "authorId": "u2",
+    "repository": "cis/order-service",
+    "createdAt": "2025-08-05T10:00:00Z",
+    "updatedAt": "2025-08-09T15:21:00Z",
+    "url": "https://github.com/example/cis-order-service/pull/101"
+  },
+  {
+    "id": "pr-2",
+    "title": "Refactor UI components for dashboard",
+    "status": "merged",
+    "authorId": "u3",
+    "repository": "cis/workspace-app",
+    "createdAt": "2025-08-01T09:12:00Z",
+    "updatedAt": "2025-08-07T12:30:00Z",
+    "url": "https://github.com/example/workspace-app/pull/202"
+  },
+  {
+    "id": "pr-3",
+    "title": "Add bulk user import endpoint",
+    "status": "closed",
+    "authorId": "u3",
+    "repository": "cis/accounts-service",
+    "createdAt": "2025-07-29T11:20:00Z",
+    "updatedAt": "2025-08-02T08:45:00Z",
+    "url": "https://github.com/example/accounts-service/pull/310"
+  },
+  {
+    "id": "pr-4",
+    "title": "Improve retry logic in provisioning",
+    "status": "open",
+    "authorId": "u4",
+    "repository": "cis/provisioning-service",
+    "createdAt": "2025-08-04T16:10:00Z",
+    "updatedAt": "2025-08-08T10:00:00Z",
+    "url": "https://github.com/example/provisioning-service/pull/77"
+  },
+  {
+    "id": "pr-5",
+    "title": "Fix 500 on /v1/orders when field missing",
+    "status": "merged",
+    "authorId": "u2",
+    "repository": "cis/order-service",
+    "createdAt": "2025-08-02T13:05:00Z",
+    "updatedAt": "2025-08-09T09:00:00Z",
+    "url": "https://github.com/example/cis-order-service/pull/102"
+  },
+  {
+    "id": "pr-6",
+    "title": "Migrate to new CI pipeline",
+    "status": "draft",
+    "authorId": "u1",
+    "repository": "cis/devops",
+    "createdAt": "2025-08-03T14:30:00Z",
+    "updatedAt": "2025-08-06T09:45:00Z",
+    "url": "https://github.com/example/devops/pull/11"
+  },
+  {
+    "id": "pr-7",
+    "title": "Add feature flag for payments beta",
+    "status": "open",
+    "authorId": "u5",
+    "repository": "cis/feature-toggle-manager",
+    "createdAt": "2025-08-07T10:20:00Z",
+    "updatedAt": "2025-08-09T11:10:00Z",
+    "url": "https://github.com/example/feature-toggle-manager/pull/55"
+  },
+  {
+    "id": "pr-8",
+    "title": "Docs: API usage examples",
+    "status": "closed",
+    "authorId": "u5",
+    "repository": "cis/documentation",
+    "createdAt": "2025-07-28T09:00:00Z",
+    "updatedAt": "2025-08-01T18:00:00Z",
+    "url": "https://github.com/example/docs/pull/88"
+  },
+  {
+    "id": "pr-9",
+    "title": "Optimize DB queries in accounts-service",
+    "status": "merged",
+    "authorId": "u2",
+    "repository": "cis/accounts-service",
+    "createdAt": "2025-08-06T08:00:00Z",
+    "updatedAt": "2025-08-09T13:40:00Z",
+    "url": "https://github.com/example/accounts-service/pull/311"
+  },
+  {
+    "id": "pr-10",
+    "title": "Fix flaky tests in notification-service",
+    "status": "open",
+    "authorId": "u4",
+    "repository": "cis/notification-service",
+    "createdAt": "2025-08-08T07:30:00Z",
+    "updatedAt": "2025-08-10T06:45:00Z",
+    "url": "https://github.com/example/notification-service/pull/144"
+  },
+  {
+    "id": "pr-11",
+    "title": "UI polish: tables and spacing",
+    "status": "closed",
+    "authorId": "u3",
+    "repository": "cis/workspace-app",
+    "createdAt": "2025-07-25T10:10:00Z",
+    "updatedAt": "2025-07-27T12:25:00Z",
+    "url": "https://github.com/example/workspace-app/pull/201"
+  },
+  {
+    "id": "pr-12",
+    "title": "Add SLO dashboard widgets",
+    "status": "open",
+    "authorId": "u1",
+    "repository": "cis/observability",
+    "createdAt": "2025-08-09T09:30:00Z",
+    "updatedAt": "2025-08-10T10:00:00Z",
+    "url": "https://github.com/example/observability/pull/8"
+  },
+  {
+    "id": "pr-13",
+    "title": "Security: bump critical dependencies",
+    "status": "merged",
+    "authorId": "u1",
+    "repository": "cis/platform",
+    "createdAt": "2025-08-01T09:45:00Z",
+    "updatedAt": "2025-08-05T08:10:00Z",
+    "url": "https://github.com/example/platform/pull/33"
+  },
+  {
+    "id": "pr-14",
+    "title": "Refactor payment validation module",
+    "status": "closed",
+    "authorId": "u5",
+    "repository": "cis/payment-service",
+    "createdAt": "2025-08-03T07:25:00Z",
+    "updatedAt": "2025-08-07T15:05:00Z",
+    "url": "https://github.com/example/payment-service/pull/189"
+  },
+  {
+    "id": "pr-15",
+    "title": "Improve logs correlation IDs",
+    "status": "open",
+    "authorId": "u2",
+    "repository": "cis/resources-server",
+    "createdAt": "2025-08-09T11:50:00Z",
+    "updatedAt": "2025-08-10T09:12:00Z",
+    "url": "https://github.com/example/resources-server/pull/74"
+  }
+]

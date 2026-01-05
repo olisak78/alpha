@@ -1,0 +1,275 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "description": "The Accounts service is responsible for the central management of consumers' global accounts, subaccounts, and directories. \n\nGlobal accounts represent a business entity and contain contract information, including customer details and purchased entitlements. The global account is the context for billing each customer.",
+    "termsOfService": "http://www.sap.com",
+    "title": "Accounts Service",
+    "version": "1.0",
+    "apiHubDescription": "The Accounts service provides REST APIs that are responsible for the management of global accounts, and the creation and management of directories, subaccounts, and their custom properties/tags. \nGlobal accounts represent a business entity and contain contract information, including customer details and purchased entitlements. The global account is the context for billing each customer. \nUse the subaccount APIs to structure your global account according to your organization's and project's requirements regarding members, authorizations, and quotas. This service also provides you with APIs for creating and managing directories. While the use of directories is optional, they allow you to further organize and manage your subaccounts according to your specific technical and business needs. The service also lets you manage the custom properties/tags that you associate with your directories and subaccounts.",
+    "apiHubExternalDocsDesc": "Account Administration Using APIs of the SAP Cloud Management Service",
+    "apiHubExternalDocsUrl": "https://help.sap.com/viewer/65de2977205c403bbc107264b8eccf4b/Cloud/en-US/17b6a171552544a6804f12ea83112a3f.html",
+    "apiHubShortDescription": "Manage the directories and subaccounts in your global account's structure.",
+    "shortDescription": "The Accounts service is responsible for the central management of global accounts, directories, and subaccounts of all consumers."
+  },
+  "servers": [
+    {
+      "url": "https://accounts-service.cfapps.eu10.hana.ondemand.com",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Authorization": []
+    }
+  ],
+  "tags": [
+    { "description": "Trial Account Operations (Technical)", "name": "d_TrialAccountController end-point" },
+    { "description": "AppConfiguration management", "name": "v_AppConfigurationController" },
+    { "description": "Unified Services Operations (Technical)", "name": "z_UnifiedServicesTechnicalController end-point" },
+    { "description": "Subaccount Operations", "name": "g_Accounts APIs" },
+    { "description": "NEO Migration", "name": "i_NEO Migration API" },
+    { "description": "Global Account Operations", "name": "a_GlobalAccountController end-point" },
+    { "description": "Directories Operations (Technical)", "name": "f_Directories API" },
+    { "description": "Metadata Definitions (Technical)", "name": "y_PropertiesMetadataController end-point" },
+    { "description": "Directory Operations", "name": "e_Directories API" },
+    { "description": "CRM Tenant Operations (Technical)", "name": "CrmTenantTechnicalController end-point" },
+    { "description": "Global Account Operations (Technical)", "name": "b_GlobalAccountTechnicalController end-point" },
+    { "description": "Job Management", "name": "w_AsyncJobsController" },
+    { "description": "Subaccount Operations (Technical)", "name": "h_Accounts APIs" },
+    { "description": "Properties Data Operations (Technical)", "name": "x_PropertiesDataController end-point" },
+    { "description": "Global Accounts", "name": "c_GlobalAccountUC2Controller end-point" }
+  ],
+  "paths": {
+    "/accounts/v1/crmTenant/{globalAccountGUID}": {
+      "patch": {
+        "description": " Create, update, or delete the associated CRM tenant for a given global account.<br/><br/>Required scopes: $XSAPPNAME.global-account.update",
+        "operationId": "updateCrmTenant",
+        "parameters": [
+          {
+            "description": "Global account unique ID",
+            "in": "path",
+            "name": "globalAccountGUID",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/AccountCrmTenantRequestPayload" } }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AccountCrmTenantRequestPayload" } } },
+            "description": "Ok",
+            "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } }
+          },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Global Account Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Create, update, or delete a CRM tenant of a given global account",
+        "tags": ["CrmTenantTechnicalController end-point"]
+      }
+    },
+    "/accounts/v1/directories": {
+      "post": {
+        "description": "Directories allow you to organize and manage your subaccounts according to your technical and business needs.\nA directory can contain one or more subaccounts and directories. The maximum number of directory levels allowed in a global account is 5.\nUsing directories to group subaccounts is optional.\nIf you have directories in your account model, you can still create subaccounts directly under your global account.\n\nRequired scope: $XSAPPNAME.global-account.account-directory.create",
+        "operationId": "createDirectory",
+        "parameters": [
+          { "description": "The unique ID of the directory's parent entity.\n You can create the directory directly under a global account or another directory.", "in": "query", "name": "parentGUID", "required": false, "schema": { "type": "string" } }
+        ],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateDirectoryRequestPayload" } } }, "required": true },
+        "responses": {
+          "201": {
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DirectoryResponseObject" } } },
+            "description": "Created",
+            "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } }
+          },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Create a directory",
+        "tags": ["e_Directories API"]
+      }
+    },
+    "/accounts/v1/directories/{directoryGUID}": {
+      "delete": {
+        "description": "Delete the directory, including its subdirectories, subaccounts, and their content.<br/><br/>Required scope: $XSAPPNAME.global-account.account-directory.delete",
+        "operationId": "deleteDirectory_1",
+        "parameters": [
+          { "description": "The GUID of the directory to delete.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } },
+          { "description": "Specifies whether to delete the directory and all its content, including subdirectories, subaccounts, and data contained within (default is false). Content refers to any entity or data, such as applications, service instances, spaces, active subscriptions, brokers, platform, and members, depending on the type of subaccount (Neo or multi-environment).  When set to false, the request fails if the directory contains subdirectories and subaccounts, even if they are empty. When set to true, all content in the directory is permanently deleted. The deletion may take a while depending on the amount of content in your subaccounts.", "in": "query", "name": "forceDelete", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DirectoryResponseObject" } } }, "description": "Ok", "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory not found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Delete a directory",
+        "tags": ["e_Directories API"]
+      },
+      "get": {
+        "description": "Get details for a specified directory.<br/><br/>Required scope: $XSAPPNAME.global-account.account-directory.read",
+        "operationId": "getDirectory_1",
+        "parameters": [
+          { "description": "The GUID of the directory for which to get details.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } },
+          { "description": "Whether to get the contents of the directory, for example the subaccounts it contains.", "in": "query", "name": "expand", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DirectoryResponseObject" } } }, "description": "Ok", "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory not found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Get a directory",
+        "tags": ["e_Directories API"]
+      },
+      "patch": {
+        "description": "Update the properties of a directory.\nYou can update its display name, description, and assigned labels.<br/><br/>Required scope: $XSAPPNAME.account-directory.update",
+        "operationId": "updateDirectory",
+        "parameters": [
+          { "description": "The GUID of the directory to update.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateDirectoryRequestPayload" } } }, "required": true },
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DirectoryResponseObject" } } }, "description": "Ok", "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory not found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Update a directory",
+        "tags": ["e_Directories API"]
+      }
+    },
+    "/accounts/v1/directories/{directoryGUID}/changeDirectoryFeatures": {
+      "patch": {
+        "description": "Global account admins can enable additional features in a directory or remove features that are already enabled.\n\nBy default, all directories provide the following basic features: (1) group and filter subaccounts, (2) monitor usage and costs, and (3) set custom properties and tags. Optionally, you can allow a directory to also manage its own entitlements and its user authorizations.\n\nAll existing subaccounts and subdirectories in the directory implicitly inherit the capabilities of the enabled features in this directory.\n\nNOTE: The user authorization management feature must be applied in combination with the entitlement management feature. In other words, if the directory has both entitlement and user authorization management enable, you cannot disable just the entitlement management feature without also disabling user authorization management. Likewise, if a directory has only the default features enabled, you cannot enable user authorization management without also enabling entitlement management.\n\nNOTE: Your multi-level account hierarchy can have more than one directory enabled with user authorization and/or entitlement management; however, only one directory in any directory path can have these features enabled. In other words, other directories above or below this directory in the same path can only have the default features specified. If you are not sure which features to enable, we recommend that you set only the default features, and then add features later on as they are needed.\n\nRequired scope: $XSAPPNAME.account-directory.update",
+        "operationId": "updateDirectoryFeatures",
+        "parameters": [
+          { "description": "The GUID of the directory to update directory features.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateDirectoryTypeRequestPayload" } } }, "required": true },
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DirectoryResponseObject" } } }, "description": "Ok", "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory not found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Add or remove features for a directory",
+        "tags": ["e_Directories API"]
+      }
+    },
+    "/accounts/v1/directories/{directoryGUID}/customProperties": {
+      "get": {
+        "description": "Get all the custom properties that are assigned as key-value pairs to a given directory.\n\nNOTE: This API is deprecated. Custom properties are now called labels. The \"customProperties\" field supports only single values per key and is now replaced by the string array \"labels\", which supports multiple values per key. This API returns only the first value of any label key that has multiple values assigned to it. Use instead: GET /accounts/v1/directories/{directoryGUID}/labels\n\nRequired scope: $XSAPPNAME.global-account.account-directory.read",
+        "operationId": "getDirectoryCustomProperties",
+        "parameters": [
+          { "description": "The unique ID of the directory for which to get custom properties.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResponseCollection" } } }, "description": "Ok", "headers": { "X-CorrelationID": { "description": "Unique ID for tracking jobs across services", "schema": { "type": "string" }, "style": "simple" } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Get custom properties for a directory (deprecated)",
+        "tags": ["e_Directories API"]
+      }
+    },
+    "/accounts/v1/directories/{directoryGUID}/labels": {
+      "delete": {
+        "description": "Remove all user-defined labels that are assigned to a given directory.\n\nTo remove specific labels, use instead: PUT /accounts/v1/directories/{directoryGUID}/labels\n\nRequired scope: $XSAPPNAME.global-account.account-directory.update",
+        "operationId": "deleteDirectoryLabels",
+        "parameters": [
+          { "description": "The GUID of the directory", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LabelsResponseObject" } } }, "description": "Ok" },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Delete all labels from a directory",
+        "tags": ["e_Directories API"]
+      },
+      "get": {
+        "description": "Get all the user-defined labels, that are assigned as key-value pairs to a given directory. \n\nRequired scope: $XSAPPNAME.global-account.account-directory.read",
+        "operationId": "getDirectoryLabels",
+        "parameters": [
+          { "description": "The GUID of the directory.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LabelsResponseObject" } } }, "description": "Ok" },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Get labels for a directory",
+        "tags": ["e_Directories API"]
+      },
+      "put": {
+        "description": "Assign user-defined labels to a given directory. Labels are specified as key-value pairs.\n\nRequired scope: $XSAPPNAME.global-account.account-directory.update",
+        "operationId": "createDirectoryLabels",
+        "parameters": [
+          { "description": "The GUID of the directory.", "in": "path", "name": "directoryGUID", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LabelAssignmentRequestPayload" } } }, "required": true },
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LabelsResponseObject" } } }, "description": "Ok" },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Bad request" },
+          "401": { "description": "Not Authorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Directory Not Found" },
+          "429": { "description": "Rate Limit Exceeded", "headers": { "X-Ratelimit-Reset": { "description": "The time at which the rate limit will reset, expressed in milliseconds. It indicates the timestamp when the client can make additional requests without exceeding the rate limit.", "example": "167918400000", "schema": { "type": "string", "format": "long" } } } },
+          "500": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }, "description": "Internal Server Error" }
+        },
+        "summary": "Assign labels to a directory",
+        "tags": ["e_Directories API"]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountCrmTenantRequestPayload": { "type": "object", "properties": { "tenantId": { "type": "string" }, "action": { "type": "string" } } },
+      "ErrorResponse": { "type": "object", "properties": { "code": { "type": "string" }, "message": { "type": "string" } } },
+      "DirectoryResponseObject": { "type": "object", "properties": { "guid": { "type": "string" }, "name": { "type": "string" } } },
+      "CreateDirectoryRequestPayload": { "type": "object", "properties": { "name": { "type": "string" }, "parentGUID": { "type": "string" } } },
+      "UpdateDirectoryRequestPayload": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" } } },
+      "UpdateDirectoryTypeRequestPayload": { "type": "object", "properties": { "features": { "type": "array", "items": { "type": "string" } } } },
+      "ResponseCollection": { "type": "object", "properties": { "items": { "type": "array", "items": { "type": "object" } } } },
+      "LabelsResponseObject": { "type": "object", "properties": { "labels": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } } } },
+      "LabelAssignmentRequestPayload": { "type": "object", "properties": { "labels": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } } } }
+    }
+  }
+}

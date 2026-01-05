@@ -1,0 +1,288 @@
+[
+  {
+    "name": "CP CF Core Developer on Duty Global (Staging)",
+    "description": "CF Core",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "CP CF Core Developer on Duty Global (Canary)",
+    "description": "CF Core",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "CP CF Core Developer on Duty Global (Hotfix)",
+    "description": "CF Core",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "CP CF Core Developer on Duty Global (Live)",
+    "description": "CF Core",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "CP CF Core Developer on Duty Restricted EUA",
+    "description": "CF Core",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "BTP CCF Monitoring Viewer (PROD) Global",
+    "description": "BTP Monitoring",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "BTP CCF Monitoring Admin (PROD) Global ",
+    "description": "BTP Monitoring",
+    "group": "Developer on Duty (CF)"
+  },
+  {
+    "name": "HCP Commercial Infrastructure",
+    "description": "CIS@Neo",
+    "group": "Developer on Duty (Neo)"
+  },
+  {
+    "name": "HCP CIS Admin Canary",
+    "description": "CIS@Neo",
+    "group": "Developer on Duty (Neo)"
+  },
+  {
+    "name": "SCP atom-cfs Admin Global (STAGING) 768575953313",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP atom-cfs Admin Global (CANARY) 408950856194",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP atom-cfs Admin Global (PROD) 170046645031",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom Viewer (CANARY)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom Viewer (PROD)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom MoD/DoD (STAGING)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom MoD/DoD (CANARY)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom MoD/DoD (PROD)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom MoD/DoD Limited (CANARY)",
+    "group": "ATOM"
+  },
+  {
+    "name": "SCP Atom MoD/DoD Limited (PROD)",
+    "group": "ATOM"
+  },
+  {
+    "name": "Cloud Reporting access for Solution Cloud Platform",
+    "description": "",
+    "group": "Cloud Reporting"
+  },
+  {
+    "name": "Cloud Reporting access for Usage Data Cloud Platform",
+    "description": "",
+    "group": "Cloud Reporting"
+  },
+  {
+    "name": "BTP CFS Developer",
+    "description": "Access to all CFS GitHub orgs and Gerrit projects"
+  },
+  {
+    "name": "HCP CFS Development and Support Team EU",
+    "description": ""
+  },
+  {
+    "name": "HCP Commercial Infrastructure",
+    "description": ""
+  },
+  {
+    "name": "CP CF Administrator Global (Staging)",
+    "description": ""
+  },
+  {
+    "name": "HCP Cloud Engineering Non-EU",
+    "description": "Application Performance Monitoring",
+    "group": "APM"
+  },
+  {
+    "name": "HCP Cloud Engineering EU",
+    "description": "Application Performance Monitoring",
+    "group": "APM"
+  },
+  {
+    "name": "CP CF AuditlogService LogStorage Developer Global (Canary)",
+    "description": "Audit Log",
+    "group": "Audit Log"
+  },
+  {
+    "name": "CP CF AuditlogService LogStorage Developer Global (Hotfix)",
+    "description": "Audit Log",
+    "group": "Audit Log"
+  },
+  {
+    "name": "CP CF AuditlogService LogStorage Developer Global (Live)",
+    "description": "Audit Log",
+    "group": "Audit Log"
+  },
+  {
+    "name": "CP CF AuditlogService LogStorage Developer EU+ (Live)",
+    "description": "Audit Log",
+    "group": "Audit Log"
+  },
+  {
+    "name": "CP CF UDM Usage Data Management Operator Global (Canary)",
+    "description": "Usage Data Management",
+    "group": "Usage Data"
+  },
+  {
+    "name": "CP CF UDM Usage Data Management Operator Global (Hofix)",
+    "description": "Usage Data Management",
+    "group": "Usage Data"
+  },
+  {
+    "name": "CP CF UDM Usage Data Management Operator Global (Live)",
+    "description": "Usage Data Management",
+    "group": "Usage Data"
+  },
+  {
+    "name": "CP CF HTML5 Application Repository Developer Global (Hotfix)",
+    "description": "Approuter",
+    "group": "Approuter"
+  },
+  {
+    "name": "CP CF HTML5 Application Repository Developer Global (Live)",
+    "description": "Approuter",
+    "group": "Approuter"
+  },
+  {
+    "name": "CP CF CCF Internal Full (Staging)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Internal Full (Integrate)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Internal Full (Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Internal Full (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Approver",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (Staging)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (Integrate)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (AC Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer (AC Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer EU (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Viewer Global (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (Staging)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (Integrate)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (AC Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic (AC Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic EU (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Basic Global (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (Staging)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (Integrate)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (CN Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (AC Canary)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full (AC Hotfix)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full EU (Live)",
+    "group": "CCF Operator"
+  },
+  {
+    "name": "CP CF CCF Operator Full Global (Live)",
+    "group": "CCF Operator"
+  }
+]

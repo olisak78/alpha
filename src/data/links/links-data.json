@@ -1,0 +1,209 @@
+[
+  {
+    "id": "1",
+    "title": "JaaS Status",
+    "url": "https://me.sap.com/cacv2/customer/2029347",
+    "description": "Java as a Service status dashboard",
+    "categoryId": "ci-cd",
+    "tags": ["jaas", "status", "dashboard"],
+    "favorite": false
+  },
+  {
+    "id": "2",
+    "title": "xMake Nova",
+    "url": "https://xmake-nova.wdf.sap.corp",
+    "description": "Next-generation build system",
+    "categoryId": "ci-cd",
+    "tags": ["build", "xmake", "nova"],
+    "favorite": false
+  },
+  {
+    "id": "3",
+    "title": "CIS 2.0",
+    "url": "https://gkecfsmicroservice.jaas-gcp.cloud.sap.corp/",
+    "description": "Modern microservice CI system",
+    "categoryId": "ci-cd",
+    "tags": ["cis", "microservice", "ci"],
+    "favorite": false
+  },
+  {
+    "id": "4",
+    "title": "Sonar",
+    "url": "https://sonar.tools.sap/",
+    "description": "Code quality and security analysis",
+    "categoryId": "security",
+    "tags": ["quality", "security", "analysis"],
+    "favorite": false
+  },
+  {
+    "id": "5",
+    "title": "Fortify",
+    "url": "https://fortify.tools.sap/ssc",
+    "description": "Static application security testing",
+    "categoryId": "security",
+    "tags": ["security", "testing", "static"],
+    "favorite": false
+  },
+  {
+    "id": "6",
+    "title": "Vault",
+    "url": "https://vault.tools.sap/ui/vault/auth?with=oidc%2F",
+    "description": "Secrets management",
+    "categoryId": "security",
+    "tags": ["secrets", "vault", "management"],
+    "favorite": false
+  },
+  {
+    "id": "7",
+    "title": "Copernicus",
+    "url": "https://copernicus.cfapps.sap.hana.ondemand.com/",
+    "description": "Application monitoring dashboard",
+    "categoryId": "monitoring",
+    "tags": ["monitoring", "dashboard", "application"],
+    "favorite": false
+  },
+  {
+    "id": "8",
+    "title": "Cloud Availability Center",
+    "url": "https://me.sap.com/systemsprovisioning/availability",
+    "description": "Cloud service availability dashboard",
+    "categoryId": "monitoring",
+    "tags": ["availability", "cloud", "dashboard"],
+    "favorite": false
+  },
+  {
+    "id": "9",
+    "title": "Splunk",
+    "url": "https://portal.victorops.com/",
+    "description": "Log analysis and monitoring",
+    "categoryId": "monitoring",
+    "tags": ["logs", "analysis", "monitoring"],
+    "favorite": false
+  },
+  {
+    "id": "10",
+    "title": "Jira Tools",
+    "url": "https://jira.tools.sap/",
+    "description": "Issue tracking and project management",
+    "categoryId": "project",
+    "tags": ["jira", "issues", "tracking"],
+    "favorite": false
+  },
+  {
+    "id": "11",
+    "title": "Project Portal",
+    "url": "https://projectportal.tools.sap/",
+    "description": "Project management and tracking",
+    "categoryId": "project",
+    "tags": ["project", "portal", "management"],
+    "favorite": false
+  },
+  {
+    "id": "12",
+    "title": "SNOW",
+    "url": "https://itsm.services.sap/sp",
+    "description": "ServiceNow ITSM platform",
+    "categoryId": "project",
+    "tags": ["servicenow", "itsm", "platform"],
+    "favorite": false
+  },
+  {
+    "id": "13",
+    "title": "CIS Delivery Wiki",
+    "url": "https://wiki.wdf.sap.corp/wiki/pages/viewpage.action?pageId=1893349895#Development,CI&Delivery(CIS/CISAdmin/CISConfig)-Delivery",
+    "description": "CIS delivery process documentation",
+    "categoryId": "documentation",
+    "tags": ["wiki", "cis", "delivery"],
+    "favorite": false
+  },
+  {
+    "id": "14",
+    "title": "On Duty Tasks",
+    "url": "https://wiki.wdf.sap.corp/wiki/x/6_jyc",
+    "description": "On-duty task documentation",
+    "categoryId": "documentation",
+    "tags": ["duty", "tasks", "documentation"],
+    "favorite": false
+  },
+  {
+    "id": "15",
+    "title": "Cloud Engineer OnDuty",
+    "url": "https://wiki.wdf.sap.corp/wiki/display/CloudEng/Cloud+Engineer+on+Duty",
+    "description": "Cloud engineer on-duty procedures",
+    "categoryId": "documentation",
+    "tags": ["cloud", "engineer", "procedures"],
+    "favorite": false
+  },
+  {
+    "id": "16",
+    "title": "GitHub Tools",
+    "url": "https://github.tools.sap/",
+    "description": "GitHub tools and utilities",
+    "categoryId": "development",
+    "tags": ["github", "tools", "utilities"],
+    "favorite": false
+  },
+  {
+    "id": "17",
+    "title": "Artifactory (internal)",
+    "url": "https://int.repositories.cloud.sap/ui",
+    "description": "Internal artifact repository",
+    "categoryId": "development",
+    "tags": ["artifactory", "repository", "internal"],
+    "favorite": false
+  },
+  {
+    "id": "18",
+    "title": "SAP API Business Hub",
+    "url": "https://api.sap.com/package/SAPCloudPlatformCoreServices",
+    "description": "API documentation and testing",
+    "categoryId": "development",
+    "tags": ["api", "documentation", "testing"],
+    "favorite": false
+  },
+  {
+    "id": "19",
+    "title": "Gardener - Live",
+    "url": "https://dashboard.garden.live.k8s.ondemand.com/",
+    "description": "Kubernetes gardener live environment",
+    "categoryId": "infrastructure",
+    "tags": ["kubernetes", "gardener", "live"],
+    "favorite": false
+  },
+  {
+    "id": "20",
+    "title": "Hyperspace Portal",
+    "url": "https://portal.hyperspace.tools.sap",
+    "description": "Hyperspace platform portal",
+    "categoryId": "infrastructure",
+    "tags": ["hyperspace", "platform", "portal"],
+    "favorite": false
+  },
+  {
+    "id": "21",
+    "title": "Converged Cloud",
+    "url": "https://dashboard.eu-de-2.cloud.sap/monsoon3/home",
+    "description": "Converged cloud management dashboard",
+    "categoryId": "infrastructure",
+    "tags": ["cloud", "converged", "dashboard"],
+    "favorite": false
+  },
+  {
+    "id": "22",
+    "title": "E2E CLI Staging ALI",
+    "url": "https://gkecfsautomation.jaas-gcp.cloud.sap.corp/job/cli-e2e-tests-on-stagingac/",
+    "description": "End-to-end CLI testing on staging ALI",
+    "categoryId": "testing",
+    "tags": ["e2e", "cli", "staging"],
+    "favorite": false
+  },
+  {
+    "id": "23",
+    "title": "SAP@Stackoverflow",
+    "url": "https://sap.stackenterprise.co/",
+    "description": "SAP Stack Overflow community",
+    "categoryId": "community",
+    "tags": ["stackoverflow", "community", "support"],
+    "favorite": false
+  }
+]

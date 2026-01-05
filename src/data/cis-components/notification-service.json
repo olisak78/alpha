@@ -1,0 +1,152 @@
+[
+  {
+    "landscape": "cf-cn40-canary",
+    "gitProperties": {
+      "git.commit.id": "0ihd68f1g1b88429g45c2c6164f89869hgh6c01d",
+      "git.build.time": "2025-08-07T11:42:18+0000",
+      "git.commit.time": "2025-08-07T11:38:54+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754566938.735,
+      "version": "5.2311.8",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-integrate",
+    "gitProperties": {
+      "git.commit.id": "9hgc57d9d9966207e23a0a4942d67647fef4a89b",
+      "git.build.time": "2025-08-06T12:53:47+0000",
+      "git.commit.time": "2025-08-06T12:50:23+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754484827.461,
+      "version": "5.2311.7",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-us10-001-integrate",
+    "gitProperties": {
+      "git.commit.id": "8gfb46c8c8744174c12e8e1719a45414cdc1e56f",
+      "git.build.time": "2025-08-04T18:16:41+0000",
+      "git.commit.time": "2025-08-04T18:13:17+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754320601.893,
+      "version": "5.2311.5",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-eu20-integrate",
+    "gitProperties": {
+      "git.commit.id": "7feb35b5b5300630645a2a6063478849988609a8",
+      "git.build.time": "2025-08-02T10:47:33+0000",
+      "git.commit.time": "2025-08-02T10:44:09+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754145253.679,
+      "version": "5.2311.3",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-us30-integrate",
+    "gitProperties": {
+      "git.commit.id": "1jie79g2h2c99540h56d3d7275g90980ihi7d02e",
+      "git.build.time": "2025-08-07T14:25:37+0000",
+      "git.commit.time": "2025-08-07T14:22:13+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754576737.842,
+      "version": "5.2311.9",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-us50-integrate",
+    "gitProperties": {
+      "git.commit.id": "2kfj80h3i3d00651i67e4e8386h01091jhj8e03f",
+      "git.build.time": "2025-08-07T16:48:15+0000",
+      "git.commit.time": "2025-08-07T16:44:51+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754585295.618,
+      "version": "5.2311.10",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-eu10-canary",
+    "gitProperties": {
+      "git.commit.id": "3lak91j4j4e11762j78f5f9497j12102kjk9f04g",
+      "git.build.time": "2025-08-07T19:15:33+0000",
+      "git.commit.time": "2025-08-07T19:12:09+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754595333.954,
+      "version": "5.2311.11",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-eu21",
+    "gitProperties": {
+      "git.commit.id": "4mbl02k5k5f22873k89g6g0508k23213lkl0g05h",
+      "git.build.time": "2025-08-02T12:38:47+0000",
+      "git.commit.time": "2025-08-02T12:35:23+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754152727.381,
+      "version": "5.2310.42",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-eu12",
+    "gitProperties": {
+      "git.commit.id": "5ncm13l6l6g33984l90h7h1619l34324mlm1h06i",
+      "git.build.time": "2025-07-31T15:22:14+0000",
+      "git.commit.time": "2025-07-31T15:18:50+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1754027334.672,
+      "version": "5.2310.38",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  },
+  {
+    "landscape": "cf-us10",
+    "gitProperties": {
+      "git.commit.id": "6odm24m7m7h44095m01i8i2720m45435nmn2i07j",
+      "git.build.time": "2025-07-29T08:45:28+0000",
+      "git.commit.time": "2025-07-29T08:42:04+0000"
+    },
+    "buildProperties": {
+      "group": "com.sap.core.commercial.service",
+      "artifact": "notification-service",
+      "time": 1753881928.186,
+      "version": "5.2310.32",
+      "name": "Commercial Infrastructure Service - Notification Service"
+    }
+  }
+]
