@@ -261,6 +261,7 @@ export interface Project {
     endpoint?: string;
   };
   monitoring?: boolean;
+  deployment?: boolean;
   'components-metrics'?: boolean
 }
 

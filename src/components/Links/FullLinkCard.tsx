@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Link } from "@/types/developer-portal";
 import type { QuickLink } from "@/contexts/QuickLinksContext";
+import { useLinksSearchFilterActions } from "@/stores/linksPageStore";
 
 interface Category {
   id: string;
@@ -38,6 +39,37 @@ export const FullLinkCard = ({
   const { id, title, url, description, tags = [] } = linkData;
 
   const CategoryIcon = category?.icon;
+
+  // Search filter actions from Zustand
+  const { setSearchTerm } = useLinksSearchFilterActions();
+
+  const handleTagClick = (e: React.MouseEvent, tag: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSearchTerm(tag);
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent, tag: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setSearchTerm(tag);
+    }
+  };
+
+ const handleCategoryClick = (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSearchTerm(name);
+  };
+
+  const handleCategoryKeyDown = (e: React.KeyboardEvent, name: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setSearchTerm(name);
+    }
+  };
 
   // Create handlers for the action buttons
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -128,8 +160,13 @@ export const FullLinkCard = ({
           {tags.map((tag) => (
             <Badge
               key={tag}
-              variant="secondary"
-              className="text-xs px-2.5 py-0.5 font-normal"
+              variant="outline"
+              role="button"
+              tabIndex={0}
+              title={`Search by tag "${tag}"`}
+              onClick={(e) => handleTagClick(e, tag)}
+              onKeyDown={(e) => handleTagKeyDown(e, tag)}
+              className="text-xs px-2.5 py-0.5 font-normal cursor-pointer transition-all hover:bg-primary/15 hover:text-primary hover:border-primary/50 hover:shadow-sm hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               {tag}
             </Badge>
@@ -140,12 +177,21 @@ export const FullLinkCard = ({
       {/* Footer: Category - Always shown if category exists */}
       {category && (
         <div className="flex items-center gap-2 pt-3 border-t mt-auto">
-          <div className={cn("p-2 rounded-md", category.color)}>
-            {CategoryIcon && <CategoryIcon className="h-4 w-4 text-white" />}
+          <div
+            role="button"
+            tabIndex={0}
+            title={`Search by category "${category.name}"`}
+            onClick={(e) => handleCategoryClick(e, category.name)}
+            onKeyDown={(e) => handleCategoryKeyDown(e, category.name)}
+            className="group flex items-center gap-2 hover:bg-primary/10 border border-border hover:border-primary/40 rounded-md p-1.5 cursor-pointer transition-colors"
+          >
+            <div className={cn("p-2 rounded-md transition-all group-hover:ring-2 group-hover:ring-primary/40", category.color)}>
+              {CategoryIcon && <CategoryIcon className="h-4 w-4 text-white" />}
+            </div>
+            <span className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
+              {category.name}
+            </span>
           </div>
-          <span className="text-sm font-medium text-muted-foreground">
-            {category.name}
-          </span>
         </div>
       )}
     </a>

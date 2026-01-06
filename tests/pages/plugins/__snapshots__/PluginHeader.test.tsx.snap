@@ -1,0 +1,134 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PluginHeader > Snapshot > should match snapshot in dark theme 1`] = `
+<div
+  class="
+        px-6 py-4 border-b
+        border-gray-700
+      "
+>
+  <div
+    class="flex items-start justify-between"
+  >
+    <div
+      class="flex items-start space-x-3"
+    >
+      <div
+        class="
+                mt-1
+                text-gray-400
+              "
+      >
+        <div
+          class="w-5 h-5"
+          data-testid="puzzle-icon"
+        >
+          Puzzle
+        </div>
+      </div>
+      <div>
+        <h2
+          class="
+                text-lg font-semibold
+                text-gray-100
+              "
+        >
+          Dark Theme
+        </h2>
+        <p
+          class="
+                  mt-1 text-sm
+                  text-gray-400
+                "
+        >
+          Description
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PluginHeader > Snapshot > should match snapshot with all props 1`] = `
+<div
+  class="
+        px-6 py-4 border-b
+        border-gray-200
+      "
+>
+  <div
+    class="flex items-start justify-between"
+  >
+    <div
+      class="flex items-start space-x-3"
+    >
+      <div
+        class="
+                mt-1
+                text-gray-600
+              "
+      >
+        <div
+          class="w-5 h-5"
+          data-testid="puzzle-icon"
+        >
+          Puzzle
+        </div>
+      </div>
+      <div>
+        <h2
+          class="
+                text-lg font-semibold
+                text-gray-900
+              "
+        >
+          Complete Plugin
+        </h2>
+        <p
+          class="
+                  mt-1 text-sm
+                  text-gray-600
+                "
+        >
+          Full description
+        </p>
+      </div>
+    </div>
+    <div
+      class="flex items-center space-x-2"
+    >
+      <button>
+        Action
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PluginHeader > Snapshot > should match snapshot with title only 1`] = `
+<div
+  class="
+        px-6 py-4 border-b
+        border-gray-200
+      "
+>
+  <div
+    class="flex items-start justify-between"
+  >
+    <div
+      class="flex items-start space-x-3"
+    >
+      <div>
+        <h2
+          class="
+                text-lg font-semibold
+                text-gray-900
+              "
+        >
+          Test Plugin
+        </h2>
+      </div>
+    </div>
+  </div>
+</div>
+`;

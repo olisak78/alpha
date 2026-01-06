@@ -23,8 +23,8 @@ const getProjectConfig = (project: Project) => {
     tabs.push('monitoring');
   }
 
-  // Add Deployment tab for CIS2 project (or any project with deployment metadata)
-  if (project.name === 'cis20' || (project.metadata && 'concourse' in project.metadata)) {
+  // Add Deployment tab if deployment metadata exists
+  if (project.deployment) {
     tabs.push('deployment');
   }
 

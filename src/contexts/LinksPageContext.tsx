@@ -4,7 +4,7 @@ import { useLinks, useCategories } from '@/hooks/api/useLinks';
 import { useCurrentUser } from '@/hooks/api/useMembers';
 import { useAddFavorite, useRemoveFavorite } from '@/hooks/api/mutations/useFavoriteMutations';
 import { useToast } from '@/hooks/use-toast';
-import { Cloud, Code, FileText, HelpCircle, Monitor, Shield, TestTube, Users, Wrench } from 'lucide-react';
+import { Cloud, Code, FileText, HelpCircle, Monitor, Shield, TestTube, Users, Wrench, HandPlatter } from 'lucide-react';
 import type { ApiLink, ApiCategory, UserMeResponse } from '@/types/api';
 
 // Import Zustand hooks for UI state
@@ -26,6 +26,7 @@ export const SHARED_ICON_MAP: Record<string, any> = {
   Cloud,
   TestTube,
   HelpCircle,
+  HandPlatter,
 };
 
 export interface LinksPageContextValue {
@@ -33,24 +34,24 @@ export interface LinksPageContextValue {
   links: Link[];
   linkCategories: LinkCategory[];
   isLoading: boolean;
-  
+
   // Filter state (from Zustand)
   searchTerm: string;
   selectedCategoryId: string;
   setSearchTerm: (term: string) => void;
   setSelectedCategoryId: (categoryId: string) => void;
-  
+
   // View state (from Zustand with localStorage)
   viewMode: ViewLinksType;
   setViewMode: (mode: ViewLinksType) => void;
-  
+
   // Computed data
   filteredLinks: Link[];
   linksByCategory: Record<string, Link[]>;
-  
+
   // Actions
   handleToggleFavorite: (linkId: string) => void;
-  
+
   // Current user data
   currentUser: UserMeResponse | undefined;
   favoriteLinkIds: Set<string>;
@@ -75,28 +76,28 @@ interface LinksProviderProps {
 
 export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
   const { toast } = useToast();
-  
+
   //  UI state from Zustand instead of useState
   const searchTerm = useLinksSearchTerm();
   const selectedCategoryId = useLinksSelectedCategoryId();
   const viewMode = useLinksViewMode(); // Now persisted via Zustand middleware
-  
+
   // Actions from Zustand
   const { setSearchTerm, setSelectedCategoryId, setViewMode } = useLinksSearchFilterActions();
-  
+
   // API hooks (stay with React Query)
   const { data: currentUser } = useCurrentUser();
   const { data: linksData, isLoading: isLoadingLinks } = useLinks();
   const { data: categoriesData, isLoading: isLoadingCategories } = useCategories();
-  
+
   // Mutations (stay with React Query)
   const addFavoriteMutation = useAddFavorite();
   const removeFavoriteMutation = useRemoveFavorite();
-  
+
   // Transform API categories to LinkCategory format with icon components (PRESERVED from original)
   const linkCategories: LinkCategory[] = useMemo(() => {
     if (!categoriesData?.categories) return [];
-    
+
     return categoriesData.categories.map((category: ApiCategory) => ({
       id: category.id,
       name: category.title,
@@ -104,17 +105,28 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       color: category.color,
     }));
   }, [categoriesData]);
-  
+
+  // Map categoryId -> category name (lowercase) for fast lookup during search
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of linkCategories) {
+      if (c?.id && c?.name) {
+        map.set(c.id, c.name.toLowerCase());
+      }
+    }
+    return map;
+  }, [linkCategories]);
+
   // Get favorite link IDs from currentUser (PRESERVED from original)
   const favoriteLinkIds = useMemo(() => {
     if (!currentUser?.link) return new Set<string>();
     return new Set(currentUser.link.map(link => link.id));
   }, [currentUser]);
-  
+
   // Transform API links to Link format (PRESERVED from original)
   const links: Link[] = useMemo(() => {
     if (!linksData) return [];
-    
+
     return linksData.map((link: ApiLink) => ({
       id: link.id,
       title: link.title,
@@ -125,23 +137,39 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       favorite: favoriteLinkIds.has(link.id),
     }));
   }, [linksData, favoriteLinkIds]);
-  
+
   // Filter links based on search and category (PRESERVED from original, uses Zustand state)
   const filteredLinks = useMemo(() => {
     if (!links || !Array.isArray(links)) return [];
-    
+
     return links.filter(link => {
       if (!link || typeof link.title !== 'string') return false;
+
       const titleLower = link.title.toLowerCase();
       const descriptionLower = link.description?.toLowerCase() || '';
       const searchTermLower = searchTerm.toLowerCase();
-      const matchesSearch = titleLower.includes(searchTermLower) ||
-        descriptionLower.includes(searchTermLower);
+
+      // Match by tags (partial, case-insensitive)
+      const tagsArray = Array.isArray(link.tags) ? link.tags : [];
+      const matchesTags = tagsArray.some(tag => (tag || '').toLowerCase().includes(searchTermLower));
+
+      // Match by category name (partial, case-insensitive)
+      const categoryNameLower = categoryNameMap.get(link.categoryId) || '';
+
+      // Match by title, description, tags, or category name
+      const matchesSearch =
+        titleLower.includes(searchTermLower) ||
+        descriptionLower.includes(searchTermLower) ||
+        matchesTags ||
+        categoryNameLower.includes(searchTermLower);
+
+      // Category filter still respected
       const matchesCategory = selectedCategoryId === "all" || link.categoryId === selectedCategoryId;
+
       return matchesSearch && matchesCategory;
     });
-  }, [links, searchTerm, selectedCategoryId]);
-  
+  }, [links, searchTerm, selectedCategoryId, categoryNameMap]);
+
   // Group filtered links by category (PRESERVED from original)
   const linksByCategory = useMemo(() => {
     return filteredLinks.reduce((acc, link) => {
@@ -150,7 +178,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       return acc;
     }, {} as Record<string, Link[]>);
   }, [filteredLinks]);
-  
+
   // Handle toggle favorite (PRESERVED from original)
   const handleToggleFavorite = useCallback((linkId: string) => {
     if (!currentUser?.id) {
@@ -161,12 +189,12 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       });
       return;
     }
-    
+
     const link = links.find(l => l.id === linkId);
     if (!link) return;
-    
+
     const isFavorite = favoriteLinkIds.has(linkId);
-    
+
     if (isFavorite) {
       // Remove from favorites
       removeFavoriteMutation.mutate(
@@ -209,7 +237,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
       );
     }
   }, [currentUser, links, favoriteLinkIds, addFavoriteMutation, removeFavoriteMutation, toast]);
-  
+
   const contextValue: LinksPageContextValue = {
     links,
     linkCategories,
@@ -226,7 +254,7 @@ export const LinksProvider: React.FC<LinksProviderProps> = ({ children }) => {
     currentUser,
     favoriteLinkIds,
   };
-  
+
   return (
     <LinksPageContext.Provider value={contextValue}>
       {children}

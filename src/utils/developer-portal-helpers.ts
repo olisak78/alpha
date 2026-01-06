@@ -85,12 +85,12 @@ export const getBasePath = (projects: string[], pathname: string): string | null
   // Handle pages with tab support
   if (segments[0] === 'teams') return '/teams';
   if (segments[0] === 'ai-arena') return '/ai-arena';
-  
+
   // Handle component view pages - these should have their own tab management
   if (projects.includes(segments[0]) && segments[1] === 'component' && segments[2]) {
     return `/${segments[0]}/component/${segments[2]}`;
   }
-  
+
   // Handle dynamic project pages
   if (projects.includes(segments[0])) {
     return `/${segments[0]}`;
@@ -129,7 +129,7 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 export const isValidUrl = (url: string): boolean => {
-  if (!url.trim()) return true; 
+  if (!url.trim()) return true;
   try {
     new URL(url.trim());
     return true;
@@ -186,7 +186,7 @@ export const buildUserFromMe = (me: UserMeResponse): User => {
 // DO NOT REMOVE even though they appear unused.
 const CATEGORY_COLOR_SAFELIST = [
   'bg-blue-500',
-  'bg-red-500', 
+  'bg-red-500',
   'bg-green-500',
   'bg-purple-500',
   'bg-amber-500',
@@ -194,36 +194,37 @@ const CATEGORY_COLOR_SAFELIST = [
   'bg-cyan-500',
   'bg-emerald-500',
   'bg-orange-500',
-  'bg-pink-500'
+  'bg-pink-500',
+  'bg-orange-700'
 ];
 
 // Helper function to sort landscape groups in the desired order
 export const sortLandscapeGroups = (groups: Record<string, Landscape[]>): [string, Landscape[]][] => {
   const entries = Object.entries(groups);
-  
+
   return entries.sort((a, b) => {
     const [groupA] = a;
     const [groupB] = b;
-    
+
     // Special case: 'Frequently Visited' should always be first
     if (groupA === 'Frequently Visited') return -1;
     if (groupB === 'Frequently Visited') return 1;
-    
+
     // Get the index in the desired order
     const indexA = LANDSCAPE_GROUP_ORDER.indexOf(groupA.toLowerCase());
     const indexB = LANDSCAPE_GROUP_ORDER.indexOf(groupB.toLowerCase());
-    
+
     // If both are in the order array, sort by their position
     if (indexA !== -1 && indexB !== -1) {
       return indexA - indexB;
     }
-    
+
     // If only A is in the order array, it comes first
     if (indexA !== -1) return -1;
-    
+
     // If only B is in the order array, it comes first
     if (indexB !== -1) return 1;
-    
+
     // If neither is in the order array, sort alphabetically
     return groupA.localeCompare(groupB);
   });

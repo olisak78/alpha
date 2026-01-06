@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useLinksSearchTerm, useLinksSelectedCategoryId, useLinksSearchFilterActions } from "@/stores/linksPageStore";
@@ -15,6 +15,7 @@ export const LinksSearchFilter = () => {
   const { linkCategories: categories } = useLinksPageContext();
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -91,11 +92,32 @@ export const LinksSearchFilter = () => {
       <div className="relative w-full lg:w-80 flex-shrink-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
+          ref={inputRef}
           placeholder="Search links..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 border-2 bg-muted/50 h-9"
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && searchTerm) {
+              setSearchTerm("");
+              requestAnimationFrame(() => inputRef.current?.focus());
+            }
+          }}
+          className={cn("pl-10 border-2 bg-muted/50 h-9", searchTerm ? "pr-10" : "pr-4")}
+          aria-label="Search links"
         />
+        {searchTerm && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm("");
+              requestAnimationFrame(() => inputRef.current?.focus());
+            }}
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground border border-border flex items-center justify-center"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Divider */}
@@ -145,10 +167,10 @@ export const LinksSearchFilter = () => {
               }
             }}
             className={cn(
-              "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0",
+              "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors",
               selectedCategoryId === "all"
                 ? "bg-primary text-primary-foreground shadow-sm scale-105"
-                : "bg-muted hover:bg-muted/80 text-muted-foreground border border-border/90 hover:border-border hover:scale-105 dark:bg-gray-800/50 dark:hover:bg-gray-700/70 dark:border-gray-600/50"
+                : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary border border-border/90 hover:border-primary/60 hover:scale-105 dark:bg-gray-800/50 dark:hover:bg-primary/20 dark:border-gray-600/50"
             )}
           >
             All Links
@@ -168,10 +190,10 @@ export const LinksSearchFilter = () => {
                 }
               }}
               className={cn(
-                "px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 whitespace-nowrap flex-shrink-0",
+                "px-3 py-1.5 rounded-full text-sm font-medium transition-all transition-colors flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 focus-visible:ring-2 focus-visible:ring-primary/50",
                 selectedCategoryId === category.id
                   ? "bg-primary text-primary-foreground shadow-sm scale-105"
-                  : "bg-gray-50 hover:bg-gray-100 text-muted-foreground border border-border/90 hover:border-border hover:scale-105 dark:bg-gray-800/50 dark:hover:bg-gray-700/70 dark:text-gray-300 dark:border-gray-600/50"
+                  : "bg-gray-50 hover:bg-primary/10 text-muted-foreground hover:text-primary border border-border/90 hover:border-primary/60 hover:scale-105 dark:bg-gray-800/50 dark:hover:bg-primary/20 dark:text-gray-300 dark:border-gray-600/50"
               )}
             >
               {category.icon && <category.icon className="h-3.5 w-3.5" />}

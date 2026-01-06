@@ -1,0 +1,161 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Pagination > Snapshot > should match snapshot for first page 1`] = `
+<div
+  class="flex items-center justify-center gap-2 mt-6"
+>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+    disabled=""
+  >
+    <span
+      data-testid="chevron-left-icon"
+    >
+      ←
+    </span>
+    Previous
+  </button>
+  <span
+    class="text-sm text-muted-foreground px-4"
+  >
+    Page 
+    1
+     of 
+    5
+  </span>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+  >
+    Next
+    <span
+      data-testid="chevron-right-icon"
+    >
+      →
+    </span>
+  </button>
+</div>
+`;
+
+exports[`Pagination > Snapshot > should match snapshot for last page 1`] = `
+<div
+  class="flex items-center justify-center gap-2 mt-6"
+>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+  >
+    <span
+      data-testid="chevron-left-icon"
+    >
+      ←
+    </span>
+    Previous
+  </button>
+  <span
+    class="text-sm text-muted-foreground px-4"
+  >
+    Page 
+    5
+     of 
+    5
+  </span>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+    disabled=""
+  >
+    Next
+    <span
+      data-testid="chevron-right-icon"
+    >
+      →
+    </span>
+  </button>
+</div>
+`;
+
+exports[`Pagination > Snapshot > should match snapshot for middle page 1`] = `
+<div
+  class="flex items-center justify-center gap-2 mt-6"
+>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+  >
+    <span
+      data-testid="chevron-left-icon"
+    >
+      ←
+    </span>
+    Previous
+  </button>
+  <span
+    class="text-sm text-muted-foreground px-4"
+  >
+    Page 
+    3
+     of 
+    5
+  </span>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+  >
+    Next
+    <span
+      data-testid="chevron-right-icon"
+    >
+      →
+    </span>
+  </button>
+</div>
+`;
+
+exports[`Pagination > Snapshot > should match snapshot when loading 1`] = `
+<div
+  class="flex items-center justify-center gap-2 mt-6"
+>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+    disabled=""
+  >
+    <span
+      data-testid="chevron-left-icon"
+    >
+      ←
+    </span>
+    Previous
+  </button>
+  <span
+    class="text-sm text-muted-foreground px-4"
+  >
+    Page 
+    3
+     of 
+    5
+  </span>
+  <button
+    data-size="sm"
+    data-testid="pagination-button"
+    data-variant="outline"
+    disabled=""
+  >
+    Next
+    <span
+      data-testid="chevron-right-icon"
+    >
+      →
+    </span>
+  </button>
+</div>
+`;

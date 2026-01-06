@@ -1,0 +1,212 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RegisterPluginDialog > Snapshot > should match snapshot 1`] = `
+<div
+  data-open="false"
+  data-testid="dialog"
+>
+  <div
+    data-testid="dialog-trigger"
+  >
+    <button
+      data-size="sm"
+      data-variant="default"
+    >
+      <div
+        class="h-4 w-4 mr-2"
+        data-testid="plus-icon"
+      >
+        Plus
+      </div>
+      Register Plugin
+    </button>
+  </div>
+  <div
+    class="sm:max-w-[500px]"
+    data-testid="dialog-content"
+  >
+    <div
+      data-testid="dialog-header"
+    >
+      <h2
+        data-testid="dialog-title"
+      >
+        Register New Plugin
+      </h2>
+      <p
+        data-testid="dialog-description"
+      >
+        Add a new plugin to the portal. Fill in the details below.
+      </p>
+    </div>
+    <div
+      class="space-y-4"
+    >
+      <div
+        class="space-y-2"
+      >
+        <label
+          data-testid="label-pluginName"
+          for="pluginName"
+        >
+          Name 
+          <span
+            class="text-red-500"
+          >
+            *
+          </span>
+        </label>
+        <input
+          class=""
+          data-testid="input-pluginName"
+          id="pluginName"
+          placeholder="e.g., my-awesome-plugin"
+          value=""
+        />
+      </div>
+      <div
+        class="space-y-2"
+      >
+        <label
+          data-testid="label-pluginTitle"
+          for="pluginTitle"
+        >
+          Title 
+          <span
+            class="text-red-500"
+          >
+            *
+          </span>
+        </label>
+        <input
+          class=""
+          data-testid="input-pluginTitle"
+          id="pluginTitle"
+          placeholder="e.g., My Awesome Plugin"
+          value=""
+        />
+      </div>
+      <div
+        class="space-y-2"
+      >
+        <label
+          data-testid="label-pluginDescription"
+          for="pluginDescription"
+        >
+          Description
+        </label>
+        <textarea
+          data-testid="textarea-pluginDescription"
+          id="pluginDescription"
+          placeholder="Describe what your plugin does..."
+          rows="3"
+        />
+      </div>
+      <div
+        class="space-y-2"
+      >
+        <div
+          class="flex items-center gap-2"
+        >
+          <label
+            data-testid="label-pluginBundleUrl"
+            for="pluginBundleUrl"
+          >
+            Bundle URL 
+            <span
+              class="text-red-500"
+            >
+              *
+            </span>
+          </label>
+          <div>
+            <div>
+              <div>
+                <div
+                  class="h-4 w-4 text-muted-foreground cursor-help"
+                  data-testid="info-icon"
+                >
+                  Info
+                </div>
+              </div>
+              <div
+                data-testid="tooltip-content"
+              >
+                <p>
+                  URL to the compiled JavaScript bundle (e.g., plugin.js)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input
+          class=""
+          data-testid="input-pluginBundleUrl"
+          id="pluginBundleUrl"
+          placeholder="e.g., https://example.com/plugin.js"
+          type="url"
+          value=""
+        />
+      </div>
+      <div
+        class="space-y-2"
+      >
+        <div
+          class="flex items-center gap-2"
+        >
+          <label
+            data-testid="label-pluginBackendUrl"
+            for="pluginBackendUrl"
+          >
+            Backend URL 
+            <span
+              class="text-red-500"
+            >
+              *
+            </span>
+          </label>
+          <div>
+            <div>
+              <div>
+                <div
+                  class="h-4 w-4 text-muted-foreground cursor-help"
+                  data-testid="info-icon"
+                >
+                  Info
+                </div>
+              </div>
+              <div
+                data-testid="tooltip-content"
+              >
+                <p>
+                  URL to the plugin's backend server for API calls
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input
+          class=""
+          data-testid="input-pluginBackendUrl"
+          id="pluginBackendUrl"
+          placeholder="e.g., https://api.example.com"
+          type="url"
+          value=""
+        />
+      </div>
+    </div>
+    <div
+      data-testid="dialog-footer"
+    >
+      <button
+        data-variant="outline"
+      >
+        Cancel
+      </button>
+      <button>
+        Register Plugin
+      </button>
+    </div>
+  </div>
+</div>
+`;
