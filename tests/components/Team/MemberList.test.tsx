@@ -16,6 +16,26 @@ vi.mock('../../../src/hooks/use-toast', () => ({
   }),
 }));
 
+// Mock the AuthContext
+const mockAuthContext = {
+  user: {
+    id: '1',
+    name: 'Test User',
+    email: 'test@example.com',
+    provider: 'githubtools' as const,
+  },
+  isAuthenticated: true,
+  isLoading: false,
+  login: vi.fn(),
+  logout: vi.fn(),
+  refreshAuth: vi.fn(),
+};
+
+vi.mock('../../../src/contexts/AuthContext', () => ({
+  useAuth: () => mockAuthContext,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // Mock the TeamContext
 const mockTeamContext = {
   members: [] as Member[],

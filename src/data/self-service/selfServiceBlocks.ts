@@ -29,13 +29,13 @@ export const selfServiceBlocks: SelfServiceDialog[] = [
     dialogType: "dynamic",
     dataFilePath: "/data/self-service/dynamic-jobs/multi-cis-environment.json"
   },
-  // {
-  //   id: "hello-developer-portal",
-  //   title: "Hello Developer Portal",
-  //   description: "",
-  //   icon: Cloud,
-  //   category: "Infrastructure",
-  //   dialogType: "dynamic",
-  //   dataFilePath: "/data/self-service/dynamic-jobs/hello-developer-portal.json"
-  // }
+  {
+    id: "hello-developer-portal",
+    title: "Hello Developer Portal",
+    description: "",
+    icon: Cloud,
+    category: "Infrastructure",
+    dialogType: "dynamic",
+    dataFilePath: "/data/self-service/dynamic-jobs/hello-developer-portal.json"
+  }
 ];

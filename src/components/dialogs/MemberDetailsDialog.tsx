@@ -13,11 +13,14 @@ import {
   Users,
   IdCard,
   ArrowLeft,
-  Copy
+  Copy,
+  Check
 } from "lucide-react";
+import { useState, useCallback } from "react";
 import type { Member as DutyMember } from "@/hooks/useOnDutyData";
-import { openTeamsChat, formatBirthDate, openEditPicture, openEmailClient, SAP_PEOPLE_BASE_URL, copyToClipboard, formatPhoneNumber } from "@/utils/member-utils";
+import { openTeamsChat, formatBirthDate, openSAPProfile, openEmailClient, SAP_PEOPLE_BASE_URL, copyToClipboard, formatPhoneNumber } from "@/utils/member-utils";
 import { TeamsIcon } from "../icons/TeamsIcon";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Extended member interface with additional fields for the details dialog
 export interface ExtendedMember extends DutyMember {
@@ -38,7 +41,26 @@ interface MemberDetailsDialogProps {
 
 
 export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager, onGoBack, showBackButton }: MemberDetailsDialogProps) {
+  const { user } = useAuth();
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  
+  // Enhanced copy function with visual feedback
+  const handleCopyToClipboard = useCallback(async (e: React.MouseEvent, text: string, fieldLabel: string) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldLabel);
+      // Clear the copied state after 2 seconds
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  }, []);
+
   if (!member) return null;
+
+  // Check if current user can edit this member's picture
+  const canEditPicture = user?.id === member.id;
 
   const detailItems = [
     {
@@ -106,9 +128,9 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
               </Button>
             )}
             <div className="flex-1">
-              <DialogTitle>Member Details</DialogTitle>
+              <DialogTitle>User Details</DialogTitle>
               <DialogDescription>
-                View detailed information about this team member
+                View detailed information about this user
               </DialogDescription>
             </div>
           </div>
@@ -118,8 +140,12 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
           {/* Member Header */}
           <div className="flex items-center gap-4">
             <Avatar 
-              className="h-20 w-20 cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => openEditPicture(member.id)}
+              className={`h-20 w-20 transition-opacity duration-200 ${
+                canEditPicture ? 'hover:opacity-70' : ''
+              }`}
+              onClick={canEditPicture ? () => openSAPProfile(member.id) : undefined}
+              style={{ cursor: canEditPicture ? 'pointer' : 'default' }}
+              title={canEditPicture ? 'Open Profile' : undefined}
             >
               <AvatarImage src={`${SAP_PEOPLE_BASE_URL}/avatar/${member.id}`} alt={`${member.fullName} avatar`} />
             </Avatar>
@@ -182,15 +208,26 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
                       {item.value}
                     </span>
                     {item.isCopyable && item.value && item.value !== "Not specified" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => copyToClipboard(e, item.value)}
-                        className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
-                        aria-label={`Copy ${item.label}`}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        {copiedField === item.label && (
+                          <span className="text-xs text-green-600 font-medium animate-in fade-in duration-200">
+                            Copied!
+                          </span>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleCopyToClipboard(e, item.value, item.label)}
+                          className="h-6 w-6 p-0 opacity-60 hover:opacity-100 transition-all duration-200"
+                          aria-label={`Copy ${item.label}`}
+                        >
+                          {copiedField === item.label ? (
+                            <Check className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 );

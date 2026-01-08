@@ -30,10 +30,20 @@ const PluginCard = ({ plugin, onOpen, onEdit, onDelete }: PluginCardProps) => {
     // 1. The owner of the plugin
     // 2. A portal admin
     const canModifyPlugin = user && (
-        user.name === plugin.owner || 
-        user.email === plugin.owner || 
+        user.id === plugin.owner ||
         user.portal_admin === true
     );
+
+    const getOwnerDisplayName = (): string => {
+        // Try to get from metadata first
+        console.log(plugin.metadata)
+        if (plugin.metadata?.author_name) {
+            return `${plugin.metadata.author_name}`;
+        }
+
+        // Fallback to the owner ID if metadata is not available
+        return plugin.owner;
+    };
 
     const handlePinClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -103,7 +113,7 @@ const PluginCard = ({ plugin, onOpen, onEdit, onDelete }: PluginCardProps) => {
                 {/* Footer with author and action buttons */}
                 <div className="flex items-center justify-between mt-auto pt-2">
                     <span className="text-xs text-muted-foreground">
-                        By {plugin.owner}
+                        By {getOwnerDisplayName()}
                     </span>
                     <div className="flex items-center gap-1.5">
                         {/* Edit button - only show if user can modify */}

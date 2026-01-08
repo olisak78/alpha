@@ -13,9 +13,10 @@ export const calculateHealthPercentage = (label: string, summary: HealthSummary)
   switch (label) {
     case 'Healthy':
       return (((summary.up || 0) / summary.total) * 100).toFixed(1);
-    case 'Down':
+    case 'Down': {
       const downCount = (summary.down || 0);
       return ((downCount / summary.total) * 100).toFixed(1);
+    }
     default:
       return '0';
   }

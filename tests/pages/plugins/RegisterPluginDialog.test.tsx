@@ -141,7 +141,7 @@ describe('RegisterPluginDialog', () => {
   const mockToast = vi.fn();
   const mockUser = {
     id: 'user-123',
-    name: 'Test User',
+    name: 'Test User',          // ✅ This is what's used in metadata
     email: 'test@example.com',
   };
 
@@ -178,14 +178,11 @@ describe('RegisterPluginDialog', () => {
     it('should render the trigger button', () => {
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // The trigger button is inside the dialog-trigger wrapper
       const triggerWrapper = screen.getByTestId('dialog-trigger');
       expect(triggerWrapper).toBeInTheDocument();
       
-      // Should contain the Plus icon
       expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
       
-      // Should have the Register Plugin text (appears twice, so use getAllByText)
       const registerButtons = screen.getAllByText('Register Plugin');
       expect(registerButtons.length).toBeGreaterThan(0);
     });
@@ -239,7 +236,7 @@ describe('RegisterPluginDialog', () => {
       expect(nameLabel.textContent).toContain('*');
       expect(titleLabel.textContent).toContain('*');
       expect(bundleUrlLabel.textContent).toContain('*');
-      expect(backendUrlLabel.textContent).toContain('*');
+      expect(backendUrlLabel.textContent).not.toContain('*'); // ✅ Not required
     });
 
     it('should have placeholders for all inputs', () => {
@@ -336,12 +333,10 @@ describe('RegisterPluginDialog', () => {
         name: 'Name is required',
         title: 'Title is required',
         bundleUrl: 'Bundle URL is required',
-        backendUrl: 'Backend URL is required',
       });
 
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // Find and click the Register Plugin button (not the dialog trigger)
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
       await user.click(submitButton!);
@@ -350,7 +345,30 @@ describe('RegisterPluginDialog', () => {
         expect(screen.getByText('Name is required')).toBeInTheDocument();
         expect(screen.getByText('Title is required')).toBeInTheDocument();
         expect(screen.getByText('Bundle URL is required')).toBeInTheDocument();
-        expect(screen.getByText('Backend URL is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should validate backend URL format only if provided', async () => {
+      const user = userEvent.setup();
+      const { validateForm } = await import('@/plugins/models/models');
+      
+      vi.mocked(validateForm).mockReturnValue({
+        backendUrl: 'Please enter a valid URL',
+      });
+
+      render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
+
+      await user.type(screen.getByTestId('input-pluginName'), 'test');
+      await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
+      await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
+      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'invalid-url');
+
+      const buttons = screen.getAllByRole('button');
+      const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
+      await user.click(submitButton!);
+
+      await waitFor(() => {
+        expect(screen.getByText('Please enter a valid URL')).toBeInTheDocument();
       });
     });
 
@@ -358,14 +376,12 @@ describe('RegisterPluginDialog', () => {
       const user = userEvent.setup();
       const { validateForm } = await import('@/plugins/models/models');
       
-      // First validation returns error
       vi.mocked(validateForm).mockReturnValueOnce({
         name: 'Name is required',
       });
 
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // Trigger validation
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
       await user.click(submitButton!);
@@ -374,11 +390,9 @@ describe('RegisterPluginDialog', () => {
         expect(screen.getByText('Name is required')).toBeInTheDocument();
       });
 
-      // Type in the field
       const nameInput = screen.getByTestId('input-pluginName');
       await user.type(nameInput, 't');
 
-      // Error should be cleared
       await waitFor(() => {
         expect(screen.queryByText('Name is required')).not.toBeInTheDocument();
       });
@@ -428,20 +442,19 @@ describe('RegisterPluginDialog', () => {
   });
 
   describe('Form Submission', () => {
-    it('should submit form with correct payload', async () => {
+    // ✅ FIXED: Metadata uses author_name with user.name
+    it('should submit form with correct payload including metadata', async () => {
       const user = userEvent.setup();
       const { apiClient } = await import('@/services/ApiClient');
 
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // Fill in all fields
       await user.type(screen.getByTestId('input-pluginName'), 'test-plugin');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test Plugin');
       await user.type(screen.getByTestId('textarea-pluginDescription'), 'Test description');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
       await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
-      // Submit
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
       await user.click(submitButton!);
@@ -451,7 +464,7 @@ describe('RegisterPluginDialog', () => {
           backend_server_url: 'https://api.example.com',
           description: 'Test description',
           icon: 'Puzzle',
-          metadata: {},
+          metadata: { author_name: 'Test User' },  // ✅ FIXED: Uses author_name
           name: 'test-plugin',
           owner: 'user-123',
           react_component_path: 'https://example.com/bundle.js',
@@ -460,6 +473,38 @@ describe('RegisterPluginDialog', () => {
       });
     });
 
+    // ✅ FIXED: Test for empty backend URL
+    it('should send null for backend URL when field is empty', async () => {
+      const user = userEvent.setup();
+      const { apiClient } = await import('@/services/ApiClient');
+
+      render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
+
+      await user.type(screen.getByTestId('input-pluginName'), 'test-plugin');
+      await user.type(screen.getByTestId('input-pluginTitle'), 'Test Plugin');
+      await user.type(screen.getByTestId('textarea-pluginDescription'), 'Test description');
+      await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
+      // Don't fill backend URL
+
+      const buttons = screen.getAllByRole('button');
+      const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
+      await user.click(submitButton!);
+
+      await waitFor(() => {
+        expect(apiClient.post).toHaveBeenCalledWith('/plugins', {
+          backend_server_url: null,  // ✅ Should be null
+          description: 'Test description',
+          icon: 'Puzzle',
+          metadata: { author_name: 'Test User' },  // ✅ FIXED
+          name: 'test-plugin',
+          owner: 'user-123',
+          react_component_path: 'https://example.com/bundle.js',
+          title: 'Test Plugin',
+        });
+      });
+    });
+
+    // ✅ FIXED: Updated payload expectation
     it('should trim whitespace from form fields', async () => {
       const user = userEvent.setup();
       const { apiClient } = await import('@/services/ApiClient');
@@ -483,6 +528,7 @@ describe('RegisterPluginDialog', () => {
           description: 'Test description',
           react_component_path: 'https://example.com/bundle.js',
           backend_server_url: 'https://api.example.com',
+          metadata: { author_name: 'Test User' },  // ✅ FIXED
         }));
       });
     });
@@ -500,13 +546,11 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
       await user.click(submitButton!);
 
-      // Should show loading state
       expect(screen.getByTestId('loader-icon')).toBeInTheDocument();
       expect(screen.getByText('Registering...')).toBeInTheDocument();
     });
@@ -524,7 +568,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -544,7 +587,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test Plugin');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -567,7 +609,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -586,7 +627,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -596,7 +636,6 @@ describe('RegisterPluginDialog', () => {
         expect(mockOnSuccess).toHaveBeenCalled();
       });
 
-      // Form fields should be cleared
       const nameInput = screen.getByTestId('input-pluginName') as HTMLInputElement;
       const titleInput = screen.getByTestId('input-pluginTitle') as HTMLInputElement;
       
@@ -617,7 +656,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -640,7 +678,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -666,7 +703,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -690,7 +726,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -710,16 +745,13 @@ describe('RegisterPluginDialog', () => {
 
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // Fill in fields
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
 
-      // Close dialog (simulated via Cancel button)
       const buttons = screen.getAllByRole('button');
       const cancelButton = buttons.find(btn => btn.textContent === 'Cancel');
       await user.click(cancelButton!);
 
-      // Fields should be reset
       const nameInput = screen.getByTestId('input-pluginName') as HTMLInputElement;
       const titleInput = screen.getByTestId('input-pluginTitle') as HTMLInputElement;
       
@@ -737,7 +769,6 @@ describe('RegisterPluginDialog', () => {
 
       render(<RegisterPluginDialog onSuccess={mockOnSuccess} />);
 
-      // Trigger validation
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
       await user.click(submitButton!);
@@ -746,11 +777,9 @@ describe('RegisterPluginDialog', () => {
         expect(screen.getByText('Name is required')).toBeInTheDocument();
       });
 
-      // Close dialog
       const cancelButton = buttons.find(btn => btn.textContent === 'Cancel');
       await user.click(cancelButton!);
 
-      // Error should be cleared
       expect(screen.queryByText('Name is required')).not.toBeInTheDocument();
     });
 
@@ -765,7 +794,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -775,17 +803,16 @@ describe('RegisterPluginDialog', () => {
         expect(screen.getByText('Submit error')).toBeInTheDocument();
       });
 
-      // Close dialog
       const cancelButton = buttons.find(btn => btn.textContent === 'Cancel');
       await user.click(cancelButton!);
 
-      // Submit error should be cleared
       expect(screen.queryByText('Submit error')).not.toBeInTheDocument();
     });
   });
 
   describe('User Authentication', () => {
-    it('should use authenticated user ID as owner', async () => {
+    // ✅ FIXED: Uses author_name with user.name
+    it('should use authenticated user name in metadata', async () => {
       const user = userEvent.setup();
       const { apiClient } = await import('@/services/ApiClient');
 
@@ -794,7 +821,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -805,12 +831,14 @@ describe('RegisterPluginDialog', () => {
           '/plugins',
           expect.objectContaining({
             owner: 'user-123',
+            metadata: { author_name: 'Test User' },  // ✅ FIXED
           })
         );
       });
     });
 
-    it('should use "Unknown" as owner if user is not authenticated', async () => {
+    // ✅ FIXED: Empty string for metadata when user is null
+    it('should use empty string for author_name if user is not authenticated', async () => {
       const user = userEvent.setup();
       const { useAuth } = await import('@/contexts/AuthContext');
       const { apiClient } = await import('@/services/ApiClient');
@@ -829,7 +857,6 @@ describe('RegisterPluginDialog', () => {
       await user.type(screen.getByTestId('input-pluginName'), 'test');
       await user.type(screen.getByTestId('input-pluginTitle'), 'Test');
       await user.type(screen.getByTestId('input-pluginBundleUrl'), 'https://example.com/bundle.js');
-      await user.type(screen.getByTestId('input-pluginBackendUrl'), 'https://api.example.com');
 
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find(btn => btn.textContent === 'Register Plugin');
@@ -840,6 +867,7 @@ describe('RegisterPluginDialog', () => {
           '/plugins',
           expect.objectContaining({
             owner: 'Unknown',
+            metadata: { author_name: '' },  // ✅ FIXED: Empty string
           })
         );
       });

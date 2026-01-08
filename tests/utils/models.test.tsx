@@ -536,18 +536,32 @@ describe('models.tsx', () => {
       expect(isValidUrl('')).toBe(false);
       expect(isValidUrl('   ')).toBe(false);
     });
-
-
   });
 
   describe('validateForm', () => {
-    it('should return no errors for valid form data', () => {
+    // ✅ UPDATED: backendUrl is now optional
+    it('should return no errors for valid form data with backend URL', () => {
       const formData = {
         name: 'my-plugin',
         title: 'My Plugin',
         description: 'A test plugin',
         bundleUrl: 'https://example.com/bundle.js',
         backendUrl: 'https://example.com/api',
+      };
+
+      const errors = validateForm(formData);
+
+      expect(errors).toEqual({});
+    });
+
+    // ✅ NEW: Test for valid form without backend URL
+    it('should return no errors for valid form data without backend URL', () => {
+      const formData = {
+        name: 'my-plugin',
+        title: 'My Plugin',
+        description: 'A test plugin',
+        bundleUrl: 'https://example.com/bundle.js',
+        backendUrl: '',
       };
 
       const errors = validateForm(formData);
@@ -562,7 +576,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -576,7 +590,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -590,7 +604,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -604,7 +618,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -620,7 +634,7 @@ describe('models.tsx', () => {
           title: '',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -634,7 +648,7 @@ describe('models.tsx', () => {
           title: 'A',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -648,7 +662,7 @@ describe('models.tsx', () => {
           title: '  A  ',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -664,7 +678,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: '',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -678,7 +692,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'not a url',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -692,7 +706,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: '   ',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -702,7 +716,8 @@ describe('models.tsx', () => {
     });
 
     describe('Backend URL Validation', () => {
-      it('should require backendUrl', () => {
+      // ✅ UPDATED: backendUrl is no longer required
+      it('should not require backendUrl', () => {
         const formData = {
           name: 'my-plugin',
           title: 'My Plugin',
@@ -713,10 +728,11 @@ describe('models.tsx', () => {
 
         const errors = validateForm(formData);
 
-        expect(errors.backendUrl).toBe('Backend URL is required');
+        expect(errors.backendUrl).toBeUndefined();
       });
 
-      it('should require valid backendUrl', () => {
+      // ✅ UPDATED: Should only validate format if provided
+      it('should validate backendUrl format if provided', () => {
         const formData = {
           name: 'my-plugin',
           title: 'My Plugin',
@@ -730,7 +746,8 @@ describe('models.tsx', () => {
         expect(errors.backendUrl).toBe('Please enter a valid URL');
       });
 
-      it('should reject whitespace-only backendUrl', () => {
+      // ✅ UPDATED: Should allow whitespace-only (treated as empty)
+      it('should allow whitespace-only backendUrl', () => {
         const formData = {
           name: 'my-plugin',
           title: 'My Plugin',
@@ -741,18 +758,34 @@ describe('models.tsx', () => {
 
         const errors = validateForm(formData);
 
-        expect(errors.backendUrl).toBe('Backend URL is required');
+        expect(errors.backendUrl).toBeUndefined();
+      });
+
+      // ✅ NEW: Should accept valid URL
+      it('should accept valid backendUrl', () => {
+        const formData = {
+          name: 'my-plugin',
+          title: 'My Plugin',
+          description: '',
+          bundleUrl: 'https://example.com/bundle.js',
+          backendUrl: 'https://api.example.com',
+        };
+
+        const errors = validateForm(formData);
+
+        expect(errors.backendUrl).toBeUndefined();
       });
     });
 
     describe('Multiple Errors', () => {
+      // ✅ UPDATED: Removed backendUrl from expected errors
       it('should return all validation errors', () => {
         const formData = {
           name: 'a',
           title: 'B',
           description: '',
           bundleUrl: 'invalid',
-          backendUrl: 'also-invalid',
+          backendUrl: 'also-invalid',  // ✅ This will error because it's invalid format
         };
 
         const errors = validateForm(formData);
@@ -760,7 +793,7 @@ describe('models.tsx', () => {
         expect(errors.name).toBe('Name must be at least 2 characters');
         expect(errors.title).toBe('Title must be at least 2 characters');
         expect(errors.bundleUrl).toBe('Please enter a valid URL');
-        expect(errors.backendUrl).toBe('Please enter a valid URL');
+        expect(errors.backendUrl).toBe('Please enter a valid URL');  // ✅ Only errors on invalid format
       });
     });
 
@@ -771,7 +804,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: '',
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -785,7 +818,7 @@ describe('models.tsx', () => {
           title: 'My Plugin',
           description: 'A'.repeat(1000),
           bundleUrl: 'https://example.com/bundle.js',
-          backendUrl: 'https://example.com/api',
+          backendUrl: '',
         };
 
         const errors = validateForm(formData);
@@ -801,8 +834,6 @@ describe('models.tsx', () => {
 
       expect(screen.getByTestId('puzzle-icon')).toBeInTheDocument();
     });
-
-
 
     it('should render specific icon when valid name provided', () => {
       render(<DynamicIcon name="Home" />);

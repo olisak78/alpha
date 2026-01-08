@@ -3,9 +3,7 @@ import { useAuthRefresh } from '@/hooks/useAuthRefresh';
 import { setGlobalAuthErrorTrigger, clearGlobalAuthErrorTrigger } from '@/lib/authRefreshService';
 import { AuthErrorHandler } from '@/components/AuthErrorHandler';
 
-interface AuthErrorContextType {
-  // Context is mainly internal - components don't need to interact with it directly
-}
+type AuthErrorContextType = Record<string, never>;
 
 const AuthErrorContext = createContext<AuthErrorContextType | undefined>(undefined);
 

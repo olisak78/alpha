@@ -1,0 +1,3925 @@
+{
+  "version": "2.1.0",
+  "$schema": "http://json.schemastore.org/sarif-2.1.0-rtm.5",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ESLint",
+          "informationUri": "https://eslint.org",
+          "rules": [
+            {
+              "id": "react-refresh/only-export-components",
+              "properties": {
+                "category": "No category provided"
+              }
+            },
+            {
+              "id": "react-hooks/exhaustive-deps",
+              "helpUri": "https://github.com/facebook/react/issues/14920",
+              "properties": {},
+              "shortDescription": {
+                "text": "verifies the list of dependencies for Hooks like useEffect and similar"
+              }
+            },
+            {
+              "id": "no-useless-escape",
+              "helpUri": "https://eslint.org/docs/latest/rules/no-useless-escape",
+              "properties": {},
+              "shortDescription": {
+                "text": "Disallow unnecessary escape characters"
+              }
+            }
+          ],
+          "version": "9.39.1"
+        }
+      },
+      "artifacts": [
+        {
+          "location": {
+            "uri": "src/App.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/AuthDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/ConfirmDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/CreateDeploymentDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/CreateDeploymentDialogButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentCardActions.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentCardHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentCardSkeleton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentConfigurationStep.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentStats.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentsHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentsLoadingSkeleton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/DeploymentsManager.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/EndpointSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/ModelConfigurationSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/ModelSearchStep.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/ModelSelectionCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/ModelSummaryCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/TimelineSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AILaunchpad/deploymentUtils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Alerts/AddAlertDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Alerts/AlertEditorDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Alerts/AlertViewDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Announcements.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AppliedFilters.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/AuthErrorHandler.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/BreadcrumbPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Breadcrumbs.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/CircuitBreakerSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/ActionButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/ComponentHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/HealthStatusBadge.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/MetricItem.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/QualityMetricsGrid.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentCard/SystemInfoBadges.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/CodeQualityCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/ComponentHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/ComponentHealthCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/HealthErrorDisplay.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/InfrastructureCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/NestedHealthComponent.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentView/StatusDot.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentViewApi.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentViewOverview.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentsList.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentsSearchFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ComponentsTabContent.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DateRangeCalendar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/DeveloperPortalHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/HeaderDropdown.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/HeaderNavigation.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/HeaderTabsList.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/TopBarDateTime.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperPortalHeader/UserProfileDropdown.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/DeveloperRankCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/GlobalAuthErrorHandler.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/HealthDashboard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/HealthDetails.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/HealthOverview.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/HealthRow.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/HealthTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/StatusBadge.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Health/index.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/HealthStatusFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Heatmap.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Homepage/JiraIssuesFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Homepage/JiraIssuesTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Homepage/JiraIssuesTableRow.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/LandscapeFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/LandscapeLinksSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/LandscapeToolsButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/CompactLinkCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/FullLinkCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/LinksGrid.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/LinksHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/LinksSearchFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/NoLinksFound.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/UnifiedLinkCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/UnifiedLinksGrid.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Links/ViewLinksToggleButton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/NotificationModal.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/NotificationPopup.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/OnDutyPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Ops2goLandscapeInfo.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/PortalContainer.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/PortalContent.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ProjectLayout.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ProtectedRoute.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/QuickFilterButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/FormElement.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/FormPreview.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/JobStatusIndicator.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/JobStatusPoller.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/SelfServiceBlockDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/SelfServiceDialogButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/SelfServiceWizard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SelfService/StepIndicator.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Sidebar/SideBar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/SmallCardsBlock.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TablePagination.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/DutySchedule/OnCall.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/DutySchedule/OnDuty.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/DutySchedule/OnDutySchedule.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/DutySchedule/ScheduleHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/DutySchedule/ScheduleTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/MemberCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/MemberList.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/OnDutyAndCall.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/ScoreBoards.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/Team.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamColorPicker.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamContainer.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamDocs.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamJiraFilters.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamJiraIssues.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/TeamJiraTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Team/types.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TeamSelectorBar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Timeline/TimelineTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/Timeline/TimelineTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/AlertExpandedView.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/FilterButtons.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/FilterControls.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/SearchInput.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/TriggeredAlertsFilters.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/TriggeredAlerts/TriggeredAlertsTable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/UserInformationSettings.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ViewSwitcher.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/AddDocumentationDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/AddLinkDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/ApprovalDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/ClosePRDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/DialogIndicator.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/EditDocumentationDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/EditLinkDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/FormField.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/MemberDetailsDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/MoveMemberDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/SettingsDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/TeamMemberDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/UploadDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/dialogs/utils/dialog-helpers.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/AvsIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/CamIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/CloudAutomationIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/CockpitIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/ConcourseIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/ControlCenterIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/DynatraceIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/GardenerIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/GithubIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/GrafanaIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/IaasIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/KibanaIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/LogsIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/OperationConsoleIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/PlutonoIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/SwaggerIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/TeamsIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/UnifiedServiceIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/icons/VaultIcon.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/multi-select.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/settings/CustomizationAppearanceSettings.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/settings/ProjectVisibilitySection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/settings/ThemeSection.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/stats/GitHubContributionsStat.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/ComponentsTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/DeploymentTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/CamProfilesTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/DeleteConfirmationDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/GithubPrsTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/JiraIssuesTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/NotificationsTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/QuickLinkFormDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/QuickLinksGrid.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/QuickLinksSearchFilter.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/QuickLinksStates.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/MePageTabs/QuickLinksTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/tabs/TriggeredAlertsTab.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/accordion.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/alert-dialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/alert.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/aspect-ratio.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/avatar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/badge.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/button.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/calendar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/card.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/carousel.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/chart.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/checkbox.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/circle-gauge.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/collapsible.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/command.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/context-menu.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/dialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/drawer.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/dropdown-menu.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/form.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/hover-card.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/input-otp.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/input.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/label.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/menubar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/navigation-menu.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/pagination.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/popover.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/progress.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/radio-group.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/resizable.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/scroll-area.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/select.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/separator.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/sheet.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/skeleton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/slider.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/sonner.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/switch.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/table.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/tabs.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/textarea.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/toast.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/toaster.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/toggle-group.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/toggle.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/tooltip.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/components/ui/use-toast.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/constants/developer-portal.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/AuthContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/AuthErrorContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/ComponentDisplayContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/HeaderNavigationContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/LinksPageContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/PortalProviders.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/QuickLinksContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/TeamContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/TriggeredAlertsContext.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/contexts/hooks.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/data/mockFeatureToggles.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/data/self-service/selfServiceBlocks.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/AIChatPane.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/AILeftPane.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/AIPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/components/DeploymentSelector.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/components/InputBar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/components/MessageBubble.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/components/SettingsDrawer.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/hooks/useChat.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/index.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/lib/helpers.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/lib/mockClient.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/ai-arena/types/chat.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/DocsPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/CreateItemDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DeleteConfirmDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DocsContent.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DocsRawEditor.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DocsSearch.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DocsSidebar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/DocsTableOfContents.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/features/docs/components/MermaidDiagram.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useDeleteLinkMutation.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useFavoriteMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useLinksMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useMemberMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useQuickLinkMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useSelfServiceMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useTeamMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useTriggeredAlertsMutations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/mutations/useUpdateLink.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useAlerts.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useClosePullRequest.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useComponentHealth.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useComponents.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useConcourse.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useDocs.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useDocumentation.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useGitHubAveragePRtime.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useGitHubContributions.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useGitHubHeatmap.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useGitHubPRReviewComments.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useGitHubPRs.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useHealth.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useJenkinsBuildStatus.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useJenkinsQueueStatus.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useJira.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useJobStatus.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useLandscapes.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useLinks.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useMembers.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useOrganizations.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/usePluginSubscriptions.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/usePlugins.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useProjects.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useQuickLinks.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useSelfService.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useSonarMeasures.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useSwaggerUI.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useTeams.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/api/useTriggeredAlerts.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useJiraFiltering.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useScoreboardData.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useTeamAuthorization.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useTeamComponents.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useTeamLinks.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/team/useUserManagement.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/use-mobile.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/use-toast.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useAuthRefresh.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useAuthWithRole.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useChatHistory.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useDebounce.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useLandscapeTools.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useLinkCard.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useNotifications.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useOnDutyData.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/usePersistedState.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useProjectSync.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useProjectVisibility.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useQuickLinksData.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useQuickLinksDelete.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useQuickLinksForm.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useScheduleData.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useScheduleExcel.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useSessionState.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useSettings.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useTabRouting.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useTeamsPage.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useTriggeredAlertsFilters.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/hooks/useUserInformation.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/authRefreshService.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/chat-db.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/prism-languages.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/queryClient.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/queryKeys.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/lib/utils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/main.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/AIArenaPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/AILaunchpadPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/AlertsPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/ComponentViewPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/DynamicProjectPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/HomePage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/Index.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/LinksPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/LoginPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/MonitoringPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/NotFound.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/Ops2goPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/PendingReviewPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/PluginMarketplacePage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/PluginViewPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/SelfServicePage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/pages/TeamsPage.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/BasePlugin.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PageSkeleton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/Pagination.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PluginBody.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PluginCard.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PluginCardSkeleton.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PluginContainer.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/PluginHeader.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/RegisterPluginDialog.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/components/SearchBar.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/index.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/models/models.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/types/plugin-types.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/utils/PluginApiClient.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/plugins/utils/pluginLoader.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/providers/QueryProvider.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/AlertsApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/ApiClient.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/ComponentsApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/JiraApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/LandscapesApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/Ops2goApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/ProjectsApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/QPATimelineApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/SelfServiceApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/SonarApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/SwaggerApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/aiPlatformApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/authService.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/concourseApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/deleteLinkApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/favoritesApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/githubApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/githubDocsApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/healthApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/pluginSubscriptions.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/services/triggeredAlertsApi.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/appStateStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/dataStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/linksPageStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/navigationStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/projectsStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/quickLinksStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/selectionStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/sidebarStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/teamStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/themeStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/uiStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/stores/useDualAuthStore.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/test/App.test.tsx"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/test/setup.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/api.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/concourse.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/developer-portal.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/documentation.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/health.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/new-backend-entities.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/project-interface.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/types/team.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/alertUtils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/dateUtils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/developer-portal-helpers.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/environment.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/landscapeDefaults.test.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/landscapeHistory.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/landscapeUtils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/member-utils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/utils/schedule-utils.ts"
+          }
+        },
+        {
+          "location": {
+            "uri": "src/vite-env.d.ts"
+          }
+        }
+      ],
+      "results": [
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/Alerts/AlertViewDialog.tsx",
+                  "index": 23
+                },
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 17,
+                  "endLine": 42,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/Breadcrumbs.tsx",
+                  "index": 28
+                },
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 10,
+                  "endLine": 181,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/Breadcrumbs.tsx",
+                  "index": 28
+                },
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 31,
+                  "endLine": 181,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/Breadcrumbs.tsx",
+                  "index": 28
+                },
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 49,
+                  "endLine": 181,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook React.useMemo has a missing dependency: 'props'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/DateRangeCalendar.tsx",
+                  "index": 49
+                },
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 6,
+                  "endLine": 51,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook React.useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/DateRangeCalendar.tsx",
+                  "index": 49
+                },
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 7,
+                  "endLine": 51,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'showAuthError' function makes the dependencies of useEffect Hook (at line 66) change on every render. To fix this, wrap the definition of 'showAuthError' in its own useCallback() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/GlobalAuthErrorHandler.tsx",
+                  "index": 57
+                },
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 9,
+                  "endLine": 42,
+                  "endColumn": 4
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/Health/HealthOverview.tsx",
+                  "index": 60
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 14,
+                  "endLine": 10,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'getProjectFromPath'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/PortalContainer.tsx",
+                  "index": 86
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 6,
+                  "endLine": 80,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'editingMember'. Either include it or remove the dependency array. If 'setUserIdValidated' needs the current value of 'editingMember', you can also switch to useReducer instead of useState and read 'editingMember' in the reducer."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/dialogs/TeamMemberDialog.tsx",
+                  "index": 142
+                },
+                "region": {
+                  "startLine": 90,
+                  "startColumn": 6,
+                  "endLine": 90,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'allIssues' logical expression could make the dependencies of useMemo Hook (at line 233) change on every render. To fix this, wrap the initialization of 'allIssues' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/tabs/MePageTabs/JiraIssuesTab.tsx",
+                  "index": 174
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 9,
+                  "endLine": 40,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'allIssues' logical expression could make the dependencies of useMemo Hook (at line 263) change on every render. To fix this, wrap the initialization of 'allIssues' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/tabs/MePageTabs/JiraIssuesTab.tsx",
+                  "index": 174
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 9,
+                  "endLine": 40,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'allIssues' logical expression could make the dependencies of useMemo Hook (at line 273) change on every render. To fix this, wrap the initialization of 'allIssues' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/tabs/MePageTabs/JiraIssuesTab.tsx",
+                  "index": 174
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 9,
+                  "endLine": 40,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/badge.tsx",
+                  "index": 187
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 17,
+                  "endLine": 40,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/button.tsx",
+                  "index": 188
+                },
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 18,
+                  "endLine": 56,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/form.tsx",
+                  "index": 201
+                },
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 3,
+                  "endLine": 168,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/navigation-menu.tsx",
+                  "index": 207
+                },
+                "region": {
+                  "startLine": 119,
+                  "startColumn": 3,
+                  "endLine": 119,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/sonner.tsx",
+                  "index": 219
+                },
+                "region": {
+                  "startLine": 29,
+                  "startColumn": 19,
+                  "endLine": 29,
+                  "endColumn": 24
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/components/ui/toggle.tsx",
+                  "index": 227
+                },
+                "region": {
+                  "startLine": 43,
+                  "startColumn": 18,
+                  "endLine": 43,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'checkAuthStatusAndSetUser'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/AuthContext.tsx",
+                  "index": 231
+                },
+                "region": {
+                  "startLine": 37,
+                  "startColumn": 6,
+                  "endLine": 37,
+                  "endColumn": 8
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/AuthContext.tsx",
+                  "index": 231
+                },
+                "region": {
+                  "startLine": 173,
+                  "startColumn": 14,
+                  "endLine": 173,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/AuthErrorContext.tsx",
+                  "index": 232
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 14,
+                  "endLine": 14,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has missing dependencies: 'components', 'noCentralLandscapes', and 'projectId'. Either include them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/ComponentDisplayContext.tsx",
+                  "index": 233
+                },
+                "region": {
+                  "startLine": 166,
+                  "startColumn": 6,
+                  "endLine": 166,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/ComponentDisplayContext.tsx",
+                  "index": 233
+                },
+                "region": {
+                  "startLine": 192,
+                  "startColumn": 17,
+                  "endLine": 192,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/HeaderNavigationContext.tsx",
+                  "index": 234
+                },
+                "region": {
+                  "startLine": 157,
+                  "startColumn": 17,
+                  "endLine": 157,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/LinksPageContext.tsx",
+                  "index": 235
+                },
+                "region": {
+                  "startLine": 19,
+                  "startColumn": 14,
+                  "endLine": 19,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/LinksPageContext.tsx",
+                  "index": 235
+                },
+                "region": {
+                  "startLine": 65,
+                  "startColumn": 14,
+                  "endLine": 65,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/QuickLinksContext.tsx",
+                  "index": 237
+                },
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 14,
+                  "endLine": 24,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/QuickLinksContext.tsx",
+                  "index": 237
+                },
+                "region": {
+                  "startLine": 91,
+                  "startColumn": 14,
+                  "endLine": 91,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Move your React context(s) to a separate file."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/TeamContext.tsx",
+                  "index": 238
+                },
+                "region": {
+                  "startLine": 102,
+                  "startColumn": 14,
+                  "endLine": 102,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/TeamContext.tsx",
+                  "index": 238
+                },
+                "region": {
+                  "startLine": 337,
+                  "startColumn": 17,
+                  "endLine": 337,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Move your React context(s) to a separate file."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/TriggeredAlertsContext.tsx",
+                  "index": 239
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 14,
+                  "endLine": 40,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/TriggeredAlertsContext.tsx",
+                  "index": 239
+                },
+                "region": {
+                  "startLine": 213,
+                  "startColumn": 17,
+                  "endLine": 213,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/contexts/TriggeredAlertsContext.tsx",
+                  "index": 239
+                },
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 17,
+                  "endLine": 217,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'lastMessageCount'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/AIChatPane.tsx",
+                  "index": 243
+                },
+                "region": {
+                  "startLine": 65,
+                  "startColumn": 6,
+                  "endLine": 65,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/AIPage.tsx",
+                  "index": 245
+                },
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 14,
+                  "endLine": 8,
+                  "endColumn": 24
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'deployments' logical expression could make the dependencies of useMemo Hook (at line 65) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'deployments' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/components/DeploymentSelector.tsx",
+                  "index": 246
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 9,
+                  "endLine": 21,
+                  "endColumn": 102
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Unnecessary escape character: \\{."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/components/MessageBubble.tsx",
+                  "index": 248
+                },
+                "region": {
+                  "startLine": 159,
+                  "startColumn": 76,
+                  "endLine": 159,
+                  "endColumn": 77
+                }
+              }
+            }
+          ],
+          "ruleId": "no-useless-escape",
+          "ruleIndex": 2
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Unnecessary escape character: \\}."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/components/MessageBubble.tsx",
+                  "index": 248
+                },
+                "region": {
+                  "startLine": 159,
+                  "startColumn": 78,
+                  "endLine": 159,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "ruleId": "no-useless-escape",
+          "ruleIndex": 2
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Unnecessary escape character: \\[."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/components/MessageBubble.tsx",
+                  "index": 248
+                },
+                "region": {
+                  "startLine": 159,
+                  "startColumn": 80,
+                  "endLine": 159,
+                  "endColumn": 81
+                }
+              }
+            }
+          ],
+          "ruleId": "no-useless-escape",
+          "ruleIndex": 2
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'activeId'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/ai-arena/hooks/useChat.ts",
+                  "index": 250
+                },
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 6,
+                  "endLine": 181,
+                  "endColumn": 8
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'docsConfig' conditional could make the dependencies of useCallback Hook (at line 140) change on every render. To fix this, wrap the initialization of 'docsConfig' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/docs/DocsPage.tsx",
+                  "index": 255
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 9,
+                  "endLine": 59,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'docsConfig' conditional could make the dependencies of useCallback Hook (at line 261) change on every render. To fix this, wrap the initialization of 'docsConfig' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/docs/DocsPage.tsx",
+                  "index": 255
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 9,
+                  "endLine": 59,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'docsConfig' conditional could make the dependencies of useCallback Hook (at line 345) change on every render. To fix this, wrap the initialization of 'docsConfig' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/docs/DocsPage.tsx",
+                  "index": 255
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 9,
+                  "endLine": 59,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useCallback has missing dependencies: 'expandedDirs' and 'loadDirectoryChildren'. Either include them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/features/docs/DocsPage.tsx",
+                  "index": 255
+                },
+                "region": {
+                  "startLine": 232,
+                  "startColumn": 6,
+                  "endLine": 232,
+                  "endColumn": 68
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useMemo has unnecessary dependencies: 'assigneeFilter', 'search', and 'statusFilter'. Either exclude them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/team/useJiraFiltering.ts",
+                  "index": 303
+                },
+                "region": {
+                  "startLine": 137,
+                  "startColumn": 6,
+                  "endLine": 137,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useMemo has missing dependencies: 'SCORE_WEIGHTS.alerts', 'SCORE_WEIGHTS.availability', 'SCORE_WEIGHTS.dora', 'SCORE_WEIGHTS.quality', 'SCORE_WEIGHTS.runs', and 'allTeams'. Either include them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/team/useScoreboardData.ts",
+                  "index": 304
+                },
+                "region": {
+                  "startLine": 176,
+                  "startColumn": 8,
+                  "endLine": 176,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'convertApiLinksToLocal'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/team/useTeamLinks.ts",
+                  "index": 307
+                },
+                "region": {
+                  "startLine": 77,
+                  "startColumn": 6,
+                  "endLine": 77,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useMemo has unnecessary dependencies: 'list' and 'userId'. Either exclude them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useNotifications.ts",
+                  "index": 317
+                },
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 6,
+                  "endLine": 76,
+                  "endColumn": 20
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'onCall' logical expression could make the dependencies of useMemo Hook (at line 161) change on every render. To fix this, wrap the initialization of 'onCall' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useOnDutyData.ts",
+                  "index": 318
+                },
+                "region": {
+                  "startLine": 103,
+                  "startColumn": 9,
+                  "endLine": 103,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'onDuty' logical expression could make the dependencies of useMemo Hook (at line 161) change on every render. To fix this, wrap the initialization of 'onDuty' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useOnDutyData.ts",
+                  "index": 318
+                },
+                "region": {
+                  "startLine": 104,
+                  "startColumn": 9,
+                  "endLine": 104,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'onCall' logical expression could make the dependencies of useMemo Hook (at line 99) change on every render. To fix this, wrap the initialization of 'onCall' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useScheduleData.ts",
+                  "index": 325
+                },
+                "region": {
+                  "startLine": 63,
+                  "startColumn": 9,
+                  "endLine": 63,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'onDuty' logical expression could make the dependencies of useMemo Hook (at line 99) change on every render. To fix this, wrap the initialization of 'onDuty' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useScheduleData.ts",
+                  "index": 325
+                },
+                "region": {
+                  "startLine": 64,
+                  "startColumn": 9,
+                  "endLine": 64,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'setIsDropdown'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useTeamsPage.ts",
+                  "index": 330
+                },
+                "region": {
+                  "startLine": 130,
+                  "startColumn": 6,
+                  "endLine": 130,
+                  "endColumn": 8
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'setTabs'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useTeamsPage.ts",
+                  "index": 330
+                },
+                "region": {
+                  "startLine": 151,
+                  "startColumn": 4,
+                  "endLine": 151,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has missing dependencies: 'navigate' and 'selectedTab'. Either include them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useTeamsPage.ts",
+                  "index": 330
+                },
+                "region": {
+                  "startLine": 184,
+                  "startColumn": 4,
+                  "endLine": 184,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has missing dependencies: 'isSystemTabChange' and 'selectedTab'. Either include them or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useTeamsPage.ts",
+                  "index": 330
+                },
+                "region": {
+                  "startLine": 199,
+                  "startColumn": 4,
+                  "endLine": 199,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'triggeredAlerts' logical expression could make the dependencies of useMemo Hook (at line 458) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'triggeredAlerts' in its own useMemo() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/hooks/useTriggeredAlertsFilters.ts",
+                  "index": 331
+                },
+                "region": {
+                  "startLine": 205,
+                  "startColumn": 9,
+                  "endLine": 205,
+                  "endColumn": 53
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'activeTab'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/AIArenaPage.tsx",
+                  "index": 340
+                },
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 6,
+                  "endLine": 45,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "The 'handleSearchTermChange' function makes the dependencies of useMemo Hook (at line 137) change on every render. To fix this, wrap the definition of 'handleSearchTermChange' in its own useCallback() Hook."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/AlertsPage.tsx",
+                  "index": 342
+                },
+                "region": {
+                  "startLine": 69,
+                  "startColumn": 9,
+                  "endLine": 74,
+                  "endColumn": 4
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'setTabs'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/ComponentViewPage.tsx",
+                  "index": 343
+                },
+                "region": {
+                  "startLine": 127,
+                  "startColumn": 8,
+                  "endLine": 127,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'isExistInLandscape'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/ComponentViewPage.tsx",
+                  "index": 343
+                },
+                "region": {
+                  "startLine": 184,
+                  "startColumn": 8,
+                  "endLine": 184,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'pluginState.loadState'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/PluginViewPage.tsx",
+                  "index": 354
+                },
+                "region": {
+                  "startLine": 188,
+                  "startColumn": 6,
+                  "endLine": 188,
+                  "endColumn": 26
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'getDefaults'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/pages/SelfServicePage.tsx",
+                  "index": 355
+                },
+                "region": {
+                  "startLine": 110,
+                  "startColumn": 6,
+                  "endLine": 110,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "React Hook useEffect has a missing dependency: 'pluginState.loadState'. Either include it or remove the dependency array."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/components/BasePlugin.tsx",
+                  "index": 357
+                },
+                "region": {
+                  "startLine": 144,
+                  "startColumn": 8,
+                  "endLine": 148,
+                  "endColumn": 6
+                }
+              }
+            }
+          ],
+          "ruleId": "react-hooks/exhaustive-deps",
+          "ruleIndex": 1
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 65,
+                  "startColumn": 17,
+                  "endLine": 65,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 23,
+                  "endLine": 76,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 100,
+                  "startColumn": 23,
+                  "endLine": 100,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 127,
+                  "startColumn": 23,
+                  "endLine": 127,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 167,
+                  "startColumn": 14,
+                  "endLine": 167,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 176,
+                  "startColumn": 17,
+                  "endLine": 176,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 186,
+                  "startColumn": 17,
+                  "endLine": 186,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/plugins/models/models.tsx",
+                  "index": 368
+                },
+                "region": {
+                  "startLine": 230,
+                  "startColumn": 17,
+                  "endLine": 230,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "ruleId": "react-refresh/only-export-components",
+          "ruleIndex": 0
+        }
+      ]
+    }
+  ]
+}

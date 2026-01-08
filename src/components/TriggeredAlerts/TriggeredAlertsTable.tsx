@@ -2,22 +2,32 @@ import { useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Activity, ChevronDown, ChevronRight } from 'lucide-react';
 import { formatAlertDate } from '@/utils/dateUtils';
-import type { TriggeredAlert } from '@/types/api';
-import { 
-  getAlertComponent, 
+import {
   getSeverityColor, 
   getStatusColor
 } from '@/utils/alertUtils';
 import { AlertExpandedView } from './AlertExpandedView';
 import { useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
 import { FilterButtons } from './FilterButtons';
+import TablePagination from '@/components/TablePagination';
+import { useTableSort } from '@/hooks/useTableSort';
+import { sortAlerts } from './alertSortConfigs';
+import { TriggeredAlertsTableHeader } from './TriggeredAlertsTableHeader';
 
 interface TriggeredAlertsTableProps {
   showRegion?: boolean;
+  onShowAlertDefinition?: (alertName: string) => void;
 }
 
-export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTableProps) {
-  const { filteredAlerts, projectId, onShowAlertDefinition } = useTriggeredAlertsContext();
+export function TriggeredAlertsTable({ showRegion = true, onShowAlertDefinition }: TriggeredAlertsTableProps) {
+  const { 
+    filteredAlerts, 
+    projectId, 
+    filters,
+    actions,
+    totalCount,
+    totalPages,
+  } = useTriggeredAlertsContext();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const handleToggleExpand = useCallback((alertKey: string) => {
@@ -32,30 +42,36 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
     });
   }, []);
 
+  const handlePageChange = useCallback((page: number) => {
+    actions.setPage(page);
+    // Clear expanded rows when changing pages
+    setExpandedRows(new Set());
+  }, [actions]);
+
+  const { sortState, handleSort, sortedData: sortedAlerts } = useTableSort({
+    data: filteredAlerts,
+    sortFn: sortAlerts,
+  });
+
 
   return (
     <>
       <div className="border rounded-lg overflow-hidden bg-card">
-        {/* Table Header */}
-        <div className={`grid ${showRegion ? 'grid-cols-10' : 'grid-cols-9'} px-4 py-3 border-b bg-muted/30 text-sm font-medium`}>
-          <div className="col-span-4">Alert Name</div>
-          <div className="col-span-1">Severity</div>
-          <div className="col-span-1">Start Time</div>
-          <div className="col-span-1">End Time</div>
-          <div className="col-span-1">Status</div>
-          <div className="col-span-1">Landscape</div>
-          {showRegion && <div className="col-span-1">Region</div>}
-        </div>
+        <TriggeredAlertsTableHeader 
+          showRegion={showRegion}
+          sortState={sortState}
+          onSort={handleSort}
+        />
 
         {/* Table Body */}
         <div>
-          {filteredAlerts.length === 0 ? (
+          {sortedAlerts.length === 0 ? (
             <div className="px-4 py-12 text-center text-sm text-muted-foreground">
               <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>No triggered alerts found</p>
             </div>
           ) : (
-            filteredAlerts.map((alert, idx) => {
+            sortedAlerts.map((alert, idx) => {
               const alertKey = `${alert.alertname}-${idx}`;
               const isExpanded = expandedRows.has(alertKey);
               
@@ -171,6 +187,18 @@ export function TriggeredAlertsTable({ showRegion = true }: TriggeredAlertsTable
         </div>
       </div>
 
+      {/* Pagination */}
+      {sortedAlerts.length > 0 && (
+        <div className="mt-4">
+          <TablePagination
+            currentPage={filters.page}
+            totalPages={totalPages}
+            totalItems={totalCount}
+            onPageChange={handlePageChange}
+            itemsPerPage={filters.pageSize}
+          />
+        </div>
+      )}
     </>
   );
 }

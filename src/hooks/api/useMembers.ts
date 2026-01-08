@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@/services/ApiClient';
 import { queryKeys } from '@/lib/queryKeys';
+import { queryClient } from '@/lib/queryClient';
 import type {
   UserMeResponse,
   UsersListResponse,
@@ -91,8 +92,6 @@ export function useCurrentUser(
  * Hook to prefetch users list
  */
 export function usePrefetchUsers() {
-  const { queryClient } = require('@/lib/queryClient');
-  
   return (params: UsersQueryParams = {}) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.users.list(params),

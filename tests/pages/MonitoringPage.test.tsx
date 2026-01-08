@@ -8,21 +8,26 @@ import MonitoringPage from '../../src/pages/MonitoringPage';
 
 // Mock the child components
 vi.mock('../../src/pages/AlertsPage', () => ({
-  default: ({ projectId, projectName, alertsUrl }: any) => (
+  default: ({ projectId, projectName, alertsUrl, initialSearchTerm, onSearchTermChange }: any) => (
     <div data-testid="alerts-page">
       <div data-testid="alerts-project-id">{projectId}</div>
       <div data-testid="alerts-project-name">{projectName}</div>
       <div data-testid="alerts-url">{alertsUrl || 'no-url'}</div>
+      <div data-testid="alerts-search-term">{initialSearchTerm || 'no-search'}</div>
     </div>
   ),
 }));
 
 vi.mock('../../src/components/tabs/TriggeredAlertsTab', () => ({
-  TriggeredAlertsTab: ({ projectId }: any) => (
+  TriggeredAlertsTab: ({ projectId, onShowAlertDefinition }: any) => (
     <div data-testid="triggered-alerts-tab">
       <div data-testid="triggered-alerts-project-id">{projectId}</div>
-      <div data-testid="triggered-alerts-project-name"></div>
-      <div data-testid="triggered-alerts-url">no-url</div>
+      <button 
+        data-testid="show-alert-definition-btn"
+        onClick={() => onShowAlertDefinition?.('test-alert')}
+      >
+        Show Alert Definition
+      </button>
     </div>
   ),
 }));
@@ -48,7 +53,7 @@ vi.mock('../../src/components/QuickFilterButtons', () => ({
 // Mock UI components
 vi.mock('../../src/components/ui/card', () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
-  CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
+  CardContent: ({ children, className }: any) => <div data-testid="card-content" className={className}>{children}</div>,
   CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
   CardTitle: ({ children }: any) => <div data-testid="card-title">{children}</div>,
 }));
@@ -62,9 +67,18 @@ vi.mock('../../src/hooks/api/useAlerts', () => ({
   })),
 }));
 
-vi.mock('../../src/hooks/useTriggeredAlertsFilters', () => ({
-  useTriggeredAlertsFilters: vi.fn(() => ({
+// Mock the TriggeredAlertsContext
+vi.mock('../../src/contexts/TriggeredAlertsContext', () => ({
+  TriggeredAlertsProvider: ({ children, projectId, onShowAlertDefinition }: any) => (
+    <div data-testid="triggered-alerts-provider" data-project-id={projectId}>
+      {children}
+    </div>
+  ),
+  useTriggeredAlertsContext: vi.fn(() => ({
+    totalCount: 5,
     filteredAlerts: [{ alertname: 'test-alert' }],
+    isLoading: false,
+    error: null,
   })),
 }));
 
@@ -116,7 +130,8 @@ describe('MonitoringPage', () => {
       });
 
       expect(screen.getByText('Monitoring')).toBeInTheDocument();
-      // The actual component doesn't have this description text
+      expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
+      expect(screen.getByTestId('triggered-alerts-provider')).toHaveAttribute('data-project-id', 'test-project-123');
     });
 
     it('should render with alertsUrl prop', () => {
@@ -131,6 +146,7 @@ describe('MonitoringPage', () => {
       );
 
       expect(screen.getByText('Monitoring')).toBeInTheDocument();
+      expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
     });
 
     it('should render without alertsUrl prop', () => {
@@ -139,6 +155,7 @@ describe('MonitoringPage', () => {
       });
 
       expect(screen.getByText('Monitoring')).toBeInTheDocument();
+      expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
     });
   });
 
@@ -170,7 +187,7 @@ describe('MonitoringPage', () => {
       });
 
       expect(screen.getByTestId('quick-filter-buttons')).toBeInTheDocument();
-      expect(screen.getByTestId('filter-button-triggered-alerts')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-button-alerts-history')).toBeInTheDocument();
       expect(screen.getByTestId('filter-button-alerts-definitions')).toBeInTheDocument();
     });
   });
@@ -181,7 +198,7 @@ describe('MonitoringPage', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByTestId('filter-button-triggered-alerts')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-button-alerts-history')).toBeInTheDocument();
       expect(screen.getByTestId('filter-button-alerts-definitions')).toBeInTheDocument();
     });
 
@@ -208,13 +225,13 @@ describe('MonitoringPage', () => {
   });
 
   describe('Filter State Management', () => {
-    it('should default to triggered-alerts tab', () => {
+    it('should default to alerts-history tab', () => {
       render(<MonitoringPage {...defaultProps} />, {
         wrapper: createWrapper(),
       });
 
-      const triggeredAlertsButton = screen.getByTestId('filter-button-triggered-alerts');
-      expect(triggeredAlertsButton).toHaveClass('active');
+      const alertsHistoryButton = screen.getByTestId('filter-button-alerts-history');
+      expect(alertsHistoryButton).toHaveClass('active');
     });
   });
 
@@ -250,8 +267,6 @@ describe('MonitoringPage', () => {
 
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
       expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
-      // Note: TriggeredAlertsTab only receives projectId, not projectName or alertsUrl
-      expect(screen.getByTestId('triggered-alerts-url')).toHaveTextContent('no-url');
     });
 
     it('should render TriggeredAlertsTab with correct projectId', () => {
@@ -262,6 +277,19 @@ describe('MonitoringPage', () => {
       // TriggeredAlertsTab should be rendered by default
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
       expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
+    });
+
+    it('should handle showAlertDefinition callback', () => {
+      render(<MonitoringPage {...defaultProps} />, {
+        wrapper: createWrapper(),
+      });
+
+      const showAlertBtn = screen.getByTestId('show-alert-definition-btn');
+      fireEvent.click(showAlertBtn);
+
+      // Should switch to alerts-definitions tab
+      expect(screen.getByTestId('alerts-page')).toBeInTheDocument();
+      expect(screen.getByTestId('alerts-search-term')).toHaveTextContent('test-alert');
     });
   });
 
@@ -277,10 +305,8 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
-      // Note: TriggeredAlertsTab doesn't receive projectName prop
-      expect(screen.getByTestId('triggered-alerts-project-name')).toHaveTextContent('');
+      expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
     });
 
     it('should handle different project IDs', () => {
@@ -294,7 +320,6 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('project-with-dashes-and-numbers-123');
     });
 
@@ -309,7 +334,6 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('');
     });
 
@@ -325,10 +349,8 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
-      // Note: TriggeredAlertsTab doesn't receive projectName prop
-      expect(screen.getByTestId('triggered-alerts-project-name')).toHaveTextContent('');
+      expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
     });
   });
 
@@ -373,9 +395,8 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
-      expect(screen.getByTestId('triggered-alerts-url')).toHaveTextContent('no-url');
+      expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
     });
 
     it('should handle special characters in URLs', () => {
@@ -390,10 +411,8 @@ describe('MonitoringPage', () => {
         }
       );
 
-      // By default, only TriggeredAlertsTab is rendered
       expect(screen.getByTestId('triggered-alerts-tab')).toBeInTheDocument();
-      // Note: TriggeredAlertsTab doesn't receive alertsUrl prop, so it always shows 'no-url'
-      expect(screen.getByTestId('triggered-alerts-url')).toHaveTextContent('no-url');
+      expect(screen.getByTestId('triggered-alerts-project-id')).toHaveTextContent('test-project-123');
     });
   });
 });

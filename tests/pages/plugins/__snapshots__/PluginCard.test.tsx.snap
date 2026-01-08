@@ -78,7 +78,7 @@ exports[`PluginCard > Snapshot > should match snapshot for non-owner view 1`] = 
         class="text-xs text-muted-foreground"
       >
         By 
-        test-user@example.com
+        Test User
       </span>
       <div
         class="flex items-center gap-1.5"
@@ -174,7 +174,7 @@ exports[`PluginCard > Snapshot > should match snapshot for pinned plugin 1`] = `
         class="text-xs text-muted-foreground"
       >
         By 
-        test-user@example.com
+        Test User
       </span>
       <div
         class="flex items-center gap-1.5"
@@ -335,7 +335,7 @@ exports[`PluginCard > Snapshot > should match snapshot for unpinned plugin as ow
         class="text-xs text-muted-foreground"
       >
         By 
-        test-user@example.com
+        Test User
       </span>
       <div
         class="flex items-center gap-1.5"

@@ -5,6 +5,7 @@ import {
   getTriggeredAlert,
   getAlertProjects,
   getTriggeredAlertsFilters,
+  TriggeredAlertsQueryParams,
 } from '@/services/triggeredAlertsApi';
 import type { TriggeredAlert, TriggeredAlertsResponse, TriggeredAlertsFiltersResponse } from '@/types/api';
 
@@ -15,18 +16,20 @@ import type { TriggeredAlert, TriggeredAlertsResponse, TriggeredAlertsFiltersRes
 /**
  * Hook to fetch triggered alerts for a specific project
  * @param projectname - The name of the project
+ * @param params - Optional query parameters for filtering and pagination
  * @param options - Additional query options
  */
 export function useTriggeredAlerts(
   projectname: string,
+  params?: TriggeredAlertsQueryParams,
   options?: Omit<
     UseQueryOptions<TriggeredAlertsResponse, Error>,
     'queryKey' | 'queryFn'
   >
 ): UseQueryResult<TriggeredAlertsResponse, Error> {
   return useQuery({
-    queryKey: queryKeys.triggeredAlerts.byProject(projectname),
-    queryFn: () => getTriggeredAlerts(projectname),
+    queryKey: queryKeys.triggeredAlerts.byProject(projectname, params),
+    queryFn: () => getTriggeredAlerts(projectname, params),
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes (alerts change frequently)
     enabled: !!projectname,
     ...options,

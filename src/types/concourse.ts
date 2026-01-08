@@ -25,7 +25,7 @@ export interface ConcourseLatestExecutionResponse {
   buildNumber: number;
 }
 
-export interface ConcourseJobsResponse extends ConcourseJobsByLandscape {}
+export type ConcourseJobsResponse = ConcourseJobsByLandscape;
 
 // Pipeline types
 export type PipelineType = 'landscape-update-pipeline' | 'landscape-monitoring-pipeline';

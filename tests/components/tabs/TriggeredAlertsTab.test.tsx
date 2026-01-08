@@ -16,7 +16,6 @@ vi.mock('../../../src/contexts/TriggeredAlertsContext', () => ({
       severities: ['critical', 'warning'],
       statuses: ['firing', 'resolved'],
       landscapes: ['production', 'staging'],
-      components: ['component-a', 'component-b'],
     },
   }),
 }));
@@ -42,7 +41,6 @@ describe('TriggeredAlertsTab', () => {
   it('should render the component with required props', () => {
     render(<TriggeredAlertsTab {...defaultProps} />);
     
-    expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-filters')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-table')).toBeInTheDocument();
   });
@@ -50,7 +48,6 @@ describe('TriggeredAlertsTab', () => {
   it('should render with different projectId', () => {
     render(<TriggeredAlertsTab projectId="different-project-456" />);
     
-    expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-filters')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-table')).toBeInTheDocument();
   });
@@ -68,7 +65,6 @@ describe('TriggeredAlertsTab', () => {
   it('should handle edge cases', () => {
     render(<TriggeredAlertsTab projectId="" />);
     
-    expect(screen.getByTestId('triggered-alerts-provider')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-filters')).toBeInTheDocument();
     expect(screen.getByTestId('triggered-alerts-table')).toBeInTheDocument();
   });

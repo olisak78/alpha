@@ -20,6 +20,10 @@ export interface PluginApiData {
   react_component_path?: string;
   backend_server_url?: string;
   owner: string;
+   metadata?: {                        
+    author_name?: string;        
+    [key: string]: any;                
+  };
   subscribed?: boolean; // Whether the current user is subscribed to this plugin
 }
 

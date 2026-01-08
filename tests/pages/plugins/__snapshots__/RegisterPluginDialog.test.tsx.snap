@@ -158,12 +158,7 @@ exports[`RegisterPluginDialog > Snapshot > should match snapshot 1`] = `
             data-testid="label-pluginBackendUrl"
             for="pluginBackendUrl"
           >
-            Backend URL 
-            <span
-              class="text-red-500"
-            >
-              *
-            </span>
+            Backend URL
           </label>
           <div>
             <div>
@@ -179,7 +174,7 @@ exports[`RegisterPluginDialog > Snapshot > should match snapshot 1`] = `
                 data-testid="tooltip-content"
               >
                 <p>
-                  URL to the plugin's backend server for API calls
+                  URL to the plugin's backend server for API calls (optional)
                 </p>
               </div>
             </div>

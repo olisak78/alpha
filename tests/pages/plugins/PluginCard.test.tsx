@@ -67,6 +67,7 @@ vi.mock('@/plugins/models/models', () => ({
 }));
 
 describe('PluginCard', () => {
+  // ✅ UPDATED: owner is now a user ID, added metadata with author_name
   const mockPlugin: PluginApiData = {
     id: 'plugin-1',
     name: 'test-plugin',
@@ -75,7 +76,10 @@ describe('PluginCard', () => {
     icon: 'TestIcon',
     category: 'Development',
     version: 'v1.0.0',
-    owner: 'test-user@example.com',
+    owner: 'user-123',                          // ✅ CHANGED: Now a user ID
+    metadata: {                                 // ✅ ADDED: Metadata with author name
+      author_name: 'Test User',
+    },
     subscribed: false,
   };
 
@@ -104,9 +108,10 @@ describe('PluginCard', () => {
       isPending: false,
     } as any);
 
+    // ✅ UPDATED: user.id matches plugin.owner
     vi.mocked(useAuthWithRole).mockReturnValue({
       user: {
-        id: 'user-1',
+        id: 'user-123',                         // ✅ CHANGED: Matches plugin.owner
         name: 'Test User',
         email: 'test-user@example.com',
         portal_admin: false,
@@ -213,7 +218,8 @@ describe('PluginCard', () => {
       expect(screen.getByText('v1.0.0')).toBeInTheDocument();
     });
 
-    it('should display plugin owner', () => {
+    // ✅ UPDATED: Display author name from metadata
+    it('should display plugin owner from metadata', () => {
       render(
         <PluginCard
           plugin={mockPlugin}
@@ -223,7 +229,22 @@ describe('PluginCard', () => {
         />
       );
 
-      expect(screen.getByText(/By test-user@example.com/)).toBeInTheDocument();
+      expect(screen.getByText(/By Test User/)).toBeInTheDocument();
+    });
+
+    // ✅ NEW: Test fallback to owner ID when metadata is missing
+    it('should display owner ID when metadata is missing', () => {
+      const pluginWithoutMetadata = { ...mockPlugin, metadata: undefined };
+      render(
+        <PluginCard
+          plugin={pluginWithoutMetadata}
+          onOpen={mockOnOpen}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      );
+
+      expect(screen.getByText(/By user-123/)).toBeInTheDocument();
     });
 
     it('should render pin icon', () => {
@@ -437,11 +458,12 @@ describe('PluginCard', () => {
   });
 
   describe('Permission-Based Actions', () => {
-    it('should show edit and delete buttons when user is plugin owner', async () => {
+    // ✅ UPDATED: Check by user.id matching plugin.owner
+    it('should show edit and delete buttons when user ID matches plugin owner', async () => {
       const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
       vi.mocked(useAuthWithRole).mockReturnValue({
         user: {
-          id: 'user-1',
+          id: 'user-123',                      // ✅ Matches plugin.owner
           name: 'Test User',
           email: 'test-user@example.com',
           portal_admin: false,
@@ -466,15 +488,15 @@ describe('PluginCard', () => {
       const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
       vi.mocked(useAuthWithRole).mockReturnValue({
         user: {
-          id: 'admin-1',
+          id: 'admin-123',                     // ✅ Different ID
           name: 'Admin User',
           email: 'admin@example.com',
-          portal_admin: true,
+          portal_admin: true,                  // ✅ But is admin
         },
         isLoading: false,
       } as any);
 
-      const otherUserPlugin = { ...mockPlugin, owner: 'other-user@example.com' };
+      const otherUserPlugin = { ...mockPlugin, owner: 'other-user-456' };  // ✅ Different owner
       render(
         <PluginCard
           plugin={otherUserPlugin}
@@ -488,11 +510,12 @@ describe('PluginCard', () => {
       expect(screen.getByTestId('trash-icon')).toBeInTheDocument();
     });
 
-    it('should hide edit and delete buttons when user is not owner and not admin', async () => {
+    // ✅ UPDATED: Check by user.id not matching plugin.owner
+    it('should hide edit and delete buttons when user ID does not match owner and not admin', async () => {
       const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
       vi.mocked(useAuthWithRole).mockReturnValue({
         user: {
-          id: 'user-2',
+          id: 'user-999',                      // ✅ Different ID
           name: 'Other User',
           email: 'other-user@example.com',
           portal_admin: false,
@@ -533,55 +556,8 @@ describe('PluginCard', () => {
       expect(screen.queryByTestId('trash-icon')).not.toBeInTheDocument();
     });
 
-    it('should match owner by user name', async () => {
-      const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
-      vi.mocked(useAuthWithRole).mockReturnValue({
-        user: {
-          id: 'user-1',
-          name: 'test-user@example.com',
-          email: 'different@example.com',
-          portal_admin: false,
-        },
-        isLoading: false,
-      } as any);
-
-      render(
-        <PluginCard
-          plugin={mockPlugin}
-          onOpen={mockOnOpen}
-          onEdit={mockOnEdit}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
-      expect(screen.getByTestId('trash-icon')).toBeInTheDocument();
-    });
-
-    it('should match owner by user email', async () => {
-      const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
-      vi.mocked(useAuthWithRole).mockReturnValue({
-        user: {
-          id: 'user-1',
-          name: 'Different Name',
-          email: 'test-user@example.com',
-          portal_admin: false,
-        },
-        isLoading: false,
-      } as any);
-
-      render(
-        <PluginCard
-          plugin={mockPlugin}
-          onOpen={mockOnOpen}
-          onEdit={mockOnEdit}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
-      expect(screen.getByTestId('trash-icon')).toBeInTheDocument();
-    });
+    // ✅ REMOVED: No longer matching by name
+    // ✅ REMOVED: No longer matching by email
   });
 
   describe('Action Buttons', () => {
@@ -816,7 +792,7 @@ describe('PluginCard', () => {
         name: 'minimal',
         title: 'Minimal',
         description: '',
-        owner: 'owner@example.com',
+        owner: 'owner-123',                    // ✅ CHANGED: User ID
       };
 
       render(
@@ -832,6 +808,7 @@ describe('PluginCard', () => {
       expect(screen.getByText('No description provided')).toBeInTheDocument();
       expect(screen.getByText('Development')).toBeInTheDocument(); // Default category
       expect(screen.getByText('v1.0.0')).toBeInTheDocument(); // Default version
+      expect(screen.getByText(/By owner-123/)).toBeInTheDocument(); // ✅ Shows owner ID when no metadata
     });
 
     it('should handle very long title', () => {
@@ -947,7 +924,7 @@ describe('PluginCard', () => {
       const { useAuthWithRole } = await import('@/hooks/useAuthWithRole');
       vi.mocked(useAuthWithRole).mockReturnValue({
         user: {
-          id: 'user-2',
+          id: 'user-999',                      // ✅ Different ID
           name: 'Other User',
           email: 'other@example.com',
           portal_admin: false,

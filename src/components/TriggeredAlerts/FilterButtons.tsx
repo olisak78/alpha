@@ -40,36 +40,41 @@ export function FilterButtons({
     // Use context if available
     if (contextActions && contextFilters) {
       switch (filterType) {
-        case 'severity':
+        case 'severity': {
           const currentSeverity = contextFilters.selectedSeverity || [];
           if (!currentSeverity.includes(value)) {
             contextActions.setSelectedSeverity([...currentSeverity, value]);
           }
           break;
-        case 'status':
+        }
+        case 'status': {
           const currentStatus = contextFilters.selectedStatus || [];
           if (!currentStatus.includes(value)) {
             contextActions.setSelectedStatus([...currentStatus, value]);
           }
           break;
-        case 'landscape':
+        }
+        case 'landscape': {
           const currentLandscape = contextFilters.selectedLandscape || [];
           if (!currentLandscape.includes(value)) {
             contextActions.setSelectedLandscape([...currentLandscape, value]);
           }
           break;
-        case 'region':
+        }
+        case 'region': {
           const currentRegion = contextFilters.selectedRegion || [];
           if (!currentRegion.includes(value)) {
             contextActions.setSelectedRegion([...currentRegion, value]);
           }
           break;
-        case 'component':
+        }
+        case 'component': {
           const currentComponent = contextFilters.selectedComponent || [];
           if (!currentComponent.includes(value)) {
             contextActions.setSelectedComponent([...currentComponent, value]);
           }
           break;
+        }
         case 'alertname':
           contextActions.setSearchTerm(value);
           break;

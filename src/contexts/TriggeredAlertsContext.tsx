@@ -18,6 +18,11 @@ interface TriggeredAlertsContextValue {
   filtersLoading: boolean;
   // Error state
   error: Error | null;
+  // Pagination info
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
   // Applied filters logic
   appliedFilters: AppliedFilter[];
   // Function to show alert definition
@@ -32,7 +37,7 @@ export interface AppliedFilter {
   isExclusion?: boolean;
 }
 
-const TriggeredAlertsContext = createContext<TriggeredAlertsContextValue | undefined>(undefined);
+export const TriggeredAlertsContext = createContext<TriggeredAlertsContextValue | undefined>(undefined);
 
 interface TriggeredAlertsProviderProps {
   children: ReactNode;
@@ -203,6 +208,10 @@ export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefini
       {children}
     </TriggeredAlertsContext.Provider>
   );
+}
+
+export function useOptionalTriggeredAlertsContext() {
+  return useContext(TriggeredAlertsContext);
 }
 
 export function useTriggeredAlertsContext() {

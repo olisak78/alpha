@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "lint_sarif": "eslint -f @microsoft/eslint-formatter-sarif -o eslint-results.sarif 'src/**/*.{js,ts,jsx,tsx}'",
+    "lint_sarif": "./scripts/run-lint-sarif.sh",
     "preview": "vite preview",
     "get": "npm install --no-save --registry=https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm --proxy=null",
     "test": "vitest run",

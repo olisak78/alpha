@@ -176,8 +176,8 @@ export const queryKeys = {
   triggeredAlerts: {
     all: ['triggered-alerts'] as const,
     projects: () => [...queryKeys.triggeredAlerts.all, 'projects'] as const,
-    byProject: (projectname: string) => 
-      [...queryKeys.triggeredAlerts.all, 'by-project', projectname] as const,
+    byProject: (projectname: string, params?: Record<string, any>) => 
+      [...queryKeys.triggeredAlerts.all, 'by-project', projectname, params] as const,
     detail: (projectname: string, fingerprint: string) =>
       [...queryKeys.triggeredAlerts.all, 'detail', projectname, fingerprint] as const,
     filters: (projectname: string) =>

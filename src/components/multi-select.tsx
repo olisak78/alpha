@@ -33,7 +33,13 @@ export function MultiSelect({
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false)
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: string, event?: React.MouseEvent) => {
+    // Prevent event bubbling to parent popovers
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    
     if (!Array.isArray(selected)) {
       onChange([value])
       return
@@ -66,7 +72,7 @@ export function MultiSelect({
   }, [selected, placeholder, maxDisplay])
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"

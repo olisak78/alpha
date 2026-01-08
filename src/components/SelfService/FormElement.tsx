@@ -83,7 +83,7 @@ export const FormElement = ({ element, value, onChange }: FormElementProps) => {
         </div>
       );
 
-    case 'radio':
+    case 'radio': {
       // Find which option is currently selected based on the stored value
       const selectedOption = element.options?.find((opt: any) => opt.value === currentValue);
       const selectedId = selectedOption?.id || element.defaultValue?.id || '';
@@ -111,9 +111,10 @@ export const FormElement = ({ element, value, onChange }: FormElementProps) => {
           </RadioGroup>
         </div>
       );
+    }
 
     case 'text':
-    default:
+    default: {
       const isClusterName = elementId === 'ClusterName';
       return (
         <div className="space-y-2">
@@ -132,5 +133,6 @@ export const FormElement = ({ element, value, onChange }: FormElementProps) => {
           )}
         </div>
       );
+    }
   }
 };

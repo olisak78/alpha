@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@/services/ApiClient';
 import { queryKeys } from '@/lib/queryKeys';
+import { queryClient } from '@/lib/queryClient';
 import type {
   Organization,
   OrganizationListResponse,
@@ -102,8 +103,6 @@ export function useOrganizationByName(
  * Hook to prefetch organizations list
  */
 export function usePrefetchOrganizations() {
-  const { queryClient } = require('@/lib/queryClient');
-  
   return (params?: PaginationParams) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.organizations.list(params),
@@ -116,8 +115,6 @@ export function usePrefetchOrganizations() {
  * Hook to prefetch a specific organization
  */
 export function usePrefetchOrganization() {
-  const { queryClient } = require('@/lib/queryClient');
-  
   return (id: string) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.organizations.detail(id),

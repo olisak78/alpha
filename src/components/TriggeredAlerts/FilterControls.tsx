@@ -3,8 +3,8 @@ import { DateRangeCalendar } from '@/components/DateRangeCalendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { memo } from 'react';
-import { useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
+import { memo, useState } from 'react';
+import { useOptionalTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
 import { MultiSelect, MultiSelectOption } from '@/components/multi-select';
 
 export interface FilterControlConfig {
@@ -20,13 +20,10 @@ interface FilterControlsProps {
 }
 
 export const FilterControls = memo(function FilterControls({ filterConfigs }: FilterControlsProps) {
-  // Get context data if available (for TriggeredAlertsFilters)
-  let contextData = null;
-  try {
-    contextData = useTriggeredAlertsContext();
-  } catch {
-    // Context not available, will use filterConfigs
-  }
+  const [isDateRangeOpen, setIsDateRangeOpen] = useState(false);
+
+  // Get context data if available (for TriggeredFilters)
+  const contextData = useOptionalTriggeredAlertsContext();
 
   // Use provided configs or build from context
   const configs = filterConfigs || (contextData ? [
@@ -35,16 +32,29 @@ export const FilterControls = memo(function FilterControls({ filterConfigs }: Fi
     { type: 'status' as const, label: 'Status', options: contextData.options.statuses, selected: contextData.filters.selectedStatus, onChange: contextData.actions.setSelectedStatus },
     { type: 'landscape' as const, label: 'Landscape', options: contextData.options.landscapes, selected: contextData.filters.selectedLandscape, onChange: contextData.actions.setSelectedLandscape },
     { type: 'region' as const, label: 'Region', options: contextData.options.regions, selected: contextData.filters.selectedRegion, onChange: contextData.actions.setSelectedRegion },
-    { type: 'component' as const, label: 'Component', options: contextData.options.components, selected: contextData.filters.selectedComponent, onChange: contextData.actions.setSelectedComponent },
   ] : []);
+
+  const handleDateRangeSelect = (range: any) => {
+    if (!contextData) return;
+    contextData.actions.handleDateRangeSelect(range);
+    // Only close when we have a complete range (both from and to dates)
+    if (range?.from && range?.to && range.from.getTime() !== range.to.getTime()) {
+      setIsDateRangeOpen(false);
+    }
+  };
 
   const renderTimeRangeFilter = () => {
     if (!contextData) return null;
-    
+
+    const selectedDateRange = {
+      from: contextData.filters.startDate ? new Date(contextData.filters.startDate) : undefined,
+      to: contextData.filters.endDate ? new Date(contextData.filters.endDate) : undefined,
+    };
+
     return (
       <div>
         <label className="text-sm font-medium text-foreground mb-2 block">Time Range</label>
-        <Popover>
+        <Popover modal={false} open={isDateRangeOpen} onOpenChange={setIsDateRangeOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -64,11 +74,8 @@ export const FilterControls = memo(function FilterControls({ filterConfigs }: Fi
             <DateRangeCalendar
               mode="range"
               defaultMonth={contextData.filters.startDate ? new Date(contextData.filters.startDate) : new Date()}
-              selected={{
-                from: contextData.filters.startDate ? new Date(contextData.filters.startDate) : undefined,
-                to: contextData.filters.endDate ? new Date(contextData.filters.endDate) : undefined,
-              }}
-              onSelect={contextData.actions.handleDateRangeSelect}
+              selected={selectedDateRange}
+              onSelect={handleDateRangeSelect}
               numberOfMonths={1}
             />
           </PopoverContent>
@@ -79,7 +86,7 @@ export const FilterControls = memo(function FilterControls({ filterConfigs }: Fi
 
   const renderMultiSelectFilter = (config: FilterControlConfig) => {
     if (!config.options || config.options.length === 0) return null;
-    
+
     return (
       <div>
         <label className="text-sm font-medium text-foreground mb-2 block">{config.label}</label>
@@ -99,7 +106,7 @@ export const FilterControls = memo(function FilterControls({ filterConfigs }: Fi
   // Separate time range from other filters
   const hasTimeRange = configs.some(c => c.type === 'timeRange');
   const otherConfigs = configs.filter(c => c.type !== 'timeRange');
-  
+
   // Split other configs into pairs for 2-column layout
   const configPairs: FilterControlConfig[][] = [];
   for (let i = 0; i < otherConfigs.length; i += 2) {

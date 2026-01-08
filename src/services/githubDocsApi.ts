@@ -77,7 +77,7 @@ export async function fetchGitHubDirectory(
   const fullPath = path ? `${config.docsPath}/${path}` : config.docsPath;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   return apiClient.get<GitHubContent[]>(url, {
     params: { ref: config.branch }
@@ -151,7 +151,7 @@ export async function fetchGitHubFile(
   const fullPath = path.startsWith(config.docsPath) ? path : `${config.docsPath}/${path}`;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   const data = await apiClient.get<GitHubContent>(url, {
     params: { ref: config.branch }
@@ -178,7 +178,7 @@ export async function fetchGitHubFileWithMetadata(
   const fullPath = path.startsWith(config.docsPath) ? path : `${config.docsPath}/${path}`;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   const data = await apiClient.get<GitHubContent>(url, {
     params: { ref: config.branch }
@@ -373,7 +373,7 @@ export async function createGitHubFile(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${filePath}`;
-  const url = `/github/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   return apiClient.post(url, {
     message: commitMessage,
@@ -413,7 +413,7 @@ export async function deleteGitHubFile(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${filePath}`;
-  const url = `/github/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   // Pass body as second parameter to delete method
   return apiClient.delete(
@@ -438,7 +438,7 @@ export async function deleteGitHubFolder(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${folderPath}`;
-  const url = `/github/repos/${config.owner}/${config.repo}/folders/${fullPath}`;
+  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/folders/${fullPath}`;
 
   return apiClient.delete(
     url,

@@ -2,12 +2,46 @@ import { apiClient } from './ApiClient';
 import { TriggeredAlert, TriggeredAlertsResponse, TriggeredAlertsLabelUpdatePayload, TriggeredAlertsFiltersResponse } from '../types/api';
 
 /**
+ * Query parameters for triggered alerts API
+ */
+export interface TriggeredAlertsQueryParams {
+  page?: number;
+  pageSize?: number;
+  severity?: string;
+  region?: string;
+  landscape?: string;
+  status?: string;
+  alertname?: string;
+  start_time?: string;
+  end_time?: string;
+}
+
+/**
  * Get triggered alerts for a specific project
  * @param projectname - The name of the project
+ * @param params - Optional query parameters for filtering and pagination
  * @returns Promise<TriggeredAlertsResponse> - List of triggered alerts for the project
  */
-export async function getTriggeredAlerts(projectname: string): Promise<TriggeredAlertsResponse> {
-  return apiClient.get<TriggeredAlertsResponse>(`/alert-storage/alerts/${projectname}`);
+export async function getTriggeredAlerts(
+  projectname: string, 
+  params?: TriggeredAlertsQueryParams
+): Promise<TriggeredAlertsResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params) {
+    if (params.page !== undefined) queryParams.append('page', params.page.toString());
+    if (params.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());
+    if (params.severity) queryParams.append('severity', params.severity);
+    if (params.region) queryParams.append('region', params.region);
+    if (params.landscape) queryParams.append('landscape', params.landscape);
+    if (params.status) queryParams.append('status', params.status);
+    if (params.alertname) queryParams.append('alertname', params.alertname);
+    if (params.start_time) queryParams.append('start_time', params.start_time);
+    if (params.end_time) queryParams.append('end_time', params.end_time);
+  }
+  
+  const url = `/alert-storage/alerts/${projectname}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  return apiClient.get<TriggeredAlertsResponse>(url);
 }
 
 /**

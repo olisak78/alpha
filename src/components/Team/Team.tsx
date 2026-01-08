@@ -190,8 +190,9 @@ export default function Team({
       return;
     }
 
-    // Look up the project by project_id to get the correct project.name
-    const project = projects.find(p => p.id === component.project_id);
+    // Look up the project by projectId to get the correct project.name
+    const compProjectId = (component as any).projectId ?? (component as any).project_id;
+    const project = projects.find(p => p.id === compProjectId);
     
     if (!project) {
       toast({
@@ -205,6 +206,10 @@ export default function Team({
     navigate(`/${project.name}/component/${componentName}`);
   };
 
+  const projectIdForProvider = useMemo(() => {
+    const c = teamComponents.componentsData?.components?.[0];
+    return (c as any)?.projectId ?? (c as any)?.project ?? '';
+  }, [teamComponents.componentsData]);
 
   return (
     <main className="space-y-6 px-6 pt-4">
@@ -241,17 +246,14 @@ export default function Team({
             />
 
             {/* Hidden sections moved to bottom */}
-            {false && (
-              <div>
+            {/* <div>
                 <OnDutyAndCall
                   dayMember={scheduleData.todayAssignments.dayMember}
                   nightMember={scheduleData.todayAssignments.nightMember}
                 />
-              </div>
-            )}
+              </div> */}
 
-            {false && (
-              <div>
+            {/* <div>
                 <ScoreBoards
                   jiraTop3={scoreboardData.jiraTop3}
                   gitTop3={scoreboardData.gitTop3}
@@ -259,8 +261,7 @@ export default function Team({
                   crossTeamRows={scoreboardData.crossTeamRows}
                   scoreWeights={scoreboardData.scoreWeights}
                 />
-              </div>
-            )}
+              </div> */}
 
             <div className="mt-4">
               <Card className="border-slate-200 dark:border-slate-700">
@@ -280,6 +281,7 @@ export default function Team({
 
         {activeCommonTab === "components" && (
           <ComponentDisplayProvider
+            projectId={projectIdForProvider}
             selectedLandscape={null}
             selectedLandscapeData={null}
             isCentralLandscape={false}

@@ -200,9 +200,7 @@ export function validateForm(data: RegistrationFormData): RegistrationFormErrors
     errors.bundleUrl = 'Please enter a valid URL';
   }
 
-  if (!data.backendUrl || data.backendUrl.trim() === '') {
-    errors.backendUrl = 'Backend URL is required';
-  } else if (!isValidUrl(data.backendUrl)) {
+ if (data.backendUrl && data.backendUrl.trim() !== '' && !isValidUrl(data.backendUrl)) {
     errors.backendUrl = 'Please enter a valid URL';
   }
 

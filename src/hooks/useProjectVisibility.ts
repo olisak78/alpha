@@ -52,7 +52,11 @@ export const useProjectVisibility = () => {
 
   // Update visibility for multiple projects
   const updateProjectVisibility = useCallback((visibilitySettings: ProjectVisibilitySettings) => {
-    saveVisibilitySettings(visibilitySettings);
+    try {
+      saveVisibilitySettings(visibilitySettings);
+    } catch (error) {
+      console.warn('Failed to save project visibility settings:', error);
+    }
     
     // Trigger a re-render by updating the projects context if needed
     // This could be enhanced to trigger a context update

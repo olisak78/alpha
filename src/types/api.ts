@@ -1228,6 +1228,10 @@ export interface TriggeredAlert {
  */
 export interface TriggeredAlertsResponse {
   data: TriggeredAlert[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
 }
 
 interface AlertLabel {

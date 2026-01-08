@@ -109,11 +109,11 @@ describe('AlertExpandedView', () => {
       expect(screen.getByText('Ended:')).toBeInTheDocument();
 
       // Check for the actual formatted date-time strings (UTC)
-      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
-      expect(screen.getByText('01/12/2023 11:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 10:00:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 11:00:00')).toBeInTheDocument();
 
-      const startDateElement = screen.getByText('01/12/2023 10:00');
-      const endDateElement = screen.getByText('01/12/2023 11:00');
+      const startDateElement = screen.getByText('01/12/2023 10:00:00');
+      const endDateElement = screen.getByText('01/12/2023 11:00:00');
 
       [startDateElement, endDateElement].forEach(element => {
         expect(element).toHaveClass(
@@ -129,8 +129,8 @@ describe('AlertExpandedView', () => {
 
       expect(screen.getByText('Started:')).toBeInTheDocument();
       expect(screen.queryByText('Ended:')).not.toBeInTheDocument();
-      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
-      expect(screen.queryByText('01/12/2023 01:00')).not.toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 10:00:00')).toBeInTheDocument();
+      expect(screen.queryByText('01/12/2023 01:00:00')).not.toBeInTheDocument();
     });
   });
 
@@ -299,8 +299,8 @@ describe('AlertExpandedView', () => {
       expect(statusBadge).toBeInTheDocument();
 
       // Date formatting applied - check for actual formatted date-time strings (UTC)
-      expect(screen.getByText('01/12/2023 10:00')).toBeInTheDocument();
-      expect(screen.getByText('01/12/2023 11:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 10:00:00')).toBeInTheDocument();
+      expect(screen.getByText('01/12/2023 11:00:00')).toBeInTheDocument();
     });
   });
 });

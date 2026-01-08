@@ -144,7 +144,7 @@ describe('useUpdateTriggeredAlertLabel', () => {
 
     // Should invalidate both the project alerts list and the specific alert detail
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: ['triggered-alerts', 'by-project', projectname],
+      queryKey: ['triggered-alerts', 'by-project', projectname, undefined],
     });
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: ['triggered-alerts', 'detail', projectname, fingerprint],

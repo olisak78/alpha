@@ -157,7 +157,7 @@ export default function PluginMarketplacePage() {
 
     try {
       const payload = {
-        backend_server_url: editFormData.backendUrl.trim(),
+        backend_server_url: editFormData.backendUrl.trim() || null,
         description: editFormData.description.trim(),
         icon: editingPlugin.icon || 'Puzzle',
         name: editFormData.name.trim(),
@@ -386,7 +386,7 @@ export default function PluginMarketplacePage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="editPluginBackendUrl">
-                  Backend URL <span className="text-red-500">*</span>
+                  Backend URL 
                 </Label>
                 <TooltipProvider>
                   <Tooltip>
@@ -394,7 +394,7 @@ export default function PluginMarketplacePage() {
                       <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>URL to the plugin's backend server for API calls</p>
+                      <p>URL to the plugin's backend server for API calls (optional)</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

@@ -132,7 +132,7 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
     const extendedMember: ExtendedMember = {
       ...member,
       room: "", // Sample data
-      managerName:  manager || "N/A",
+      managerName:  manager,
       birthDate: "", // Sample data (March 15, no year)
     };
     
@@ -153,7 +153,7 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
       const extendedManagerMember: ExtendedMember = {
         ...managerMember,
         room: "", // Sample data
-        managerName: manager || "N/A",
+        managerName: manager,
         birthDate: "", // Sample data
       };
       

@@ -123,10 +123,11 @@ export function useJiraFiltering({ teamName }: UseJiraFilteringProps = {}) {
       case "updated_asc":
         list.sort((a, b) => (a.fields?.updated || "").localeCompare(b.fields?.updated || ""));
         break;
-      case "priority":
+      case "priority": {
         const order: Record<string, number> = { Blocker: 1, Critical: 2, High: 3, Medium: 4, Low: 5 } as const;
         list.sort((a, b) => (order[a.fields?.priority?.name || ""] || 99) - (order[b.fields?.priority?.name || ""] || 99));
         break;
+      }
       case "updated_desc":
       default:
         list.sort((a, b) => (b.fields?.updated || "").localeCompare(a.fields?.updated || ""));

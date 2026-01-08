@@ -208,7 +208,7 @@ export default function JiraIssuesTab() {
           aValue = new Date(a.fields?.updated || 0).getTime();
           bValue = new Date(b.fields?.updated || 0).getTime();
           break;
-        case 'priority':
+        case 'priority': {
           const priorityOrder: Record<string, number> = {
             'highest': 1,
             'critical': 1,
@@ -220,6 +220,7 @@ export default function JiraIssuesTab() {
           aValue = priorityOrder[a.fields?.priority?.name?.toLowerCase() || ''] || 99;
           bValue = priorityOrder[b.fields?.priority?.name?.toLowerCase() || ''] || 99;
           break;
+        }
       }
 
       if (order === 'desc') {

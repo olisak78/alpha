@@ -5,9 +5,10 @@ import AlertsPage from '@/pages/AlertsPage';
 import { TriggeredAlertsTab } from '@/components/tabs/TriggeredAlertsTab';
 import { AlertTriangle, Settings } from 'lucide-react';
 import { useAlerts } from '@/hooks/api/useAlerts';
-import { useTriggeredAlertsFilters } from '@/hooks/useTriggeredAlertsFilters';
+import { TriggeredAlertsProvider, useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
 
-type MonitoringTabType = 'alerts-definitions' | 'triggered-alerts';
+
+type MonitoringTabType = 'alerts-definitions' | 'alerts-history';
 
 interface MonitoringPageProps {
   projectId: string;
@@ -15,8 +16,9 @@ interface MonitoringPageProps {
   alertsUrl?: string;
 }
 
-export default function MonitoringPage({ projectId, projectName, alertsUrl }: MonitoringPageProps) {
-  const [activeTab, setActiveTab] = useState<MonitoringTabType>('triggered-alerts');
+// Inner component that can access the triggered alerts context
+function MonitoringPageContent({ projectId, projectName, alertsUrl }: MonitoringPageProps) {
+  const [activeTab, setActiveTab] = useState<MonitoringTabType>('alerts-history');
   const [alertSearchTerm, setAlertSearchTerm] = useState<string>('');
 
   // Function to switch to alerts definitions tab with search term
@@ -28,8 +30,8 @@ export default function MonitoringPage({ projectId, projectName, alertsUrl }: Mo
   // Fetch alerts data to get count
   const { data: alertsData } = useAlerts(projectId);
 
-  // Fetch triggered alerts data to get count
-  const { filteredAlerts } = useTriggeredAlertsFilters(projectId);
+  // Get triggered alerts count from context
+  const { totalCount } = useTriggeredAlertsContext();
 
   // Calculate alert counts
   const alertsCount = useMemo(() => {
@@ -39,13 +41,11 @@ export default function MonitoringPage({ projectId, projectName, alertsUrl }: Mo
     }, 0);
   }, [alertsData]);
 
-  const triggeredAlertsCount = filteredAlerts.length;
-
   // Filter options for monitoring tabs with counts
-  const monitoringFilterOptions: FilterOption<MonitoringTabType>[] = [
+  const monitoringFilterOptions: FilterOption<MonitoringTabType>[] = useMemo(() => [
     {
-      value: "triggered-alerts",
-      label: `Triggered Alerts${triggeredAlertsCount > 0 ? ` (${triggeredAlertsCount})` : ''}`,
+      value: "alerts-history",
+      label: `Alerts History ${` (${totalCount})`}`,
       icon: AlertTriangle
     },
     {
@@ -53,7 +53,7 @@ export default function MonitoringPage({ projectId, projectName, alertsUrl }: Mo
       label: `Alerts Definitions${alertsCount > 0 ? ` (${alertsCount})` : ''}`,
       icon:  Settings
     },
-  ];
+  ], [totalCount, alertsCount]);
 
   return (
     <div>
@@ -76,7 +76,7 @@ export default function MonitoringPage({ projectId, projectName, alertsUrl }: Mo
           <CardContent className='pt-6'>
             {/* Tab Content */}
 
-            {activeTab === 'triggered-alerts' && (
+            {activeTab === 'alerts-history' && (
               <TriggeredAlertsTab
                 projectId={projectId}
                 onShowAlertDefinition={showAlertDefinition}
@@ -96,5 +96,13 @@ export default function MonitoringPage({ projectId, projectName, alertsUrl }: Mo
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function MonitoringPage(props: MonitoringPageProps) {
+  return (
+    <TriggeredAlertsProvider projectId={props.projectId} onShowAlertDefinition={() => {}}>
+      <MonitoringPageContent {...props} />
+    </TriggeredAlertsProvider>
   );
 }

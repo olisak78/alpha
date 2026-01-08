@@ -9,14 +9,7 @@ import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import "rapidoc";
 
-// Extend JSX IntrinsicElements to include rapi-doc
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'rapi-doc': any;
-        }
-    }
-}
+const RapiDoc: any = 'rapi-doc';
 
 interface ComponentViewApiProps {
     isLoading: boolean;
@@ -129,7 +122,7 @@ export function ComponentViewApi({ isLoading, error, swaggerData }: ComponentVie
             {/* Conditional Rendering: RapiDoc or Swagger UI */}
             {useRapiDoc ? (
                 <div className="rapidoc-container">
-                    <rapi-doc
+                    <RapiDoc
                         ref={rapiDocRef}
                         spec={JSON.stringify(schema)}
                         theme="light"

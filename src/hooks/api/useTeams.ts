@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@/services/ApiClient';
 import { queryKeys } from '@/lib/queryKeys';
+import { queryClient } from '@/lib/queryClient';
 import type {
   Team,
   TeamListResponse,
@@ -125,8 +126,6 @@ export function useTeamById(
  * Hook to prefetch teams data
  */
 export function usePrefetchTeams() {
-  const { queryClient } = require('@/lib/queryClient');
-  
   return (params?: TeamQueryParams) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.teams.list(params),
@@ -139,8 +138,6 @@ export function usePrefetchTeams() {
  * Hook to prefetch a specific team
  */
 export function usePrefetchTeam() {
-  const { queryClient } = require('@/lib/queryClient');
-  
   return (name: string) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.teams.detail(name),

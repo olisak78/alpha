@@ -85,7 +85,7 @@ const createMockTriggeredAlert = (overrides?: any) => ({
 });
 
 const createMockTriggeredAlertsResponse = (overrides?: any) => ({
-  alerts: [
+  data: [
     createMockTriggeredAlert(),
     createMockTriggeredAlert({ 
       fingerprint: 'alert-fingerprint-456', 
@@ -93,6 +93,10 @@ const createMockTriggeredAlertsResponse = (overrides?: any) => ({
       severity: 'critical'
     })
   ],
+  page: 1,
+  pageSize: 50,
+  totalCount: 2,
+  totalPages: 1,
   ...overrides,
 });
 
@@ -130,8 +134,8 @@ describe('useTriggeredAlerts', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toEqual(mockResponse);
-    expect(result.current.data?.alerts).toHaveLength(2);
-    expect(getTriggeredAlerts).toHaveBeenCalledWith(projectname);
+    expect(result.current.data?.data).toHaveLength(2);
+    expect(getTriggeredAlerts).toHaveBeenCalledWith(projectname, undefined);
   });
 
   it('should not fetch when projectname is empty', async () => {
@@ -172,7 +176,7 @@ describe('useTriggeredAlerts', () => {
   it('should return empty alerts array when no data', async () => {
     const projectname = 'test-project';
     const mockResponse = createMockTriggeredAlertsResponse({
-      alerts: [],
+      data: [],
     });
 
     vi.mocked(getTriggeredAlerts).mockResolvedValue(mockResponse);
@@ -183,7 +187,7 @@ describe('useTriggeredAlerts', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.alerts).toHaveLength(0);
+    expect(result.current.data?.data).toHaveLength(0);
   });
 
   it('should use correct stale time (2 minutes)', async () => {

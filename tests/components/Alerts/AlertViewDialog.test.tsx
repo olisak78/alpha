@@ -136,8 +136,8 @@ describe('AlertViewDialog Component', () => {
       expect(screen.getByText('Time Information')).toBeInTheDocument();
       expect(screen.getByText('Started:')).toBeInTheDocument();
       expect(screen.getByText('Ended:')).toBeInTheDocument();
-      expect(screen.getByText('14/12/2023 10:00')).toBeInTheDocument();
-      expect(screen.getByText('14/12/2023 10:30')).toBeInTheDocument();
+      expect(screen.getByText('14/12/2023 10:00:00')).toBeInTheDocument();
+      expect(screen.getByText('14/12/2023 10:30:00')).toBeInTheDocument();
 
       // Annotations (without header)
       expect(screen.queryByText('Annotations')).not.toBeInTheDocument();

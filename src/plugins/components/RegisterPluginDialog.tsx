@@ -69,10 +69,10 @@ export default function RegisterPluginDialog({ onSuccess }: RegisterPluginDialog
 
     try {
       const payload = {
-        backend_server_url: formData.backendUrl.trim(),
+        backend_server_url: formData.backendUrl.trim() || null,
         description: formData.description.trim(),
         icon: 'Puzzle',
-        metadata: {},
+        metadata: {author_name: user?.name || ''},
         name: formData.name.trim(),
         owner: user?.id || 'Unknown',
         react_component_path: formData.bundleUrl.trim(),
@@ -227,7 +227,7 @@ export default function RegisterPluginDialog({ onSuccess }: RegisterPluginDialog
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Label htmlFor="pluginBackendUrl">
-                Backend URL <span className="text-red-500">*</span>
+                Backend URL 
               </Label>
               <TooltipProvider>
                 <Tooltip>
@@ -235,7 +235,7 @@ export default function RegisterPluginDialog({ onSuccess }: RegisterPluginDialog
                     <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>URL to the plugin's backend server for API calls</p>
+                    <p>URL to the plugin's backend server for API calls (optional)</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
