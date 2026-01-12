@@ -8,6 +8,10 @@ export interface SelfServiceDialog {
   category?: string;
   dialogType: 'dynamic' | 'static';
   dataFilePath: string;
+  jenkinsJob?: {
+    jaasName: string;
+    jobName: string;
+  };
 }
 
 export const selfServiceBlocks: SelfServiceDialog[] = [
@@ -18,7 +22,11 @@ export const selfServiceBlocks: SelfServiceDialog[] = [
     icon: Monitor,
     category: "Infrastructure",
     dialogType: "static",
-    dataFilePath: "/data/self-service/static-jobs/create-dev-landscape.json"
+    dataFilePath: "/data/self-service/static-jobs/create-dev-landscape.json",
+    jenkinsJob: {
+      jaasName: "atom",
+      jobName: "deploy-dev-landscape"
+    }
   },
   {
     id: "create-multicis",
@@ -27,7 +35,11 @@ export const selfServiceBlocks: SelfServiceDialog[] = [
     icon: Cloud,
     category: "Infrastructure",
     dialogType: "dynamic",
-    dataFilePath: "/data/self-service/dynamic-jobs/multi-cis-environment.json"
+    dataFilePath: "/data/self-service/dynamic-jobs/multi-cis-environment.json",
+    jenkinsJob: {
+      jaasName: "atom",
+      jobName: "multi-cis-v3-create"
+    }
   },
   {
     id: "hello-developer-portal",
@@ -36,6 +48,11 @@ export const selfServiceBlocks: SelfServiceDialog[] = [
     icon: Cloud,
     category: "Infrastructure",
     dialogType: "dynamic",
-    dataFilePath: "/data/self-service/dynamic-jobs/hello-developer-portal.json"
+    dataFilePath: "/data/self-service/dynamic-jobs/hello-developer-portal.json",
+    jenkinsJob: {
+      jaasName: "atom",
+      jobName: "hello-deverloper-portal"
+    }
+
   }
 ];

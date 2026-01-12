@@ -117,7 +117,7 @@ export async function triggerJenkinsJob(
     queueUrl?: string;
     buildUrl?: string;
   }>(
-    `/self-service/jenkins/${jaasName}/${jobName}/trigger`,
+    `/self-service/jenkins/${jaasName}/${jobName}/trigger-tracked`,
     parameters
   );
 }
@@ -174,5 +174,58 @@ export async function fetchJenkinsBuildStatus(
 ): Promise<JenkinsBuildStatusResponse> {
   return apiClient.get<JenkinsBuildStatusResponse>(
     `/self-service/jenkins/${jaasName}/${jobName}/${buildNumber}/status`
+  );
+}
+
+export interface JenkinsJobHistoryItem {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  jaasName: string;
+  jobName: string;
+  queueItemId: string;
+  queueUrl: string;
+  baseJobUrl: string;
+  status: string;
+  buildNumber: number;
+  buildUrl: string;
+  queuedReason: string;
+  waitTime: number;
+  building: boolean;
+  duration: number;
+  result: string;
+  triggeredBy: string;
+  parameters: Record<string, any>;
+  metadata: any;
+  resultJson: any;
+  lastPolledAt: string;
+  pollingActive: boolean;
+  completedAt: string;
+  errorMessage: string;
+  pollAttempts: number;
+}
+
+export interface JenkinsJobHistoryResponse {
+  jobs: JenkinsJobHistoryItem[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
+/**
+ * Fetch Jenkins job history with pagination
+ * 
+ * @param limit - Number of jobs to return per page
+ * @param offset - Offset for pagination
+ * @param onlyMine - If true, fetch only current user's jobs. Default: true
+ * @returns Job history with pagination info
+ */
+export async function fetchJenkinsJobHistory(
+  limit: number = 10,
+  offset: number = 0,
+  onlyMine: boolean = true
+): Promise<JenkinsJobHistoryResponse> {
+  return apiClient.get<JenkinsJobHistoryResponse>(
+    `/self-service/jenkins/jobs?limit=${limit}&offset=${offset}&only_mine=${onlyMine}`
   );
 }

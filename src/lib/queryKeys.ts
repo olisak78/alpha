@@ -163,6 +163,8 @@ export const queryKeys = {
       ['selfService', 'queueStatus', jaasName, queueItemId] as const,
     buildStatus: (jaasName: string, jobName: string, buildNumber: number) =>
       ['selfService', 'buildStatus', jaasName, jobName, buildNumber] as const,
+    jobHistory: (limit: number, offset: number, onlyMine: boolean) => ['self-service', 'jobs', 'history', limit, offset, onlyMine] as const,
+
   },
 
   links: {
@@ -176,7 +178,7 @@ export const queryKeys = {
   triggeredAlerts: {
     all: ['triggered-alerts'] as const,
     projects: () => [...queryKeys.triggeredAlerts.all, 'projects'] as const,
-    byProject: (projectname: string, params?: Record<string, any>) => 
+    byProject: (projectname: string, params?: Record<string, any>) =>
       [...queryKeys.triggeredAlerts.all, 'by-project', projectname, params] as const,
     detail: (projectname: string, fingerprint: string) =>
       [...queryKeys.triggeredAlerts.all, 'detail', projectname, fingerprint] as const,

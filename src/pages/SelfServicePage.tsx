@@ -1,30 +1,31 @@
 import { useState, useEffect } from "react";
 import SelfServiceBlockDialog from "@/components/SelfService/SelfServiceBlockDialog";
+import ExecutionHistoryPanel from "@/components/SelfService/ExecutionHistoryPanel";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { toast } from "@/components/ui/use-toast";
-import { Card, CardContent} from "@/components/ui/card";
 import { useFetchJenkinsJobParameters } from "@/hooks/api/useSelfService";
 import { useTriggerJenkinsJob } from "@/hooks/api/mutations/useSelfServiceMutations";
-import { useCurrentUser } from "@/hooks/api/useMembers";
 import { fetchAndPopulateDynamicSteps } from "@/services/SelfServiceApi";
 import { selfServiceBlocks, type SelfServiceDialog } from "@/data/self-service/selfServiceBlocks";
 import { Wrench } from "lucide-react";
-import { useJobStatus, useAddJobStatus, type Job } from "@/hooks/api/useJobStatus";
-import { JobStatusPoller } from "@/components/SelfService/JobStatusPoller";
+import JobsHistoryTable from '@/components/SelfService/JobsHistoryTable';
+import { useJenkinsJobHistory } from '@/hooks/api/useJenkinsJobHistory';
 
 export default function SelfServicePage() {
   const [activeBlock, setActiveBlock] = useState<SelfServiceDialog | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [staticJobData, setStaticJobData] = useState<any>(null);
-  const [activeQueuePolls, setActiveQueuePolls] = useState<
-    Array<{ jaasName: string; queueItemId: string; jobName: string }>
-  >([]);
-  const [showJobs, setShowJobs] = useState(true);
 
-  const { data: jobs = [], isLoading: isLoadingJobs } = useJobStatus();
-  const addJobMutation = useAddJobStatus();
-  const { data: currentUser } = useCurrentUser();
+  // Execution History Panel State
+  const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
+  const [selectedJobForHistory, setSelectedJobForHistory] = useState<{
+    jobName: string;
+    serviceTitle: string;
+  } | null>(null);
+
+  // Fetch job history for calculating counts
+  const { data: jobHistory } = useJenkinsJobHistory(10, 0);
 
   const jenkinsQuery = useFetchJenkinsJobParameters(
     staticJobData?.jenkinsJob?.jaasName || "",
@@ -36,13 +37,36 @@ export default function SelfServicePage() {
 
   const triggerMutation = useTriggerJenkinsJob();
 
-  // Calculate statistics
-  const stats = {
-    total: jobs.length,
-    success: jobs.filter(j => j.status?.toLowerCase() === 'success').length,
-    failed: jobs.filter(j => j.status?.toLowerCase() === 'failed' || j.status?.toLowerCase() === 'aborted').length,
-    running: jobs.filter(j => j.status?.toLowerCase() === 'running').length,
-    pending: jobs.filter(j => ['queued', 'pending'].includes(j.status?.toLowerCase())).length,
+  // Calculate history count for a specific service/job
+  const getServiceHistoryCount = (jobName?: string): number => {
+    if (!jobName || !jobHistory) return 0;
+    return jobHistory.jobs.filter(job => job.jobName === jobName).length;
+  };
+
+  // Handle history button click - open the execution history panel
+  const handleHistoryClick = (block: SelfServiceDialog) => {
+    const jobName = block.jenkinsJob?.jobName;
+
+    if (!jobName) {
+      toast({
+        title: "Error",
+        description: "Job name not configured for this service",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSelectedJobForHistory({
+      jobName: jobName,
+      serviceTitle: block.title
+    });
+    setHistoryPanelOpen(true);
+  };
+
+  // Close history panel
+  const closeHistoryPanel = () => {
+    setHistoryPanelOpen(false);
+    setSelectedJobForHistory(null);
   };
 
   const loadStaticData = async (path: string) => {
@@ -52,7 +76,11 @@ export default function SelfServicePage() {
       if (!response.ok) throw new Error('Failed to fetch');
       return await response.json();
     } catch (error) {
-      toast({ title: "Error", description: "Failed to load configuration", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load configuration",
+        variant: "destructive"
+      });
       return null;
     }
   };
@@ -62,16 +90,58 @@ export default function SelfServicePage() {
     setIsOpen(true);
 
     if (block.dataFilePath) {
-      const data = await loadStaticData(block.dataFilePath);
-      setStaticJobData(data);
+      const staticData = await loadStaticData(block.dataFilePath);
+      if (staticData) {
+        setStaticJobData(staticData);
 
-      if (data?.jenkinsJob && data?.steps?.some((s: any) => s.isDynamic)) {
-        const populatedData = await fetchAndPopulateDynamicSteps(
-          data.jenkinsJob.jaasName,
-          data.jenkinsJob.jobName,
-          data.steps
-        );
-        setStaticJobData({ ...data, steps: populatedData.steps });
+        if (staticData.jenkinsJob) {
+          const hasDynamicSteps = staticData.steps?.some((step: any) => step.isDynamic);
+
+          if (hasDynamicSteps) {
+            try {
+              const { jaasName, jobName } = staticData.jenkinsJob;
+              const populatedData = await fetchAndPopulateDynamicSteps(
+                jaasName,
+                jobName,
+                staticData.steps
+              );
+
+              setStaticJobData({
+                ...staticData,
+                steps: populatedData.steps
+              });
+
+              const allParams: any[] = [];
+              populatedData.steps.forEach((step: any) => {
+                if (step.fields) {
+                  allParams.push(...step.fields);
+                }
+              });
+
+              if (allParams.length > 0) {
+                setFormData(getDefaults(allParams));
+              }
+            } catch (error) {
+              console.error('Failed to load dynamic steps:', error);
+              toast({
+                title: "Error",
+                description: "Failed to load dynamic configuration",
+                variant: "destructive"
+              });
+            }
+          } else {
+            const allParams: any[] = [];
+            (staticData.steps || []).forEach((step: any) => {
+              if (step.fields) {
+                allParams.push(...step.fields);
+              }
+            });
+
+            if (allParams.length > 0) {
+              setFormData(getDefaults(allParams));
+            }
+          }
+        }
       }
     }
   };
@@ -84,45 +154,32 @@ export default function SelfServicePage() {
   };
 
   useEffect(() => {
-    if (!isOpen || !staticJobData) return;
-
-    const allParams: any[] = [];
-
-    if (activeBlock?.dialogType === 'static' || activeBlock?.dialogType === 'dynamic') {
-      if (staticJobData?.steps) {
-        staticJobData.steps.forEach((step: any) => {
-          if (step.fields) allParams.push(...step.fields);
-        });
-      } else if (Array.isArray(staticJobData)) {
-        allParams.push(...staticJobData);
+    if (jenkinsQuery.data && activeBlock?.dialogType === 'dynamic') {
+      const params = jenkinsQuery.data.steps?.[0]?.fields || [];
+      if (params.length > 0) {
+        setFormData(getDefaults(params));
       }
     }
-
-    if (activeBlock?.dialogType === 'dynamic' && jenkinsQuery.data) {
-      jenkinsQuery.data.steps.forEach((step: any) => {
-        if (step.fields) allParams.push(...step.fields);
-      });
-    }
-
-    if (allParams.length > 0) {
-      setFormData(getDefaults(allParams));
-    }
-  }, [isOpen, staticJobData, jenkinsQuery.data, activeBlock]);
+  }, [jenkinsQuery.data, activeBlock]);
 
   const getDefaults = (params: any[]) => {
     const defaults: Record<string, any> = {};
-    params.filter(p => p.type !== "WHideParameterDefinition").forEach(p => {
-      const key = p.name || p.id;
-      const value = p.defaultParameterValue?.value || p.defaultValue?.value;
 
-      if (key === 'ClusterName') {
-        const userId = (currentUser as any)?.iuser || (currentUser as any)?.id || '';
-        if (userId) {
-          defaults[key] = userId;
-        } else if (!currentUser) {
+    const hiddenTypes = ['WHideParameterDefinition'];
+
+    params.forEach(param => {
+      if (hiddenTypes.includes(param.type)) {
+        return;
+      }
+
+      const key = param.id || param.name;
+      const value = param.defaultValue !== undefined ? param.defaultValue : param.value;
+
+      if (key === 'ClusterName' && !value) {
+        if (param.description && param.description.includes('$USERID')) {
           toast({
-            title: "Warning",
-            description: "Unable to retrieve user ID. ClusterName must be entered manually.",
+            title: "Note",
+            description: "ClusterName must be entered manually.",
             variant: "destructive"
           });
           defaults[key] = '';
@@ -132,6 +189,7 @@ export default function SelfServicePage() {
       } else {
         defaults[key] = value || '';
       }
+      
     });
 
     return defaults;
@@ -154,9 +212,25 @@ export default function SelfServicePage() {
     const { jaasName, jobName } = staticJobData.jenkinsJob;
 
     const filteredParams = Object.entries(formData).reduce((acc, [key, value]) => {
+      // Skip false boolean values
       if (typeof value === 'boolean' && value === false) {
         return acc;
       }
+      
+      // Handle SLEEP_SECONDS field specially - must be a number, not empty string
+      if (key === 'SLEEP_SECONDS') {
+        // Convert to number
+        const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+        
+        // If empty string, NaN, null, undefined, or invalid -> use 0
+        if (value === '' || value === null || value === undefined || isNaN(numValue)) {
+          acc[key] = 0;
+        } else {
+          acc[key] = numValue;
+        }
+        return acc;
+      }
+      
       acc[key] = value;
       return acc;
     }, {} as Record<string, any>);
@@ -165,27 +239,6 @@ export default function SelfServicePage() {
       { jaasName, jobName, parameters: filteredParams },
       {
         onSuccess: (response) => {
-          const queueItemId = response.queueItemId || String(Date.now());
-          const queueUrl = response.queueUrl || response.buildUrl || `#jenkins-job-${jaasName}-${jobName}-${queueItemId}`;
-          const baseJobUrl = response.buildUrl ? response.buildUrl.split('/job/')[0] : `#jenkins-${jaasName}`;
-
-          addJobMutation.mutate({
-            status: 'queued',
-            message: response.message || 'Job queued successfully',
-            queueUrl: queueUrl,
-            queueItemId: queueItemId,
-            baseJobUrl: baseJobUrl,
-            jobName: jobName,
-            jaasName: jaasName,
-          });
-
-          if (response.queueItemId) {
-            setActiveQueuePolls(prev => [
-              ...prev,
-              { jaasName, queueItemId: response.queueItemId!, jobName }
-            ]);
-          }
-
           toast({
             title: "Success",
             description: response.message || `Job queued successfully`
@@ -201,65 +254,6 @@ export default function SelfServicePage() {
         }
       }
     );
-  };
-
-  // Get circle border color based on status
-  const getCircleColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'success': return 'border-green-500';
-      case 'failed':
-      case 'aborted': return 'border-red-500';
-      case 'running': return 'border-blue-500';
-      case 'queued':
-      case 'pending': return 'border-yellow-500';
-      default: return 'border-gray-400';
-    }
-  };
-
-  const calculateDuration = (job: Job) => {
-    // For queued/pending jobs, use waitTime from queue status endpoint
-    if (['queued', 'pending'].includes(job.status?.toLowerCase()) && job.waitTime !== undefined) {
-      const seconds = Math.floor(job.waitTime / 1000);
-      if (seconds < 60) return `${seconds}s`;
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes}m`;
-      const hours = Math.floor(minutes / 60);
-      return `${hours}h`;
-    }
-
-    // For running/aborted/completed jobs, use duration from build status endpoint
-    if (['running', 'aborted', 'success', 'failed'].includes(job.status?.toLowerCase()) && job.duration !== undefined) {
-      const seconds = Math.floor(job.duration / 1000);
-      if (seconds < 60) return `${seconds}s`;
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes}m`;
-      const hours = Math.floor(minutes / 60);
-      return `${hours}h`;
-    }
-
-    // Fallback: calculate from timestamp
-    if (!job.timestamp) return '';
-    const seconds = Math.floor((Date.now() - job.timestamp) / 1000);
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h`;
-  };
-
-  // Get display text for job circle (buildNumber or "Queued")
-  const getJobDisplayText = (job: Job) => {
-    if (job.status?.toLowerCase() === 'queued' || job.status?.toLowerCase() === 'pending') {
-      return 'Queued';
-    }
-
-    if (job.queueUrl) {
-      const match = job.queueUrl.match(/\/(\d+)\/?$/);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    return job.status?.substring(0, 3).toUpperCase() || '?';
   };
 
   return (
@@ -301,65 +295,17 @@ export default function SelfServicePage() {
                 onFormChange={updateForm}
                 onSubmit={submitForm}
                 onCancel={closeDialog}
+                historyCount={getServiceHistoryCount(block.jenkinsJob?.jobName)}
+                onHistoryClick={() => handleHistoryClick(block)}
               />
             ))}
           </div>
         </div>
 
-          {/* Circular Job Status Dashboard */}
-          {jobs.length > 0 && (
-            <div className="mt-12 max-w-4xl mx-auto">
-              <Card className="bg-transparent border-none shadow-none">
-                {showJobs && (
-                  <CardContent className="p-6">
-                    <div className="flex flex-wrap gap-4">
-                      {jobs.map((job) => {
-                        const hasUrl = job.queueUrl && job.queueUrl.trim() !== '' && !job.queueUrl.startsWith('#');
-                        const Element = hasUrl ? 'a' : 'div';
-                        const elementProps = hasUrl ? {
-                          href: job.queueUrl,
-                          target: "_blank",
-                          rel: "noopener noreferrer"
-                        } : {};
-
-                        return (
-                          <Element
-                            key={job.queueItemId}
-                            {...elementProps}
-                            className={`
-                              group relative flex flex-col items-center justify-center
-                              w-20 h-20 rounded-full border-4 bg-card/90 backdrop-blur-sm
-                              transition-all duration-300 transform-gpu
-                              ${getCircleColor(job.status)}
-                              ${hasUrl ? 'cursor-pointer hover:scale-110 hover:shadow-lg' : 'cursor-default opacity-70'}
-                            `}
-                            title={`${job.jobName} - ${job.status}${job.message ? `: ${job.message}` : ''}`}
-                          >
-                            {/* Pulsing effect for running jobs */}
-                            {job.status?.toLowerCase() === 'running' && (
-                              <span className="absolute inset-0 rounded-full border-4 border-blue-300 animate-ping" />
-                            )}
-
-                            {/* Job Number or Status Text */}
-                            <span className="text-sm font-bold leading-none text-center px-1">
-                              {job.status?.toLowerCase() !== 'queued' && (
-                                <span >#</span>
-                              )} {getJobDisplayText(job)}
-                            </span>
-
-                            {/* Hover tooltip - appears above the circle */}
-                            <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-slate-600 whitespace-nowrap">
-                              {job.status}
-                            </div>
-                          </Element>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                )}
-              </Card>
-          </div>
-        )}
+        {/* Jobs History Table */}
+        <div data-history-table>
+          <JobsHistoryTable />
+        </div>
 
         {/* Empty State */}
         {selfServiceBlocks.length === 0 && (
@@ -375,20 +321,15 @@ export default function SelfServicePage() {
         )}
       </div>
 
-      {/* Job Status Pollers - headless components that manage polling */}
-      {activeQueuePolls.map((poll) => (
-        <JobStatusPoller
-          key={poll.queueItemId}
-          jaasName={poll.jaasName}
-          queueItemId={poll.queueItemId}
-          jobName={poll.jobName}
-          onComplete={() => {
-            setActiveQueuePolls(prev =>
-              prev.filter(p => p.queueItemId !== poll.queueItemId)
-            );
-          }}
+      {/* Execution History Panel */}
+      {selectedJobForHistory && (
+        <ExecutionHistoryPanel
+          isOpen={historyPanelOpen}
+          onClose={closeHistoryPanel}
+          jobName={selectedJobForHistory.jobName}
+          serviceTitle={selectedJobForHistory.serviceTitle}
         />
-      ))}
+      )}
     </BreadcrumbPage>
   );
 }
