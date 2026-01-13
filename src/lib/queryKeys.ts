@@ -36,6 +36,8 @@ export const queryKeys = {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (params?: Record<string, any>) => [...queryKeys.users.lists(), params] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.users.details(), id] as const,
   },
 
   organizations: {
@@ -163,7 +165,8 @@ export const queryKeys = {
       ['selfService', 'queueStatus', jaasName, queueItemId] as const,
     buildStatus: (jaasName: string, jobName: string, buildNumber: number) =>
       ['selfService', 'buildStatus', jaasName, jobName, buildNumber] as const,
-    jobHistory: (limit: number, offset: number, onlyMine: boolean) => ['self-service', 'jobs', 'history', limit, offset, onlyMine] as const,
+    jobHistory: (limit: number, offset: number, onlyMine: boolean, lastUpdated: number) =>
+      ['self-service', 'jobs', 'history', limit, offset, onlyMine, lastUpdated] as const,
 
   },
 
@@ -180,8 +183,8 @@ export const queryKeys = {
     projects: () => [...queryKeys.triggeredAlerts.all, 'projects'] as const,
     byProject: (projectname: string, params?: Record<string, any>) =>
       [...queryKeys.triggeredAlerts.all, 'by-project', projectname, params] as const,
-    detail: (projectname: string, fingerprint: string) =>
-      [...queryKeys.triggeredAlerts.all, 'detail', projectname, fingerprint] as const,
+    detail: (projectname: string, fingerprint: string, startsAt: string) =>
+      [...queryKeys.triggeredAlerts.all, 'detail', projectname, fingerprint, startsAt] as const,
     filters: (projectname: string) =>
       [...queryKeys.triggeredAlerts.all, 'filters', projectname] as const,
   },

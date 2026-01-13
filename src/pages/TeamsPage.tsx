@@ -9,7 +9,7 @@ export default function TeamsPage() {
     activeCommonTab,
     selectedTeamId,
     currentTeam,
-    teamNames,
+    teams,
 
     // Data fetching
     teamsLoading,
@@ -22,6 +22,9 @@ export default function TeamsPage() {
     onOpenComponent,
     getTeamIdFromName,
   } = useTeamsPage();
+
+  // Convert teams array to team names for compatibility with TeamContainer
+  const teamNames = teams.map(team => team.title || team.name);
 
   if (teamsLoading) {
     return (
@@ -52,7 +55,7 @@ export default function TeamsPage() {
     );
   }
 
-  if (!teamNames.length) {
+  if (!teams.length) {
     return (
       <BreadcrumbPage>
         <div className="flex items-center justify-center py-8">

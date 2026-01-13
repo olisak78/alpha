@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { MemberDetailsDialog, type ExtendedMember } from '../../../src/components/dialogs/MemberDetailsDialog';
 import type { Member as DutyMember } from '../../../src/hooks/useOnDutyData';
 import * as memberUtils from '../../../src/utils/member-utils';
@@ -24,6 +25,12 @@ vi.mock('../../../src/utils/member-utils', () => ({
   formatPhoneNumber: vi.fn(),
   copyToClipboard: vi.fn(),
   SAP_PEOPLE_BASE_URL: 'https://people.wdf.sap.corp',
+  MAP_ROLE_TO_LABEL: {
+    'member': "Member",
+    'manager': "Manager",
+    'scm': "SCM",
+    'mmm': "MMM"
+  },
 }));
 
 // Mock the AuthContext
@@ -46,6 +53,15 @@ vi.mock('../../../src/contexts/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// Helper function to render component with Router
+const renderWithRouter = (component: React.ReactElement, initialEntries = ['/']) => {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      {component}
+    </MemoryRouter>
+  );
+};
+
 describe('MemberDetailsDialog Component', () => {
   const mockMember: ExtendedMember = {
     id: 'user123',
@@ -57,7 +73,13 @@ describe('MemberDetailsDialog Component', () => {
     mobile: '+1-555-0123',
     phoneNumber: '+1-555-0123',
     room: 'Building A, Room 101',
-    managerName: 'Jane Smith',
+    manager: {
+      id: 'manager123',
+      first_name: 'Jane',
+      last_name: 'Smith',
+      email: 'jane.smith@example.com',
+      team_role: 'manager'
+    },
     birthDate: '03-15',
   };
 
@@ -99,7 +121,7 @@ describe('MemberDetailsDialog Component', () => {
   describe('Basic Rendering', () => {
     it('should handle closed dialog and null member states', () => {
       // Test closed dialog
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={false}
           onOpenChange={mockOnOpenChange}
@@ -110,17 +132,19 @@ describe('MemberDetailsDialog Component', () => {
 
       // Test null member
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={null}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={null}
+          />
+        </MemoryRouter>
       );
       expect(screen.queryByText('User Details')).not.toBeInTheDocument();
     });
 
     it('should render complete dialog with all member information', () => {
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -167,7 +191,7 @@ describe('MemberDetailsDialog Component', () => {
   describe('Member Data Handling', () => {
     it('should handle various member data scenarios', () => {
       // Test minimal data with fallbacks
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -186,19 +210,21 @@ describe('MemberDetailsDialog Component', () => {
         email: 'test@example.com',
         role: 'Tester',
         team: undefined,
-        mobile: null as any,
+        mobile: undefined,
         phoneNumber: '',
         room: undefined,
-        managerName: null as any,
+        manager: undefined,
         birthDate: '',
       };
 
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={memberWithNulls}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={memberWithNulls}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getAllByText('Test User').length).toBeGreaterThan(0);
@@ -213,16 +239,24 @@ describe('MemberDetailsDialog Component', () => {
         team: 'International Team (Europe/Asia)',
         mobile: '+49-123-456-7890',
         room: 'Büro München, Raum 42/3',
-        managerName: 'François Müller-Schmidt',
+        manager: {
+          id: 'manager-special',
+          first_name: 'François',
+          last_name: 'Müller-Schmidt',
+          email: 'francois.muller@example.com',
+          team_role: 'manager'
+        },
         birthDate: '12-25',
       };
 
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={memberWithSpecialChars}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={memberWithSpecialChars}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getAllByText("José María O'Connor-Smith").length).toBeGreaterThan(0);
@@ -241,7 +275,7 @@ describe('MemberDetailsDialog Component', () => {
   describe('Avatar and SAP Profile', () => {
     it('should render avatar with correct styling and handle clicks', async () => {
       const user = userEvent.setup();
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -271,7 +305,7 @@ describe('MemberDetailsDialog Component', () => {
       const user = userEvent.setup();
       
       // Test with full member data
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -296,11 +330,13 @@ describe('MemberDetailsDialog Component', () => {
 
       // Test conditional email button rendering
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={{ ...mockMember, email: '' }}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={{ ...mockMember, email: '' }}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getByText('Open Teams Chat')).toBeInTheDocument();
@@ -314,7 +350,7 @@ describe('MemberDetailsDialog Component', () => {
 
   describe('Birth Date Formatting', () => {
     it('should handle various birth date scenarios', () => {
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -328,21 +364,25 @@ describe('MemberDetailsDialog Component', () => {
 
       // Test undefined birth date
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={{ ...mockMember, birthDate: undefined }}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={{ ...mockMember, birthDate: undefined }}
+          />
+        </MemoryRouter>
       );
       expect(memberUtils.formatBirthDate).toHaveBeenCalledWith(undefined);
 
       // Test empty birth date
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={{ ...mockMember, birthDate: '' }}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={{ ...mockMember, birthDate: '' }}
+          />
+        </MemoryRouter>
       );
       expect(memberUtils.formatBirthDate).toHaveBeenCalledWith('');
     });
@@ -355,7 +395,7 @@ describe('MemberDetailsDialog Component', () => {
   describe('Dialog Interaction and Accessibility', () => {
     it('should handle dialog interactions and have proper structure', async () => {
       const user = userEvent.setup();
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -385,7 +425,7 @@ describe('MemberDetailsDialog Component', () => {
 
     it('should support keyboard navigation through interactive elements', async () => {
       const user = userEvent.setup();
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -422,7 +462,7 @@ describe('MemberDetailsDialog Component', () => {
 
   describe('Component Updates', () => {
     it('should handle member prop changes correctly', () => {
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -442,11 +482,13 @@ describe('MemberDetailsDialog Component', () => {
       };
 
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={updatedMember}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={updatedMember}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getAllByText('John Smith').length).toBeGreaterThan(0);
@@ -457,7 +499,7 @@ describe('MemberDetailsDialog Component', () => {
     });
 
     it('should handle open state changes correctly', () => {
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={false}
           onOpenChange={mockOnOpenChange}
@@ -468,11 +510,13 @@ describe('MemberDetailsDialog Component', () => {
       expect(screen.queryByText('User Details')).not.toBeInTheDocument();
 
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={mockMember}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={mockMember}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getByText('User Details')).toBeInTheDocument();
@@ -480,7 +524,7 @@ describe('MemberDetailsDialog Component', () => {
     });
 
     it('should handle switching between different members', () => {
-      const { rerender } = render(
+      const { rerender } = renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -492,11 +536,13 @@ describe('MemberDetailsDialog Component', () => {
       expect(screen.getByText('user123')).toBeInTheDocument();
 
       rerender(
-        <MemberDetailsDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          member={mockMemberMinimal}
-        />
+        <MemoryRouter>
+          <MemberDetailsDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            member={mockMemberMinimal}
+          />
+        </MemoryRouter>
       );
 
       expect(screen.getAllByText('Jane Smith').length).toBeGreaterThan(0);
@@ -512,7 +558,7 @@ describe('MemberDetailsDialog Component', () => {
 
   describe('Copy Functionality', () => {
     it('should show copy buttons for copyable fields', () => {
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -534,7 +580,7 @@ describe('MemberDetailsDialog Component', () => {
         email: '',
       };
 
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -548,7 +594,7 @@ describe('MemberDetailsDialog Component', () => {
     });
 
     it('should render copy buttons with proper accessibility', () => {
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -586,7 +632,7 @@ describe('MemberDetailsDialog Component', () => {
         console.error('Email client not available');
       });
 
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}
@@ -620,7 +666,7 @@ describe('MemberDetailsDialog Component', () => {
         return 'Invalid Date';
       });
 
-      render(
+      renderWithRouter(
         <MemberDetailsDialog
           open={true}
           onOpenChange={mockOnOpenChange}

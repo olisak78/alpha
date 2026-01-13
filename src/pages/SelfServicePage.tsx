@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import SelfServiceBlockDialog from "@/components/SelfService/SelfServiceBlockDialog";
-import ExecutionHistoryPanel from "@/components/SelfService/ExecutionHistoryPanel";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { toast } from "@/components/ui/use-toast";
 import { useFetchJenkinsJobParameters } from "@/hooks/api/useSelfService";
@@ -17,15 +16,14 @@ export default function SelfServicePage() {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [staticJobData, setStaticJobData] = useState<any>(null);
 
-  // Execution History Panel State
-  const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
-  const [selectedJobForHistory, setSelectedJobForHistory] = useState<{
+  // Filter state for JobsHistoryTable
+  const [filteredService, setFilteredService] = useState<{
     jobName: string;
     serviceTitle: string;
   } | null>(null);
 
-  // Fetch job history for calculating counts
-  const { data: jobHistory } = useJenkinsJobHistory(10, 0);
+  // Fetch job history for calculating counts - use onlyMine=false to match filtered display
+  const { data: jobHistory } = useJenkinsJobHistory(10, 0, false);
 
   const jenkinsQuery = useFetchJenkinsJobParameters(
     staticJobData?.jenkinsJob?.jaasName || "",
@@ -43,7 +41,7 @@ export default function SelfServicePage() {
     return jobHistory.jobs.filter(job => job.jobName === jobName).length;
   };
 
-  // Handle history button click - open the execution history panel
+  // Handle history button click - filter the JobsHistoryTable
   const handleHistoryClick = (block: SelfServiceDialog) => {
     const jobName = block.jenkinsJob?.jobName;
 
@@ -56,17 +54,22 @@ export default function SelfServicePage() {
       return;
     }
 
-    setSelectedJobForHistory({
+    // Set filter to show only this service's jobs
+    setFilteredService({
       jobName: jobName,
       serviceTitle: block.title
     });
-    setHistoryPanelOpen(true);
+
+    // Scroll to the table
+    const tableElement = document.querySelector('[data-history-table]');
+    if (tableElement) {
+      tableElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
-  // Close history panel
-  const closeHistoryPanel = () => {
-    setHistoryPanelOpen(false);
-    setSelectedJobForHistory(null);
+  // Clear filter - return to regular view
+  const clearServiceFilter = () => {
+    setFilteredService(null);
   };
 
   const loadStaticData = async (path: string) => {
@@ -275,10 +278,8 @@ export default function SelfServicePage() {
         </div>
 
         {/* Services Grid */}
-        <div>
-          <h2 className="text-xl font-semibold text-foreground mb-4">Available Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {selfServiceBlocks.map((block) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {selfServiceBlocks.map((block) => (
               <SelfServiceBlockDialog
                 key={block.id}
                 block={block}
@@ -296,15 +297,18 @@ export default function SelfServicePage() {
                 onSubmit={submitForm}
                 onCancel={closeDialog}
                 historyCount={getServiceHistoryCount(block.jenkinsJob?.jobName)}
+                isSelected={filteredService?.jobName === block.jenkinsJob?.jobName}
                 onHistoryClick={() => handleHistoryClick(block)}
               />
             ))}
-          </div>
         </div>
 
         {/* Jobs History Table */}
         <div data-history-table>
-          <JobsHistoryTable />
+          <JobsHistoryTable 
+            filteredService={filteredService}
+            onClearFilter={clearServiceFilter}
+          />
         </div>
 
         {/* Empty State */}
@@ -320,16 +324,6 @@ export default function SelfServicePage() {
           </div>
         )}
       </div>
-
-      {/* Execution History Panel */}
-      {selectedJobForHistory && (
-        <ExecutionHistoryPanel
-          isOpen={historyPanelOpen}
-          onClose={closeHistoryPanel}
-          jobName={selectedJobForHistory.jobName}
-          serviceTitle={selectedJobForHistory.serviceTitle}
-        />
-      )}
     </BreadcrumbPage>
   );
 }

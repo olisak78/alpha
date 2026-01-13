@@ -121,6 +121,17 @@ export interface TeamLink {
   url: string;
 }
 
+export interface ManagedTeam{
+  name: string;
+  title: string;
+}
+
+export interface Manager{
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
 /**
  * Team Member model (different from general Member)
  * Represents a team member in the team response
@@ -138,6 +149,8 @@ export interface TeamMember {
   team_role: string;
   updated_at: string;
   uuid: string;
+  manager?: Manager;
+  managed_teams?: ManagedTeam[];
 }
 
 /**
@@ -208,14 +221,20 @@ export interface Member {
  * Represents a user from the users API endpoint
  */
 export interface User {
-  id: string;
-  name: string;
+  created_at: string;
   email: string;
-  first_name?: string;
-  last_name?: string;
-  created_at?: string;
-  updated_at?: string;
-  metadata?: Record<string, unknown>;
+  first_name: string;
+  id: string;
+  last_name: string;
+  metadata: Record<string, unknown>;
+  mobile: string;
+  team_domain: string;
+  team_id: string;
+  team_role: string;
+  updated_at: string;
+  uuid: string;
+  manager?: Manager;
+  managed_teams?: ManagedTeam[];
 }
 
 /**

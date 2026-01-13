@@ -106,21 +106,6 @@ export const shouldNavigateToTab = (basePath: string): boolean => {
   return currentPath === basePath || currentPath.startsWith(`${basePath}/`);
 }
 
-// Helper function to create URL-friendly team slugs
-export const createTeamSlug = (teamName: string): string => {
-  return teamName
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
-}
-
-// Helper function to create team name from URL slug
-export const getTeamNameFromSlug = (slug: string, teamNames: string[]): string | null => {
-  // Find the team name that matches this slug
-  return teamNames.find(teamName => createTeamSlug(teamName) === slug) || null;
-}
 
 // Validation helper functions
 export const isValidEmail = (email: string): boolean => {

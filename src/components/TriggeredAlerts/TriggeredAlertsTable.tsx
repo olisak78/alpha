@@ -13,6 +13,7 @@ import TablePagination from '@/components/TablePagination';
 import { useTableSort } from '@/hooks/useTableSort';
 import { sortAlerts } from './alertSortConfigs';
 import { TriggeredAlertsTableHeader } from './TriggeredAlertsTableHeader';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TriggeredAlertsTableProps {
   showRegion?: boolean;
@@ -84,15 +85,22 @@ export function TriggeredAlertsTable({ showRegion = true, onShowAlertDefinition 
                   >
                     {/* Alert Name */}
                     <div className="col-span-4 flex items-center gap-1 group">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         {isExpanded ? (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         )}
-                        <span className="truncate font-medium">
-                          {alert.alertname}
-                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="truncate font-medium min-w-0">
+                              {alert.alertname}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{alert.alertname}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                       <FilterButtons 
                         filterType="alertname" 

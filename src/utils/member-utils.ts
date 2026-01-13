@@ -5,6 +5,13 @@
 // Constants
 export const SAP_PEOPLE_BASE_URL = "https://people.wdf.sap.corp";
 
+export const MAP_ROLE_TO_LABEL: Record<string, string> = {
+  'member': "Member",
+  'manager': "Manager",
+  'scm': "SCM",
+  'mmm': "MMM"
+};
+
 /**
  * Opens a Microsoft Teams chat with the specified email address
  * @param email - The email address to start a chat with

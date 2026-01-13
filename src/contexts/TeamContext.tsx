@@ -149,12 +149,15 @@ export function TeamProvider({
       team: teamName,
       uuid: teamMember.uuid, // Preserve the UUID for API operations
       mobile: teamMember.mobile || "", // Include mobile if available
+      manager: teamMember.manager,
+      managed_teams: teamMember.managed_teams || []
     }));
 
     // Sort members by role priority: manager first, SCM second, then others
     return members.sort((a, b) => {
       // Define role priority: manager = 1, SCM = 2, others = 3
       const getRolePriority = (role: string | undefined) => {
+        if (role === 'mmm') return 0;
         if (role === 'manager') return 1;
         if (role === 'scm') return 2;
         return 3;

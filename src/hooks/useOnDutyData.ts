@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import teamData from "@/data/team/my-team.json";
 import * as XLSX from "xlsx";
+import { ManagedTeam, Manager } from "@/types/api";
 
 export type Member = {
   id: string;
@@ -13,6 +14,8 @@ export type Member = {
   team_id?: string; // Add team_id property for API compatibility
   uuid?: string; // Add uuid property for API operations
   mobile?: string;
+  manager?: Manager
+  managed_teams?: ManagedTeam[];
 };
 
 export type OnCallShift = {

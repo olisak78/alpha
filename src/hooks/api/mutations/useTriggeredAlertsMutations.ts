@@ -34,8 +34,9 @@ export function useUpdateTriggeredAlertLabel(
       queryClient.invalidateQueries({
         queryKey: queryKeys.triggeredAlerts.byProject(variables.projectname),
       });
+      // Invalidate all detail queries for this alert (regardless of startsAt timestamp)
       queryClient.invalidateQueries({
-        queryKey: queryKeys.triggeredAlerts.detail(variables.projectname, variables.fingerprint),
+        queryKey: ['triggered-alerts', 'detail', variables.projectname, variables.fingerprint],
       });
     },
     

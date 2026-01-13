@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Member as DutyMember } from "@/hooks/useOnDutyData";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ApprovalDialog from "../dialogs/ApprovalDialog";
 import { MoveMemberDialog } from "../dialogs/MoveMemberDialog";
 import { MemberDetailsDialog, type ExtendedMember } from "../dialogs/MemberDetailsDialog";
@@ -9,6 +9,7 @@ import { TeamColorPicker } from "./TeamColorPicker";
 import { MemberCard } from "./MemberCard";
 import { useToast } from "@/hooks/use-toast";
 import { useTeamContext } from "@/contexts/TeamContext";
+import { useUser } from "@/hooks/api/useMembers";
 
 interface MemberListProps {
   showActions?: boolean;
@@ -42,10 +43,33 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
   const [previousMember, setPreviousMember] = useState<ExtendedMember | null>(null);
   const [targetTeam, setTargetTeam] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [managerIdToFetch, setManagerIdToFetch] = useState<string>("");
   const { toast } = useToast();
 
   const managerMember = currentTeam?.members?.find(m => m.team_role === 'manager');
   const manager = managerMember ? `${managerMember.first_name || ''} ${managerMember.last_name || ''}`.trim() : '';
+
+  // Fetch manager data from API when managerIdToFetch is set
+  const { data: managerUserData } = useUser(managerIdToFetch, {
+    enabled: !!managerIdToFetch
+  });
+
+  // Effect to handle manager data when it's fetched
+  useEffect(() => {
+    if (managerUserData && managerIdToFetch) {
+      const extendedManagerMember: ExtendedMember = {
+        ...managerUserData,
+        room: "", // Sample data
+        managerName: manager,
+        birthDate: "",
+        fullName: "",
+        role: ""
+      };
+      
+      setMemberToView(extendedManagerMember);
+      setManagerIdToFetch(""); // Reset the fetch trigger
+    }
+  }, [managerUserData, managerIdToFetch, manager]);
 
   const confirmRemoveMember = () => {
     if (!memberToRemove) return;
@@ -140,25 +164,12 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
     setIsDetailsDialogOpen(true);
   };
 
-  const handleViewManager = (managerName: string) => {
+  const handleViewManager = (managerId: string) => {
     // Store the current member as previous before switching to manager
     setPreviousMember(memberToView);
     
-    // Find the manager member by name
-    const managerMember = members.find(m => 
-      m.fullName.trim() === managerName.trim()
-    );
-    
-    if (managerMember) {
-      const extendedManagerMember: ExtendedMember = {
-        ...managerMember,
-        room: "", // Sample data
-        managerName: manager,
-        birthDate: "", // Sample data
-      };
-      
-      setMemberToView(extendedManagerMember);
-    }
+    // Trigger the API fetch by setting the manager ID
+    setManagerIdToFetch(managerId);
   };
 
   const handleGoBack = () => {

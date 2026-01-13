@@ -37,24 +37,26 @@ export function useTriggeredAlerts(
 }
 
 /**
- * Hook to fetch a specific triggered alert by project name and fingerprint
+ * Hook to fetch a specific triggered alert by project name, fingerprint, and starts_at timestamp
  * @param projectname - The name of the project
  * @param fingerprint - The unique fingerprint of the alert
+ * @param startsAt - The starts_at timestamp in RFC3339Nano format (e.g., "2024-01-15T10:30:00.123456Z")
  * @param options - Additional query options
  */
 export function useTriggeredAlert(
   projectname: string,
   fingerprint: string,
+  startsAt: string,
   options?: Omit<
     UseQueryOptions<TriggeredAlert, Error>,
     'queryKey' | 'queryFn'
   >
 ): UseQueryResult<TriggeredAlert, Error> {
   return useQuery({
-    queryKey: queryKeys.triggeredAlerts.detail(projectname, fingerprint),
-    queryFn: () => getTriggeredAlert(projectname, fingerprint),
+    queryKey: queryKeys.triggeredAlerts.detail(projectname, fingerprint, startsAt),
+    queryFn: () => getTriggeredAlert(projectname, fingerprint, startsAt),
     staleTime: 1 * 60 * 1000, // Cache for 1 minute (individual alerts change frequently)
-    enabled: !!projectname && !!fingerprint,
+    enabled: !!projectname && !!fingerprint && !!startsAt,
     ...options,
   });
 }

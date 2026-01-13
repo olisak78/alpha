@@ -45,13 +45,16 @@ export async function getTriggeredAlerts(
 }
 
 /**
- * Get a specific triggered alert by project name and fingerprint
+ * Get a specific triggered alert by project name, fingerprint, and starts_at timestamp
  * @param projectname - The name of the project
  * @param fingerprint - The unique fingerprint of the alert
+ * @param startsAt - The starts_at timestamp in RFC3339Nano format (e.g., "2024-01-15T10:30:00.123456Z")
  * @returns Promise<TriggeredAlert> - The specific triggered alert
  */
-export async function getTriggeredAlert(projectname: string, fingerprint: string): Promise<TriggeredAlert> {
-  return apiClient.get<TriggeredAlert>(`/alert-storage/alerts/${projectname}/${fingerprint}`);
+export async function getTriggeredAlert(projectname: string, fingerprint: string, startsAt: string): Promise<TriggeredAlert> {
+  const queryParams = new URLSearchParams();
+  queryParams.append('starts_at', startsAt);
+  return apiClient.get<TriggeredAlert>(`/alert-storage/alerts/${projectname}/${fingerprint}?${queryParams.toString()}`);
 }
 
 /**

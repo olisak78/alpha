@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { usePortalState } from "@/contexts/hooks";
 import { DEFAULT_COMMON_TAB, VALID_COMMON_TABS } from "@/constants/developer-portal";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
-import { createTeamSlug, getTeamNameFromSlug } from "@/utils/developer-portal-helpers";
 import { useAuthWithRole } from "./useAuthWithRole";
 import { useTeams } from "@/hooks/api/useTeams";
 import type { Team as ApiTeam } from "@/types/api";
@@ -25,10 +24,10 @@ export function useTeamsPage() {
   const { memberData: currentUserMember } = useAuthWithRole();
 
   // Parse URL segments
-  const { currentTabSlug, currentCommonTab } = useMemo(() => {
+  const { currentTeamName, currentCommonTab } = useMemo(() => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
     return {
-      currentTabSlug: pathSegments[1],
+      currentTeamName: pathSegments[1],
       currentCommonTab: pathSegments[2]
     };
   }, [location.pathname]);
@@ -51,31 +50,25 @@ export function useTeamsPage() {
     return team?.id || null;
   }, [selectedTab, teamsResponse]);
 
-  // Memoized team names and user's team
-  const { teamNames, userTeam } = useMemo(() => {
-    const names = teamsResponse?.teams ? 
-      teamsResponse.teams.map(team => getTeamDisplayName(team)).sort() : 
-      [];
+  // Memoized teams data and user's team
+  const { teams, userTeam, defaultTeam } = useMemo(() => {
+    const teamsData = teamsResponse?.teams || [];
 
     // Find user's team using their member data (team_id)
-    let userTeamName = null;
-    if (currentUserMember?.team_id && teamsResponse?.teams) {
-      const userTeamData = teamsResponse.teams.find(team => team.id === currentUserMember.team_id);
-      if (userTeamData) {
-        userTeamName = getTeamDisplayName(userTeamData);
-      }
+    let userTeamData = null;
+    if (currentUserMember?.team_id && teamsData.length > 0) {
+      userTeamData = teamsData.find(team => team.id === currentUserMember.team_id);
     }
     
+    // Determine default team (user's team or first available)
+    const defaultTeamData = userTeamData || teamsData[0] || null;
+    
     return {
-      teamNames: names,
-      userTeam: userTeamName
+      teams: teamsData,
+      userTeam: userTeamData,
+      defaultTeam: defaultTeamData
     };
   }, [teamsResponse, currentUserMember?.team_id]);
-
-  // Determine default team (user's team or first available)
-  const defaultTeam = useMemo(() => {
-    return userTeam || teamNames[0] || null;
-  }, [userTeam, teamNames]);
 
   // Get current team data
   const currentTeam = useMemo(() => {
@@ -100,11 +93,11 @@ export function useTeamsPage() {
   }, [setPortalActiveTab, setSelectedComponent]);
 
   const handleCommonTabChange = useCallback((newCommonTab: string) => {
-    if (VALID_COMMON_TABS.includes(newCommonTab) && currentTabSlug) {
+    if (VALID_COMMON_TABS.includes(newCommonTab) && currentTeamName) {
       setActiveCommonTab(newCommonTab);
-      navigate(`/teams/${currentTabSlug}/${newCommonTab}`, { replace: false });
+      navigate(`/teams/${currentTeamName}/${newCommonTab}`, { replace: false });
     }
-  }, [currentTabSlug, navigate]);
+  }, [currentTeamName, navigate]);
 
   // Create team name to ID mapping function
   const getTeamIdFromName = useCallback((teamName: string): string | undefined => {
@@ -129,74 +122,75 @@ export function useTeamsPage() {
     };
   }, []);
 
-  // Effect 1: Set header tabs when team names change
-useEffect(() => {
-  if (teamNames.length > 0) {
-    // Create header tabs, but put user's team first if it exists
-    let orderedTeamNames = [...teamNames];
-    if (userTeam && teamNames.includes(userTeam)) {
-      // Remove user's team from its current position and put it first
-      orderedTeamNames = orderedTeamNames.filter(name => name !== userTeam);
-      orderedTeamNames.unshift(userTeam);
+  // Effect 1: Set header tabs when teams change
+  useEffect(() => {
+    if (teams.length > 0) {
+      // Create header tabs, put user's team first if it exists
+      let orderedTeams = [...teams];
+      if (userTeam && teams.includes(userTeam)) {
+        orderedTeams = orderedTeams.filter(team => team.id !== userTeam.id);
+        orderedTeams.unshift(userTeam);
+      }
+      
+      const headerTabs = orderedTeams.map(team => ({
+        id: team.name,
+        label: getTeamDisplayName(team),
+        path: `/teams/${team.name}`
+      }));
+      
+      setTabs(headerTabs);
     }
-    
-    const headerTabs = orderedTeamNames.map(teamName => ({
-      id: createTeamSlug(teamName),
-      label: teamName,
-      path: `/teams/${createTeamSlug(teamName)}`
-    }));
-    
-    setTabs(headerTabs);
-  }
-}, [teamNames, userTeam]);  
+  }, [teams, userTeam]);
 
-// Effect 2: Handle URL-based navigation and default team selection
-useEffect(() => {
-  if (teamNames.length === 0) return;
+  // Effect 2: Handle URL-based navigation and default team selection
+  useEffect(() => {
+    if (teams.length === 0) return;
 
-  if (currentTabSlug) {
-    const teamName = getTeamNameFromSlug(currentTabSlug, teamNames);
-    if (teamName) {
-      if (selectedTab !== teamName) {
-        setSelectedTab(teamName);
-        setIsSystemTabChange(true);
+    if (currentTeamName) {
+      const team = teams.find(team => team.name === currentTeamName);
+      if (team) {
+        const teamDisplayName = getTeamDisplayName(team);
+        if (selectedTab !== teamDisplayName) {
+          setSelectedTab(teamDisplayName);
+          setIsSystemTabChange(true);
+        }
+      } else {
+        // Invalid team name, redirect to default team
+        if (defaultTeam) {
+          const target = `/teams/${defaultTeam.name}/${DEFAULT_COMMON_TAB}`;
+          if (location.pathname !== target) {
+            navigate(target, { replace: true });
+          }
+        }
       }
     } else {
-      // Invalid team slug, redirect to default team
+      // No team name in URL, redirect to default team
       if (defaultTeam) {
-        const defaultSlug = createTeamSlug(defaultTeam);
-        const target = `/teams/${defaultSlug}/${DEFAULT_COMMON_TAB}`;
+        const target = `/teams/${defaultTeam.name}/${DEFAULT_COMMON_TAB}`;
         if (location.pathname !== target) {
           navigate(target, { replace: true });
         }
       }
     }
-  } else {
-    // No team slug in URL, redirect to default team (only on initial load)
-    if (defaultTeam) {
-      const defaultSlug = createTeamSlug(defaultTeam);
-      const target = `/teams/${defaultSlug}/${DEFAULT_COMMON_TAB}`;
-      if (location.pathname !== target) {
-        navigate(target, { replace: true });
+  }, [teams, currentTeamName, defaultTeam, location.pathname, selectedTab, navigate]);
+
+  // Effect 3: Handle header tab clicks
+  useEffect(() => {
+    if (isSystemTabChange) {
+      setIsSystemTabChange(false);
+      return;
+    }
+    
+    if (activeTab && teams.length > 0) {
+      const team = teams.find(team => team.name === activeTab);
+      if (team) {
+        const teamDisplayName = getTeamDisplayName(team);
+        if (teamDisplayName !== selectedTab) {
+          setSelectedTab(teamDisplayName);
+        }
       }
     }
-  }
-}, [teamNames, currentTabSlug, defaultTeam, location.pathname]);
-
-// Effect 3: Handle header tab clicks - Let HeaderNavigationContext handle the navigation
-useEffect(() => {
-  if (isSystemTabChange) {
-    setIsSystemTabChange(false);
-    return;
-  }
-  
-  if (activeTab && teamNames.length > 0) {
-    const teamName = getTeamNameFromSlug(activeTab, teamNames);
-    if (teamName && teamName !== selectedTab) {
-      setSelectedTab(teamName);
-    }
-  }
-}, [activeTab, teamNames, currentCommonTab]);
+  }, [activeTab, teams, selectedTab]);
 
 // Effect 4: Handle common tab updates from URL
 useEffect(() => {
@@ -211,7 +205,7 @@ useEffect(() => {
     activeCommonTab,
     selectedTeamId,
     currentTeam,
-    teamNames,
+    teams,
 
     // Data fetching
     teamsResponse,

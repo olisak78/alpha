@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { MemberList } from '../../../src/components/Team/MemberList';
 import type { Member } from '../../../src/hooks/useOnDutyData';
 import { useTeamContext } from '../../../src/contexts/TeamContext';
@@ -14,6 +16,15 @@ vi.mock('../../../src/hooks/use-toast', () => ({
   useToast: () => ({
     toast: mockToast,
   }),
+}));
+
+// Mock the useUser hook
+vi.mock('../../../src/hooks/api/useMembers', () => ({
+  useUser: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+  })),
 }));
 
 // Mock the AuthContext
@@ -63,6 +74,25 @@ const mockTeamContext = {
 vi.mock('../../../src/contexts/TeamContext', () => ({
   useTeamContext: () => mockTeamContext,
 }));
+
+// Helper function to render component with QueryClient and Router
+const renderWithQueryClient = (component: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+  
+  return render(
+    <MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    </MemoryRouter>
+  );
+};
 
 // Mock the dialogs  
 vi.mock('../../../src/components/dialogs/ApprovalDialog', () => ({
@@ -152,7 +182,7 @@ describe('MemberList Component', () => {
 
   describe('Basic Rendering and Structure', () => {
     it('should render member list with correct structure and CSS classes', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const section = document.querySelector('section'); // Get section directly
       const heading = screen.getByRole('heading', { name: /team members/i });
@@ -165,7 +195,7 @@ describe('MemberList Component', () => {
     });
 
     it('should render all member cards with correct information', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Check that all members are rendered
       expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -179,14 +209,14 @@ describe('MemberList Component', () => {
     });
 
     it('should render member count badge correctly', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const badge = screen.getByText('3');
       expect(badge).toBeInTheDocument();
     });
 
     it('should render add member button when isAdmin is true', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const addButton = screen.getByRole('button', { name: /add member/i });
       expect(addButton).toBeInTheDocument();
@@ -194,7 +224,7 @@ describe('MemberList Component', () => {
 
     it('should not render add member button when isAdmin is false', () => {
       mockTeamContext.isAdmin = false;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const addButton = screen.queryByRole('button', { name: /add member/i });
       expect(addButton).not.toBeInTheDocument();
@@ -207,7 +237,7 @@ describe('MemberList Component', () => {
 
   describe('Avatar and Initials', () => {
     it('should render initials correctly for all members', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Check for initials for all members (avatars render as initials fallback in test environment)
       const johnInitials = screen.getByText('JD');
@@ -227,7 +257,7 @@ describe('MemberList Component', () => {
       ];
 
       mockTeamContext.members = membersWithVariousNames;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       expect(screen.getByText('J')).toBeInTheDocument(); // John -> J
       expect(screen.getByText('MJ')).toBeInTheDocument(); // Mary Jane Watson -> MJ (first 2 initials)
@@ -242,7 +272,7 @@ describe('MemberList Component', () => {
   describe('Empty State', () => {
     it('should render empty state when no members are provided', () => {
       mockTeamContext.members = [];
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const emptyMessage = screen.getByText('No members found');
       const memberCount = screen.getByText('0');
@@ -260,14 +290,14 @@ describe('MemberList Component', () => {
 
   describe('Actions Visibility', () => {
     it('should show action buttons when showActions is true and isAdmin is true', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const actionButtons = screen.getAllByLabelText('Actions');
       expect(actionButtons).toHaveLength(3); // One for each member
     });
 
     it('should not show action buttons when showActions is false', () => {
-      render(<MemberList showActions={false} />);
+      renderWithQueryClient(<MemberList showActions={false} />);
 
       const actionButtons = screen.queryAllByLabelText('Actions');
       expect(actionButtons).toHaveLength(0);
@@ -275,7 +305,7 @@ describe('MemberList Component', () => {
 
     it('should not show action buttons when isAdmin is false', () => {
       mockTeamContext.isAdmin = false;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const actionButtons = screen.queryAllByLabelText('Actions');
       expect(actionButtons).toHaveLength(0);
@@ -289,7 +319,7 @@ describe('MemberList Component', () => {
   describe('Move Member Functionality', () => {
     it('should open move dialog when "Move to..." is clicked', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Open dropdown for first member
       const actionButton = screen.getAllByLabelText('Actions')[0];
@@ -306,7 +336,7 @@ describe('MemberList Component', () => {
 
     it('should complete move flow when team is selected in move dialog', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Open dropdown and click move
       const actionButton = screen.getAllByLabelText('Actions')[0];
@@ -326,7 +356,7 @@ describe('MemberList Component', () => {
 
     it('should call moveMember when move is confirmed', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Complete move flow
       const actionButton = screen.getAllByLabelText('Actions')[0];
@@ -450,7 +480,7 @@ describe('MemberList Component', () => {
   describe('Add Member Functionality', () => {
     it('should call openAddMember when add member button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const addButton = screen.getByRole('button', { name: /add member/i });
       await user.click(addButton);
@@ -489,7 +519,7 @@ describe('MemberList Component', () => {
       mockTeamContext.currentTeam = teamWithoutManager;
       
       // This should not throw an error
-      expect(() => render(<MemberList showActions={true} />)).not.toThrow();
+      expect(() => renderWithQueryClient(<MemberList showActions={true} />)).not.toThrow();
       
       // Component should still render properly
       expect(screen.getByRole('heading', { name: /team members/i })).toBeInTheDocument();
@@ -520,7 +550,7 @@ describe('MemberList Component', () => {
       mockTeamContext.currentTeam = teamWithManager;
       
       // This should not throw an error and should work with manager
-      expect(() => render(<MemberList showActions={true} />)).not.toThrow();
+      expect(() => renderWithQueryClient(<MemberList showActions={true} />)).not.toThrow();
       
       // Component should still render properly
       expect(screen.getByRole('heading', { name: /team members/i })).toBeInTheDocument();
@@ -536,7 +566,7 @@ describe('MemberList Component', () => {
       mockTeamContext.currentTeam = teamWithEmptyMembers;
       
       // This should not throw an error
-      expect(() => render(<MemberList showActions={true} />)).not.toThrow();
+      expect(() => renderWithQueryClient(<MemberList showActions={true} />)).not.toThrow();
       
       // Component should still render properly
       expect(screen.getByRole('heading', { name: /team members/i })).toBeInTheDocument();
@@ -554,7 +584,7 @@ describe('MemberList Component', () => {
         throw new Error('Move failed');
       });
 
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Complete move flow
       const actionButton = screen.getAllByLabelText('Actions')[0];
@@ -688,7 +718,7 @@ describe('MemberList Component', () => {
 
   describe('Prop Changes and Edge Cases', () => {
     it('should handle prop changes correctly', () => {
-      const { rerender } = render(<MemberList showActions={true} />);
+      const { rerender } = renderWithQueryClient(<MemberList showActions={true} />);
 
       expect(screen.getByText('3')).toBeInTheDocument();
 
@@ -700,7 +730,21 @@ describe('MemberList Component', () => {
       }];
 
       mockTeamContext.members = newMembers;
-      rerender(<MemberList showActions={true} />);
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      });
+      
+      rerender(
+        <MemoryRouter>
+          <QueryClientProvider client={queryClient}>
+            <MemberList showActions={true} />
+          </QueryClientProvider>
+        </MemoryRouter>
+      );
 
       expect(screen.getByText('4')).toBeInTheDocument();
       expect(screen.getByText('Alice Johnson')).toBeInTheDocument();
@@ -718,7 +762,7 @@ describe('MemberList Component', () => {
       ];
 
       mockTeamContext.members = membersWithMissingFields;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       expect(screen.getByText('John Doe')).toBeInTheDocument();
       expect(screen.getByText('JD')).toBeInTheDocument(); // Should show initials
@@ -735,7 +779,7 @@ describe('MemberList Component', () => {
       ];
 
       mockTeamContext.members = membersWithSpecialChars;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       expect(screen.getByText("O'Brian José-María")).toBeInTheDocument();
       expect(screen.getByText('Senior Developer & Team Lead')).toBeInTheDocument(); // Role shown as badge
@@ -752,7 +796,7 @@ describe('MemberList Component', () => {
       ];
 
       mockTeamContext.members = membersWithLongNames;
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       expect(screen.getByText('A'.repeat(50))).toBeInTheDocument();
     });
@@ -764,7 +808,7 @@ describe('MemberList Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels and roles', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       const section = document.querySelector('section'); // Get section directly
       const heading = screen.getByRole('heading', { name: /team members/i });
@@ -776,7 +820,7 @@ describe('MemberList Component', () => {
     });
 
     it('should have proper alt text for avatars', () => {
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Check for initials fallback since avatars might not render in test environment
       const johnInitials = screen.getByText('JD');
@@ -788,7 +832,7 @@ describe('MemberList Component', () => {
 
     it('should be keyboard navigable', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Tab to add member button
       await user.tab();
@@ -807,7 +851,7 @@ describe('MemberList Component', () => {
   describe('Integration Tests', () => {
     it('should handle cancellation of move operation', async () => {
       const user = userEvent.setup();
-      render(<MemberList showActions={true} />);
+      renderWithQueryClient(<MemberList showActions={true} />);
 
       // Start move flow
       const actionButton = screen.getAllByLabelText('Actions')[0];

@@ -30,7 +30,7 @@ export default function ExecutionHistoryPanel({
     } | null>(null);
 
     // Fetch job history
-    const { data: jobHistory, isLoading } = useJenkinsJobHistory(10, 0);
+    const { data: jobHistory, isLoading } = useJenkinsJobHistory(10, 0, false);
 
     // Fetch job output for selected job
     const { data: jobOutput, isLoading: isLoadingOutput, error: outputError } = useJenkinsJobOutput(

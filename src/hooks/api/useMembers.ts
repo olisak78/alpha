@@ -9,6 +9,7 @@ import type {
   NewUserSearchApiResponse,
   LdapUser,
   LdapUserSearchResponse,
+  User,
 } from '@/types/api';
 
 
@@ -44,6 +45,13 @@ async function fetchUsers(params: UsersQueryParams = {}): Promise<UsersListRespo
  */
 export async function fetchCurrentUser(): Promise<UserMeResponse> {
   return apiClient.get<UserMeResponse>('/users/me');
+}
+
+/**
+ * Fetch individual user data from /users/{userid} endpoint
+ */
+async function fetchUser(userId: string): Promise<User> {
+  return apiClient.get<User>(`/users/${userId}`);
 }
 
 /**
@@ -119,6 +127,25 @@ export function useLdapUserSearch(
     refetchOnWindowFocus: false,
     // Cache search results for 5 minutes
     staleTime: 5 * 60 * 1000,
+    ...options,
+  });
+}
+
+/**
+ * Hook to fetch individual user data from /users/{userid} endpoint
+ */
+export function useUser(
+  userId: string,
+  options?: Omit<
+    UseQueryOptions<User, Error>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<User, Error> {
+  return useQuery({
+    queryKey: queryKeys.users.detail(userId),
+    queryFn: () => fetchUser(userId),
+    // Only run if we have a userId parameter and it's not empty
+    enabled: !!userId && userId.trim().length > 0 && (options?.enabled ?? true),
     ...options,
   });
 }

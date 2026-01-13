@@ -46,6 +46,63 @@ vi.mock('../../../src/components/TriggeredAlerts/FilterButtons', () => ({
   ),
 }));
 
+// Mock the TriggeredAlertsTableHeader component
+vi.mock('../../../src/components/TriggeredAlerts/TriggeredAlertsTableHeader', () => ({
+  TriggeredAlertsTableHeader: ({ showRegion, sortState, onSort }: any) => (
+    <div className={`grid ${showRegion ? 'grid-cols-10' : 'grid-cols-9'} px-4 py-3 border-b bg-muted/30 text-sm font-medium`}>
+      <button className="col-span-4" onClick={() => onSort('alertname')}>Alert Name</button>
+      <button className="col-span-1" onClick={() => onSort('severity')}>Severity</button>
+      <button className="col-span-1" onClick={() => onSort('startsAt')}>Start Time</button>
+      <button className="col-span-1" onClick={() => onSort('endsAt')}>End Time</button>
+      <button className="col-span-1" onClick={() => onSort('status')}>Status</button>
+      <button className="col-span-1" onClick={() => onSort('landscape')}>Landscape</button>
+      {showRegion && <button className="col-span-1" onClick={() => onSort('region')}>Region</button>}
+    </div>
+  ),
+}));
+
+// Mock TablePagination component
+vi.mock('../../../src/components/TablePagination', () => ({
+  default: ({ currentPage, totalPages, onPageChange }: any) => (
+    <div data-testid="table-pagination">
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+        Previous
+      </button>
+      <span>Page {currentPage} of {totalPages}</span>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+        Next
+      </button>
+    </div>
+  ),
+}));
+
+// Mock useTableSort hook
+vi.mock('../../../src/hooks/useTableSort', () => ({
+  useTableSort: vi.fn(({ data }) => ({
+    sortState: { field: null, direction: 'asc' },
+    handleSort: vi.fn(),
+    sortedData: data,
+  })),
+}));
+
+// Mock alertSortConfigs
+vi.mock('../../../src/components/TriggeredAlerts/alertSortConfigs', () => ({
+  sortAlerts: vi.fn((items, field, direction) => items),
+}));
+
+// Mock UI components
+vi.mock('../../../src/components/ui/badge', () => ({
+  Badge: ({ children, className }: any) => (
+    <span className={className}>{children}</span>
+  ),
+}));
+
+vi.mock('../../../src/components/ui/tooltip', () => ({
+  Tooltip: ({ children }: any) => children,
+  TooltipContent: ({ children }: any) => null, // Don't render tooltip content in tests
+  TooltipTrigger: ({ children }: any) => children,
+}));
+
 // Mock Lucide React icons
 vi.mock('lucide-react', () => ({
   Activity: ({ className }: any) => <svg className={`lucide-activity ${className}`} data-testid="activity-icon" />,
@@ -55,8 +112,9 @@ vi.mock('lucide-react', () => ({
   ChevronsUpDown: ({ className }: any) => <svg className={`lucide-chevrons-up-down ${className}`} data-testid="chevrons-up-down" />,
 }));
 
-// Mock the hook to return controlled data
-const mockHookReturn = {
+// Mock the context hook instead of the filters hook
+const mockContextValue = {
+  projectId: 'test-project',
   filters: {
     searchTerm: '',
     selectedSeverity: [],
@@ -121,15 +179,18 @@ const mockHookReturn = {
   totalPages: 1,
   hasNextPage: false,
   hasPreviousPage: false,
+  appliedFilters: [],
+  onShowAlertDefinition: undefined,
 };
 
-vi.mock('../../../src/hooks/useTriggeredAlertsFilters', () => ({
-  useTriggeredAlertsFilters: vi.fn(() => mockHookReturn),
+vi.mock('../../../src/contexts/TriggeredAlertsContext', () => ({
+  TriggeredAlertsProvider: ({ children }: any) => children,
+  useTriggeredAlertsContext: vi.fn(() => mockContextValue),
 }));
 
-// Import the mocked hook
-import { useTriggeredAlertsFilters } from '../../../src/hooks/useTriggeredAlertsFilters';
-const mockUseTriggeredAlertsFilters = vi.mocked(useTriggeredAlertsFilters);
+// Import the mocked context hook
+import { useTriggeredAlertsContext } from '../../../src/contexts/TriggeredAlertsContext';
+const mockUseTriggeredAlertsContext = vi.mocked(useTriggeredAlertsContext);
 
 // Helper function to render with provider
 function renderWithProvider(component: React.ReactElement) {
@@ -174,8 +235,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should render empty state when no alerts provided', () => {
     // Mock empty alerts
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: []
     });
     
@@ -189,8 +250,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should render table headers correctly', () => {
     // Mock with alerts
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: mockAlerts
     });
     
@@ -207,8 +268,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should render alert data correctly', () => {
     // Mock with single alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [mockAlert]
     });
     
@@ -223,8 +284,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should handle multiple alerts and missing data', () => {
     // Mock with multiple alerts
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: mockAlerts
     });
     
@@ -244,8 +305,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should apply correct CSS classes for styling', () => {
     // Mock with single alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [mockAlert]
     });
     
@@ -268,8 +329,8 @@ describe('TriggeredAlertsTable', () => {
     };
     
     // Mock with long name alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [longNameAlert]
     });
     
@@ -286,8 +347,8 @@ describe('TriggeredAlertsTable', () => {
     ];
     
     // Mock with duplicate name alerts
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: duplicateNameAlerts
     });
     
@@ -300,8 +361,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should display formatted date times', () => {
     // Mock with single alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [mockAlert]
     });
 
@@ -317,8 +378,8 @@ describe('TriggeredAlertsTable', () => {
 
   it('should apply severity and status colors via utility functions', () => {
     // Mock with single alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [mockAlert]
     });
     
@@ -347,8 +408,8 @@ describe('TriggeredAlertsTable', () => {
     };
     
     // Mock with minimal alert
-    mockUseTriggeredAlertsFilters.mockReturnValue({
-      ...mockHookReturn,
+    mockUseTriggeredAlertsContext.mockReturnValue({
+      ...mockContextValue,
       filteredAlerts: [minimalAlert]
     });
     
@@ -364,7 +425,7 @@ describe('TriggeredAlertsTable', () => {
   // Tests for specific callback functions
   describe('Callback Functions', () => {
     it('should handle expand alert correctly', () => {
-      const mockAlert: TriggeredAlert = {
+      const testAlert: TriggeredAlert = {
         fingerprint: 'test-fingerprint',
         alertname: 'Test Alert',
         status: 'firing',
@@ -378,9 +439,9 @@ describe('TriggeredAlertsTable', () => {
         updatedAt: '2023-12-01T10:00:00Z'
       };
 
-      mockUseTriggeredAlertsFilters.mockReturnValue({
-        ...mockHookReturn,
-        filteredAlerts: [mockAlert]
+      mockUseTriggeredAlertsContext.mockReturnValue({
+        ...mockContextValue,
+        filteredAlerts: [testAlert]
       });
 
       renderWithProvider(<TriggeredAlertsTable />);
@@ -398,8 +459,8 @@ describe('TriggeredAlertsTable', () => {
     });
 
     it('should render filter buttons for each alert field', () => {
-      mockUseTriggeredAlertsFilters.mockReturnValue({
-        ...mockHookReturn,
+      mockUseTriggeredAlertsContext.mockReturnValue({
+        ...mockContextValue,
         filteredAlerts: [mockAlert]
       });
 

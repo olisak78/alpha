@@ -174,75 +174,81 @@ describe('triggeredAlertsApi', () => {
     it('should fetch a specific triggered alert successfully', async () => {
       const projectname = 'test-project';
       const fingerprint = 'alert-fingerprint-123';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const mockAlert = createMockTriggeredAlert();
 
       vi.mocked(apiClient.get).mockResolvedValue(mockAlert);
 
-      const result = await getTriggeredAlert(projectname, fingerprint);
+      const result = await getTriggeredAlert(projectname, fingerprint, startsAt);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}?starts_at=${encodeURIComponent(startsAt)}`);
       expect(apiClient.get).toHaveBeenCalledTimes(1);
     });
 
     it('should handle fingerprints with special characters', async () => {
       const projectname = 'test-project';
       const fingerprint = 'alert-fingerprint-with-special-chars_123';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const mockAlert = createMockTriggeredAlert({ fingerprint });
 
       vi.mocked(apiClient.get).mockResolvedValue(mockAlert);
 
-      const result = await getTriggeredAlert(projectname, fingerprint);
+      const result = await getTriggeredAlert(projectname, fingerprint, startsAt);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}?starts_at=${encodeURIComponent(startsAt)}`);
     });
 
     it('should handle long fingerprints', async () => {
       const projectname = 'test-project';
       const fingerprint = 'very-long-alert-fingerprint-with-many-characters-and-hashes-1234567890abcdef';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const mockAlert = createMockTriggeredAlert({ fingerprint });
 
       vi.mocked(apiClient.get).mockResolvedValue(mockAlert);
 
-      const result = await getTriggeredAlert(projectname, fingerprint);
+      const result = await getTriggeredAlert(projectname, fingerprint, startsAt);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}?starts_at=${encodeURIComponent(startsAt)}`);
     });
 
     it('should handle API errors', async () => {
       const projectname = 'test-project';
       const fingerprint = 'alert-fingerprint-123';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const error = new Error('Alert not found');
 
       vi.mocked(apiClient.get).mockRejectedValue(error);
 
-      await expect(getTriggeredAlert(projectname, fingerprint)).rejects.toThrow('Alert not found');
-      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}`);
+      await expect(getTriggeredAlert(projectname, fingerprint, startsAt)).rejects.toThrow('Alert not found');
+      expect(apiClient.get).toHaveBeenCalledWith(`/alert-storage/alerts/${projectname}/${fingerprint}?starts_at=${encodeURIComponent(startsAt)}`);
     });
 
     it('should handle 404 errors for non-existent alerts', async () => {
       const projectname = 'test-project';
       const fingerprint = 'non-existent-fingerprint';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const error = new Error('Alert not found');
 
       vi.mocked(apiClient.get).mockRejectedValue(error);
 
-      await expect(getTriggeredAlert(projectname, fingerprint)).rejects.toThrow('Alert not found');
+      await expect(getTriggeredAlert(projectname, fingerprint, startsAt)).rejects.toThrow('Alert not found');
     });
 
     it('should handle empty parameters', async () => {
       const projectname = '';
       const fingerprint = '';
+      const startsAt = '';
       const mockAlert = createMockTriggeredAlert();
 
       vi.mocked(apiClient.get).mockResolvedValue(mockAlert);
 
-      const result = await getTriggeredAlert(projectname, fingerprint);
+      const result = await getTriggeredAlert(projectname, fingerprint, startsAt);
 
       expect(result).toEqual(mockAlert);
-      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts//');
+      expect(apiClient.get).toHaveBeenCalledWith('/alert-storage/alerts//?starts_at=');
     });
   });
 
@@ -605,6 +611,7 @@ describe('triggeredAlertsApi', () => {
     it('should handle mixed success and error scenarios', async () => {
       const projectname = 'test-project';
       const fingerprint = 'alert-fingerprint-123';
+      const startsAt = '2025-01-01T10:00:00.123456Z';
       const mockAlertsResponse = createMockTriggeredAlertsResponse();
       const error = new Error('Alert not found');
 
@@ -617,7 +624,7 @@ describe('triggeredAlertsApi', () => {
       expect(alerts).toEqual(mockAlertsResponse);
 
       // Second call fails
-      await expect(getTriggeredAlert(projectname, fingerprint))
+      await expect(getTriggeredAlert(projectname, fingerprint, startsAt))
         .rejects.toThrow('Alert not found');
 
       expect(apiClient.get).toHaveBeenCalledTimes(2);

@@ -213,19 +213,21 @@ export interface JenkinsJobHistoryResponse {
 }
 
 /**
- * Fetch Jenkins job history with pagination
+ * Fetch Jenkins job history with pagination and time filtering
  * 
  * @param limit - Number of jobs to return per page
  * @param offset - Offset for pagination
  * @param onlyMine - If true, fetch only current user's jobs. Default: true
+ * @param lastUpdated - Number of hours to look back for job updates. Default: 48
  * @returns Job history with pagination info
  */
 export async function fetchJenkinsJobHistory(
   limit: number = 10,
   offset: number = 0,
-  onlyMine: boolean = true
+  onlyMine: boolean = true,
+  lastUpdated: number = 48
 ): Promise<JenkinsJobHistoryResponse> {
   return apiClient.get<JenkinsJobHistoryResponse>(
-    `/self-service/jenkins/jobs?limit=${limit}&offset=${offset}&only_mine=${onlyMine}`
+    `/self-service/jenkins/jobs?limit=${limit}&offset=${offset}&only_mine=${onlyMine}&last_updated=${lastUpdated}`
   );
 }

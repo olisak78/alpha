@@ -44,8 +44,6 @@ const mockUseTeamsPage = vi.mocked(useTeamsPage);
 // Default mock values for useTeamsPage hook
 const defaultMockValues = {
   // State
-  groups: {},
-  setGroups: vi.fn(),
   selectedTab: 'Engineering Team',
   activeCommonTab: 'overview',
   selectedTeamId: 'team-123',
@@ -54,7 +52,18 @@ const defaultMockValues = {
     name: 'engineering-team',
     title: 'Engineering Team',
   },
-  teamNames: ['Engineering Team', 'Product Team', 'Design Team'],
+  teams: [
+    {
+      id: 'team-123',
+      name: 'engineering-team',
+      title: 'Engineering Team',
+    },
+    {
+      id: 'team-456',
+      name: 'product-team',
+      title: 'Product Team',
+    },
+  ],
 
   // Data fetching
   teamsResponse: {
@@ -101,7 +110,7 @@ describe('TeamsPage', () => {
         ...defaultMockValues,
         teamsLoading: true,
         selectedTab: '',
-        teamNames: [],
+        teams: [],
       });
 
       render(
@@ -123,7 +132,10 @@ describe('TeamsPage', () => {
         ...defaultMockValues,
         teamsLoading: false,
         selectedTab: '',
-        teamNames: ['Team A', 'Team B'],
+        teams: [
+          { id: 'team-a', name: 'team-a', title: 'Team A' },
+          { id: 'team-b', name: 'team-b', title: 'Team B' }
+        ],
       });
 
       render(
@@ -149,7 +161,7 @@ describe('TeamsPage', () => {
         teamsLoading: false,
         teamsError: mockError,
         selectedTab: '',
-        teamNames: [],
+        teams: [],
       });
 
       render(
@@ -174,7 +186,7 @@ describe('TeamsPage', () => {
         teamsLoading: false,
         teamsError: mockError,
         selectedTab: '',
-        teamNames: [],
+        teams: [],
         refetchTeams: mockRefetchTeams,
       });
 
@@ -196,13 +208,13 @@ describe('TeamsPage', () => {
   // =========================================
 
   describe('Empty State', () => {
-    it('displays no teams found message when teamNames is empty', () => {
+    it('displays no teams found message when teams is empty', () => {
       mockUseTeamsPage.mockReturnValue({
         ...defaultMockValues,
         teamsLoading: false,
         teamsError: null,
         selectedTab: '',
-        teamNames: [],
+        teams: [],
       });
 
       render(
@@ -244,7 +256,7 @@ describe('TeamsPage', () => {
           name: 'engineering-team',
           title: 'Engineering Team',
         },
-        teamNames: ['Engineering Team', 'Product Team', 'Design Team'],
+        teamNames: ['Engineering Team', 'Product Team'],
         activeCommonTab: 'overview',
       });
 
@@ -267,7 +279,10 @@ describe('TeamsPage', () => {
           name: 'product-team',
           title: 'Product Team',
         },
-        teamNames: ['Product Team', 'Engineering Team'],
+        teams: [
+          { id: 'team-product', name: 'product-team', title: 'Product Team' },
+          { id: 'team-123', name: 'engineering-team', title: 'Engineering Team' }
+        ],
         activeCommonTab: 'members',
       };
 
@@ -291,11 +306,13 @@ describe('TeamsPage', () => {
     it('handles edge cases with minimal data', () => {
       mockUseTeamsPage.mockReturnValue({
         ...defaultMockValues,
-        groups: {},
         currentTeam: null,
         selectedTeamId: null,
         selectedTab: '',
-        teamNames: ['Team A', 'Team B'],
+        teams: [
+          { id: 'team-a', name: 'team-a', title: 'Team A' },
+          { id: 'team-b', name: 'team-b', title: 'Team B' }
+        ],
       });
 
       render(

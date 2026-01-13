@@ -2,8 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   getBasePath,
   shouldNavigateToTab,
-  createTeamSlug,
-  getTeamNameFromSlug,
   isValidEmail,
   isValidUrl,
   safeLocalStorageGet,
@@ -91,79 +89,6 @@ describe('developer-portal-helpers', () => {
     });
   });
 
-  // ============================================================================
-  // TEAM SLUG HELPERS
-  // ============================================================================
-
-  describe('createTeamSlug', () => {
-    it('should convert team name to lowercase slug', () => {
-      expect(createTeamSlug('Backend Team')).toBe('backend-team');
-      expect(createTeamSlug('FRONTEND TEAM')).toBe('frontend-team');
-    });
-
-    it('should replace spaces with hyphens', () => {
-      expect(createTeamSlug('Platform Engineering Team')).toBe('platform-engineering-team');
-    });
-
-    it('should remove special characters', () => {
-      expect(createTeamSlug('Team@2.0')).toBe('team20');
-      expect(createTeamSlug('Dev#Ops!')).toBe('devops');
-    });
-
-    it('should replace multiple spaces with single hyphen', () => {
-      expect(createTeamSlug('Backend    Team')).toBe('backend-team');
-    });
-
-    it('should replace multiple hyphens with single hyphen', () => {
-      expect(createTeamSlug('Backend---Team')).toBe('backend-team');
-    });
-
-    it('should remove leading and trailing hyphens', () => {
-      expect(createTeamSlug('-Backend Team-')).toBe('backend-team');
-      expect(createTeamSlug('---Team---')).toBe('team');
-    });
-
-    it('should handle empty strings', () => {
-      expect(createTeamSlug('')).toBe('');
-    });
-
-    it('should handle strings with only special characters', () => {
-      expect(createTeamSlug('@@##$$')).toBe('');
-    });
-
-    it('should preserve existing hyphens', () => {
-      expect(createTeamSlug('Backend-Team')).toBe('backend-team');
-    });
-
-    it('should handle numbers', () => {
-      expect(createTeamSlug('Team 123')).toBe('team-123');
-    });
-  });
-
-  describe('getTeamNameFromSlug', () => {
-    const teamNames = ['Backend Team', 'Frontend Team', 'Platform Engineering'];
-
-    it('should find matching team name from slug', () => {
-      expect(getTeamNameFromSlug('backend-team', teamNames)).toBe('Backend Team');
-      expect(getTeamNameFromSlug('frontend-team', teamNames)).toBe('Frontend Team');
-    });
-
-    it('should return null for non-matching slug', () => {
-      expect(getTeamNameFromSlug('unknown-team', teamNames)).toBeNull();
-    });
-
-    it('should return null for empty slug', () => {
-      expect(getTeamNameFromSlug('', teamNames)).toBeNull();
-    });
-
-    it('should handle empty team names array', () => {
-      expect(getTeamNameFromSlug('backend-team', [])).toBeNull();
-    });
-
-    it('should be case-insensitive in matching', () => {
-      expect(getTeamNameFromSlug('platform-engineering', teamNames)).toBe('Platform Engineering');
-    });
-  });
 
   // ============================================================================
   // VALIDATION HELPERS

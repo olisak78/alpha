@@ -16,13 +16,14 @@ interface SelfServiceBlockDialogProps {
   currentStepIndex: number;
   currentStep?: any;
   steps: any[];
-  historyCount?: number; // Optional: number of recent executions
+  historyCount?: number;
+  isSelected?: boolean; // True when this service is filtered in the jobs table
   onOpenDialog: () => void;
   onCloseDialog: (open: boolean) => void;
   onFormChange: (elementId: string, value: any) => void;
   onSubmit: () => void;
   onCancel: () => void;
-  onHistoryClick?: () => void; // Optional: handler for history button (no parameters)
+  onHistoryClick?: () => void;
 }
 
 export default function SelfServiceBlockDialog({
@@ -33,6 +34,7 @@ export default function SelfServiceBlockDialog({
   jenkinsParameters,
   staticJobParameters,
   historyCount,
+  isSelected = false,
   onOpenDialog,
   onCloseDialog,
   onFormChange,
@@ -74,11 +76,50 @@ export default function SelfServiceBlockDialog({
       }
     }}>
       <DialogTrigger asChild>
-        <Card className="group cursor-pointer hover:shadow-lg hover:border-primary/20 transition-all duration-200 flex flex-col h-full bg-card">
-          <CardContent className="p-6 flex flex-col flex-1 gap-4 relative">
+        <Card className={`group cursor-pointer border-2 transition-all duration-300 flex flex-col h-full bg-card relative overflow-hidden ${
+          isSelected 
+            ? 'border-primary shadow-2xl scale-[1.015]' 
+            : 'border-transparent hover:border-primary hover:shadow-2xl hover:scale-[1.015]'
+        }`}>
+          {/* Animated gradient background with plaid pattern - visible on hover OR when selected */}
+          <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none ${
+            isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}>
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `linear-gradient(135deg,rgba(59, 130, 246, 0.12),rgba(59, 130, 246, 0.02) 60%),repeating-linear-gradient(
+                                  0deg,transparent,transparent 10px,rgba(59, 130, 246, 0.05) 10px,rgba(59, 130, 246, 0.05) 12px),repeating-linear-gradient(
+                                  90deg,transparent,transparent 10px,rgba(59, 130, 246, 0.08) 10px,rgba(59, 130, 246, 0.08) 12px)`,
+                backgroundSize: '100% 100%, 100px 100px, 100px 100px',
+                backgroundPosition: 'center'
+              }}
+            />
+          </div>
+
+          <CardContent className="p-6 flex flex-col flex-1 gap-4 relative z-10">
             {/* Icon at top */}
             <div className="flex items-start justify-between">
-              <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/15 transition-colors">
+              <div
+                className={`p-3 bg-primary/10 rounded-xl transition-all duration-300 ${
+                  isSelected 
+                    ? 'bg-primary/20 rotate-[15deg]' 
+                    : 'group-hover:bg-primary/20 group-hover:rotate-[15deg]'
+                }`}
+                style={{
+                  boxShadow: isSelected ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' : '0 0 0 0 rgba(0, 0, 0, 0)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.boxShadow = '0 0 0 0 rgba(0, 0, 0, 0)';
+                  }
+                }}
+              >
                 <block.icon className="h-6 w-6 text-primary" />
               </div>
               <Badge variant="outline" className="text-xs">{block.category}</Badge>
@@ -117,8 +158,8 @@ export default function SelfServiceBlockDialog({
                   }}
                   disabled={historyCount === 0}
                   className={`flex items-center justify-center gap-1.5 px-3 h-10 rounded-lg transition-colors group/history flex-shrink-0 ${historyCount === 0
-                      ? 'bg-muted/50 cursor-not-allowed opacity-60'
-                      : 'bg-muted hover:bg-muted/80 cursor-pointer'
+                    ? 'bg-muted/50 cursor-not-allowed opacity-60'
+                    : 'bg-muted hover:bg-muted/80 cursor-pointer'
                     }`}
                   title={
                     historyCount === 0
@@ -127,12 +168,12 @@ export default function SelfServiceBlockDialog({
                   }
                 >
                   <History className={`h-4 w-4 flex-shrink-0 transition-colors ${historyCount === 0
-                      ? 'text-muted-foreground/50'
-                      : 'text-muted-foreground group-hover/history:text-foreground'
+                    ? 'text-muted-foreground/50'
+                    : 'text-muted-foreground group-hover/history:text-foreground'
                     }`} />
                   <span className={`text-sm font-semibold flex-shrink-0 ${historyCount === 0
-                      ? 'text-muted-foreground'
-                      : 'text-foreground'
+                    ? 'text-muted-foreground'
+                    : 'text-foreground'
                     }`}>
                     {historyCount > 99 ? '99+' : historyCount}
                   </span>

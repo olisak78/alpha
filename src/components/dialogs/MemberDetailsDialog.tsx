@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Mail,
-  MessageSquare,
   MapPin, 
   UserCheck, 
   Calendar,
@@ -18,9 +17,11 @@ import {
 } from "lucide-react";
 import { useState, useCallback } from "react";
 import type { Member as DutyMember } from "@/hooks/useOnDutyData";
-import { openTeamsChat, formatBirthDate, openSAPProfile, openEmailClient, SAP_PEOPLE_BASE_URL, copyToClipboard, formatPhoneNumber } from "@/utils/member-utils";
+import { openTeamsChat, formatBirthDate, openSAPProfile, openEmailClient, SAP_PEOPLE_BASE_URL, copyToClipboard, formatPhoneNumber, MAP_ROLE_TO_LABEL } from "@/utils/member-utils";
 import { TeamsIcon } from "../icons/TeamsIcon";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { get } from "http";
 
 // Extended member interface with additional fields for the details dialog
 export interface ExtendedMember extends DutyMember {
@@ -43,6 +44,8 @@ interface MemberDetailsDialogProps {
 export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager, onGoBack, showBackButton }: MemberDetailsDialogProps) {
   const { user } = useAuth();
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // Enhanced copy function with visual feedback
   const handleCopyToClipboard = useCallback(async (e: React.MouseEvent, text: string, fieldLabel: string) => {
@@ -62,6 +65,42 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
   // Check if current user can edit this member's picture
   const canEditPicture = user?.id === member.id;
 
+  // Check if current user can navigate to teams (manager or mmm role)
+  const canNavigateToTeams = member.managed_teams && member.managed_teams.length > 0;
+
+  // Get current team from URL to disable navigation to the current team
+  const currentUserTeam = (() => {
+    const pathParts = location.pathname.split('/');
+    const teamsIndex = pathParts.indexOf('teams');
+    if(teamsIndex === -1) return null;
+    return decodeURIComponent(pathParts[teamsIndex + 1]);
+  })();
+
+  // Helper function to handle team navigation
+  const handleTeamNavigation = (teamName: string, teamId: string) => {
+    if (!canNavigateToTeams) return;
+    
+    // Don't navigate if it's the current user's own team
+    if (teamId === currentUserTeam) return;
+    
+    // Navigate to teams page with the team name and default tab
+    navigate(`/teams/${encodeURIComponent(teamId)}/overview`);
+    
+    // Close the dialog after navigation
+    onOpenChange(false);
+  };
+
+  // Helper function to check if a team should be clickable
+  const isTeamClickable = (teamId: string) => {
+    return canNavigateToTeams && teamId !== currentUserTeam && teamId !== "Not specified";
+  };
+
+  const getManagetFullName = () => {
+    if(member.manager)
+      return `${member?.manager?.first_name} ${member?.manager?.last_name}`;
+    return "Not specified";
+  }
+
   const detailItems = [
     {
       icon: IdCard,
@@ -78,7 +117,7 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
     {
       icon: Users,
       label: "Team",
-      value: member.team || "Not specified"
+      value: member.managed_teams?.map(team => team.title).join(', ') || member.team || "Not specified"
     },
     {
       icon: MapPin,
@@ -88,10 +127,10 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
     {
       icon: UserCheck,
       label: "Manager Name",
-      value: member.managerName || "Not specified",
-      onClick: member.managerName && member.managerName !== "Not specified" && onViewManager 
-        ? () => onViewManager(member.managerName!) 
-        : undefined
+      value: getManagetFullName(),
+      onClick: member.id && onViewManager 
+        ? () => onViewManager(member.manager.id!) 
+        : undefined,
     },
     {
       icon: Calendar,
@@ -104,12 +143,6 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
       value: formatPhoneNumber(member.mobile)
     }
   ];
-
-  const MAP_ROLE_TO_LABEL: Record<string, string> = {
-  'member': "Member",
-  'manager': "Manager",
-  'scm': "SCM",
-};
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -187,6 +220,45 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
             <div className="grid gap-1">
               {detailItems.map((item, index) => {
                 const isClickable = !!item.onClick;
+                
+                // Custom rendering for teams
+                if (item.label === "Team") {
+                  return (
+                    <div key={index} className="flex items-center gap-3 p-2 rounded-md">
+                      <item.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="text-sm font-medium text-muted-foreground min-w-0">
+                        {item.label}:
+                      </span>
+                      <div className="flex-1 flex flex-wrap gap-1">
+                        {member.managed_teams && member.managed_teams.length > 0 ? (
+                          member.managed_teams.map((team, teamIndex) => {
+                            const clickable = isTeamClickable(team.name);
+                            return (
+                              <span
+                                key={teamIndex}
+                                className={`text-sm ${
+                                  clickable 
+                                    ? 'text-primary hover:underline cursor-pointer' 
+                                    : 'text-foreground'
+                                }`}
+                                onClick={clickable ? () => handleTeamNavigation(team.title, team.name) : undefined}
+                                title={team.title}
+                              >
+                                {team.title}
+                                {teamIndex < member.managed_teams!.length - 1 && ', '}
+                              </span>
+                            );
+                          })
+                        ) : (
+                          <span className="text-sm text-foreground">
+                            {member.team || "Not specified"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                
                 return (
                   <div 
                     key={index} 

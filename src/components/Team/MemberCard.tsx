@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { Member as DutyMember } from "@/hooks/useOnDutyData";
-import {SAP_PEOPLE_BASE_URL} from "@/utils/member-utils";
+import {MAP_ROLE_TO_LABEL, SAP_PEOPLE_BASE_URL} from "@/utils/member-utils";
 
 interface MemberCardProps {
   member: DutyMember;
@@ -16,11 +16,6 @@ interface MemberCardProps {
 }
 
 const initials = (name: string) => name.split(" ").map((n) => n[0]).slice(0, 2).join("");
-
-const MAP_ROLE_TO_LABEL: Record<string, string> = {
-  'manager': "Manager",
-  'scm': "SCM",
-};
 
 export function MemberCard({ member, showActions = true, isAdmin = false, onInitiateMove, onViewDetails }: MemberCardProps) {
   return (

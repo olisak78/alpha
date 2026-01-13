@@ -242,11 +242,12 @@ describe('useTriggeredAlert', () => {
   it('should fetch specific triggered alert successfully', async () => {
     const projectname = 'test-project';
     const fingerprint = 'alert-fingerprint-123';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
     const mockAlert = createMockTriggeredAlert();
 
     vi.mocked(getTriggeredAlert).mockResolvedValue(mockAlert);
 
-    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint), {
+    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint, startsAt), {
       wrapper: createWrapper(),
     });
 
@@ -255,13 +256,14 @@ describe('useTriggeredAlert', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toEqual(mockAlert);
-    expect(getTriggeredAlert).toHaveBeenCalledWith(projectname, fingerprint);
+    expect(getTriggeredAlert).toHaveBeenCalledWith(projectname, fingerprint, startsAt);
   });
 
   it('should not fetch when projectname is empty', async () => {
     const fingerprint = 'alert-fingerprint-123';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
 
-    const { result } = renderHook(() => useTriggeredAlert('', fingerprint), {
+    const { result } = renderHook(() => useTriggeredAlert('', fingerprint, startsAt), {
       wrapper: createWrapper(),
     });
 
@@ -272,8 +274,9 @@ describe('useTriggeredAlert', () => {
 
   it('should not fetch when fingerprint is empty', async () => {
     const projectname = 'test-project';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
 
-    const { result } = renderHook(() => useTriggeredAlert(projectname, ''), {
+    const { result } = renderHook(() => useTriggeredAlert(projectname, '', startsAt), {
       wrapper: createWrapper(),
     });
 
@@ -283,7 +286,7 @@ describe('useTriggeredAlert', () => {
   });
 
   it('should not fetch when both parameters are missing', async () => {
-    const { result } = renderHook(() => useTriggeredAlert('', ''), {
+    const { result } = renderHook(() => useTriggeredAlert('', '', ''), {
       wrapper: createWrapper(),
     });
 
@@ -295,10 +298,11 @@ describe('useTriggeredAlert', () => {
   it('should handle API errors', async () => {
     const projectname = 'test-project';
     const fingerprint = 'alert-fingerprint-123';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
     const error = new Error('Alert not found');
     vi.mocked(getTriggeredAlert).mockRejectedValue(error);
 
-    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint), {
+    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint, startsAt), {
       wrapper: createWrapper(),
     });
 
@@ -311,11 +315,12 @@ describe('useTriggeredAlert', () => {
   it('should use correct stale time (1 minute)', async () => {
     const projectname = 'test-project';
     const fingerprint = 'alert-fingerprint-123';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
     const mockAlert = createMockTriggeredAlert();
 
     vi.mocked(getTriggeredAlert).mockResolvedValue(mockAlert);
 
-    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint), {
+    const { result } = renderHook(() => useTriggeredAlert(projectname, fingerprint, startsAt), {
       wrapper: createWrapper(),
     });
 
@@ -327,14 +332,15 @@ describe('useTriggeredAlert', () => {
   it('should accept custom query options', async () => {
     const projectname = 'test-project';
     const fingerprint = 'alert-fingerprint-123';
+    const startsAt = '2025-01-01T10:00:00.123456Z';
     const mockAlert = createMockTriggeredAlert();
 
     vi.mocked(getTriggeredAlert).mockResolvedValue(mockAlert);
 
-    const { result } = renderHook(() => 
-      useTriggeredAlert(projectname, fingerprint, { 
+    const { result } = renderHook(() =>
+      useTriggeredAlert(projectname, fingerprint, startsAt, {
         refetchInterval: 30000,
-        enabled: true 
+        enabled: true
       }), {
       wrapper: createWrapper(),
     });
