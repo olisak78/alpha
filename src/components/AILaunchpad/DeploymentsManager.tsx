@@ -136,10 +136,10 @@ export const DeploymentsManager: React.FC<DeploymentsManagerProps> = ({
           {!error && allDeployments.length > 0 && (
             <div className="flex items-center gap-3 flex-wrap">
               {(() => {
-                const runningDeployments = allDeployments.filter(d => d.status === 'RUNNING').length;
-                const totalDeployments = allDeployments.length;
+                const runningDeployments = filteredDeployments.filter(d => d.status === 'RUNNING').length;
+                const totalDeployments = filteredDeployments.length;
                 const uniqueModels = new Set<string>();
-                allDeployments.forEach(deployment => {
+                filteredDeployments.forEach(deployment => {
                   const modelName = deployment.details?.resources?.backendDetails?.model?.name ||
                                    deployment.details?.resources?.backend_details?.model?.name ||
                                    deployment.configurationName ||

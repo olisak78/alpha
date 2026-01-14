@@ -9,8 +9,14 @@ import { selfServiceBlocks, type SelfServiceDialog } from "@/data/self-service/s
 import { Wrench } from "lucide-react";
 import JobsHistoryTable from '@/components/SelfService/JobsHistoryTable';
 import { useJenkinsJobHistory } from '@/hooks/api/useJenkinsJobHistory';
+import { isProduction } from '@/utils/environment';
+import { type TimePeriod, getHoursForPeriod } from '@/utils/selfServiceUtils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCurrentUser } from "@/hooks/api/useMembers";
 
 export default function SelfServicePage() {
+  const { user } = useAuth();
+
   const [activeBlock, setActiveBlock] = useState<SelfServiceDialog | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -22,8 +28,19 @@ export default function SelfServicePage() {
     serviceTitle: string;
   } | null>(null);
 
-  // Fetch job history for calculating counts - use onlyMine=false to match filtered display
-  const { data: jobHistory } = useJenkinsJobHistory(10, 0, false);
+  // Time period state - synchronized with JobsHistoryTable
+  // Load from localStorage on mount, default to 'last48h'
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>(() => {
+    const stored = localStorage.getItem('jobsHistory_timePeriod');
+    return (stored as TimePeriod) || 'last48h';
+  });
+
+  // Calculate hours for the selected time period
+  const lastUpdatedHours = getHoursForPeriod(timePeriod);
+
+  // Fetch job history for calculating counts - use onlyMine=false and current time period
+  // Fetch more jobs (100) to get better counts across all services
+  const { data: jobHistory } = useJenkinsJobHistory(100, 0, false, lastUpdatedHours);
 
   const jenkinsQuery = useFetchJenkinsJobParameters(
     staticJobData?.jenkinsJob?.jaasName || "",
@@ -34,6 +51,7 @@ export default function SelfServicePage() {
   );
 
   const triggerMutation = useTriggerJenkinsJob();
+  const { data: currentUser } = useCurrentUser();
 
   // Calculate history count for a specific service/job
   const getServiceHistoryCount = (jobName?: string): number => {
@@ -72,6 +90,12 @@ export default function SelfServicePage() {
     setFilteredService(null);
   };
 
+  // Handle time period change from JobsHistoryTable
+  const handleTimePeriodChange = (newPeriod: TimePeriod) => {
+    setTimePeriod(newPeriod);
+    // No need to update localStorage here - JobsHistoryTable already does it
+  };
+
   const loadStaticData = async (path: string) => {
     try {
       const publicPath = path.startsWith('/') ? path.substring(1) : path;
@@ -89,6 +113,7 @@ export default function SelfServicePage() {
   };
 
   const openDialog = async (block: SelfServiceDialog) => {
+
     setActiveBlock(block);
     setIsOpen(true);
 
@@ -122,10 +147,10 @@ export default function SelfServicePage() {
               });
 
               if (allParams.length > 0) {
-                setFormData(getDefaults(allParams));
+                const initialDefaults = getDefaults(allParams);
+                setFormData(initialDefaults);
               }
             } catch (error) {
-              console.error('Failed to load dynamic steps:', error);
               toast({
                 title: "Error",
                 description: "Failed to load dynamic configuration",
@@ -141,7 +166,8 @@ export default function SelfServicePage() {
             });
 
             if (allParams.length > 0) {
-              setFormData(getDefaults(allParams));
+              const initialDefaults = getDefaults(allParams);
+              setFormData(initialDefaults);
             }
           }
         }
@@ -157,32 +183,30 @@ export default function SelfServicePage() {
   };
 
   useEffect(() => {
+
     if (jenkinsQuery.data && activeBlock?.dialogType === 'dynamic') {
       const params = jenkinsQuery.data.steps?.[0]?.fields || [];
       if (params.length > 0) {
-        setFormData(getDefaults(params));
+        const initialDefaults = getDefaults(params);
+        setFormData(initialDefaults);
       }
     }
   }, [jenkinsQuery.data, activeBlock]);
 
-  const getDefaults = (params: any[]) => {
+   const getDefaults = (params: any[]) => {
     const defaults: Record<string, any> = {};
+    params.filter(p => p.type !== "WHideParameterDefinition").forEach(p => {
+      const key = p.name || p.id;
+      const value = p.defaultParameterValue?.value || p.defaultValue?.value;
 
-    const hiddenTypes = ['WHideParameterDefinition'];
-
-    params.forEach(param => {
-      if (hiddenTypes.includes(param.type)) {
-        return;
-      }
-
-      const key = param.id || param.name;
-      const value = param.defaultValue !== undefined ? param.defaultValue : param.value;
-
-      if (key === 'ClusterName' && !value) {
-        if (param.description && param.description.includes('$USERID')) {
+      if (key === 'ClusterName') {
+        const userId = (currentUser as any)?.iuser || (currentUser as any)?.id || '';
+        if (userId) {
+          defaults[key] = userId;
+        } else if (!currentUser) {
           toast({
-            title: "Note",
-            description: "ClusterName must be entered manually.",
+            title: "Warning",
+            description: "Unable to retrieve user ID. ClusterName must be entered manually.",
             variant: "destructive"
           });
           defaults[key] = '';
@@ -192,7 +216,6 @@ export default function SelfServicePage() {
       } else {
         defaults[key] = value || '';
       }
-      
     });
 
     return defaults;
@@ -219,12 +242,12 @@ export default function SelfServicePage() {
       if (typeof value === 'boolean' && value === false) {
         return acc;
       }
-      
+
       // Handle SLEEP_SECONDS field specially - must be a number, not empty string
       if (key === 'SLEEP_SECONDS') {
         // Convert to number
         const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
-        
+
         // If empty string, NaN, null, undefined, or invalid -> use 0
         if (value === '' || value === null || value === undefined || isNaN(numValue)) {
           acc[key] = 0;
@@ -233,7 +256,7 @@ export default function SelfServicePage() {
         }
         return acc;
       }
-      
+
       acc[key] = value;
       return acc;
     }, {} as Record<string, any>);
@@ -259,6 +282,15 @@ export default function SelfServicePage() {
     );
   };
 
+  // Filter service blocks based on environment
+  const visibleServiceBlocks = selfServiceBlocks.filter(block => {
+    // Hide "hello-developer-portal" in production (dev-only feature)
+    if (block.id === 'hello-developer-portal' && isProduction()) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <BreadcrumbPage>
       <div className="space-y-6 px-6 pt-4">
@@ -279,40 +311,42 @@ export default function SelfServicePage() {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {selfServiceBlocks.map((block) => (
-              <SelfServiceBlockDialog
-                key={block.id}
-                block={block}
-                isOpen={isOpen && activeBlock?.id === block.id}
-                isLoading={jenkinsQuery.isLoading || triggerMutation.isPending}
-                formData={formData}
-                currentStepIndex={0}
-                currentStep={undefined}
-                steps={[]}
-                jenkinsParameters={jenkinsQuery.data}
-                staticJobParameters={staticJobData}
-                onOpenDialog={() => openDialog(block)}
-                onCloseDialog={closeDialog}
-                onFormChange={updateForm}
-                onSubmit={submitForm}
-                onCancel={closeDialog}
-                historyCount={getServiceHistoryCount(block.jenkinsJob?.jobName)}
-                isSelected={filteredService?.jobName === block.jenkinsJob?.jobName}
-                onHistoryClick={() => handleHistoryClick(block)}
-              />
-            ))}
+          {visibleServiceBlocks.map((block) => (
+            <SelfServiceBlockDialog
+              key={block.id}
+              block={block}
+              isOpen={isOpen && activeBlock?.id === block.id}
+              isLoading={jenkinsQuery.isLoading || triggerMutation.isPending}
+              formData={formData}
+              currentStepIndex={0}
+              currentStep={undefined}
+              steps={[]}
+              jenkinsParameters={jenkinsQuery.data}
+              staticJobParameters={staticJobData}
+              onOpenDialog={() => openDialog(block)}
+              onCloseDialog={closeDialog}
+              onFormChange={updateForm}
+              onSubmit={submitForm}
+              onCancel={closeDialog}
+              historyCount={getServiceHistoryCount(block.jenkinsJob?.jobName)}
+              isSelected={filteredService?.jobName === block.jenkinsJob?.jobName}
+              onHistoryClick={() => handleHistoryClick(block)}
+            />
+          ))}
         </div>
 
         {/* Jobs History Table */}
         <div data-history-table>
-          <JobsHistoryTable 
+          <JobsHistoryTable
             filteredService={filteredService}
             onClearFilter={clearServiceFilter}
+            timePeriod={timePeriod}
+            onTimePeriodChange={handleTimePeriodChange}
           />
         </div>
 
         {/* Empty State */}
-        {selfServiceBlocks.length === 0 && (
+        {visibleServiceBlocks.length === 0 && (
           <div className="text-center py-8">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-muted mb-4">
               <Wrench className="h-6 w-6 text-muted-foreground" />

@@ -5,8 +5,10 @@ import {
   triggerJenkinsJob,
   fetchJenkinsQueueStatus,
   fetchJenkinsBuildStatus,
+  fetchJenkinsJobHistory,
   type JenkinsQueueStatusResponse,
-  type JenkinsBuildStatusResponse
+  type JenkinsBuildStatusResponse,
+  type JenkinsJobHistoryResponse
 } from '../../src/services/SelfServiceApi';
 import { apiClient } from '../../src/services/ApiClient';
 import type { JenkinsJobParametersResponse, JenkinsJobField } from '../../src/types/api';
@@ -344,7 +346,7 @@ describe('SelfServiceApi', () => {
 
       expect(result).toEqual(mockTriggerResponse);
       expect(apiClient.post).toHaveBeenCalledWith(
-        '/self-service/jenkins/test-jaas/test-job/trigger',
+        '/self-service/jenkins/test-jaas/test-job/trigger-tracked',
         parameters
       );
     });
@@ -377,7 +379,7 @@ describe('SelfServiceApi', () => {
 
       expect(result).toEqual(mockResponse);
       expect(apiClient.post).toHaveBeenCalledWith(
-        '/self-service/jenkins/test-jaas/test-job/trigger',
+        '/self-service/jenkins/test-jaas/test-job/trigger-tracked',
         {}
       );
     });
@@ -412,7 +414,7 @@ describe('SelfServiceApi', () => {
 
       expect(result).toEqual(mockResponse);
       expect(apiClient.post).toHaveBeenCalledWith(
-        '/self-service/jenkins/test-jaas/test-job/trigger',
+        '/self-service/jenkins/test-jaas/test-job/trigger-tracked',
         complexParameters
       );
     });
@@ -608,6 +610,318 @@ describe('SelfServiceApi', () => {
   });
 
   // ============================================================================
+  // FETCH JENKINS JOB HISTORY
+  // ============================================================================
+
+  describe('fetchJenkinsJobHistory', () => {
+    it('should fetch job history with default parameters', async () => {
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [
+          {
+            id: 'job-1',
+            createdAt: '2024-01-01T10:00:00Z',
+            updatedAt: '2024-01-01T10:05:00Z',
+            jaasName: 'test-jaas',
+            jobName: 'deploy-app',
+            queueItemId: '12345',
+            queueUrl: 'https://jenkins.example.com/queue/item/12345',
+            baseJobUrl: 'https://jenkins.example.com/job/deploy-app',
+            status: 'success',
+            buildNumber: 100,
+            buildUrl: 'https://jenkins.example.com/job/deploy-app/100',
+            queuedReason: '',
+            waitTime: 5000,
+            building: false,
+            duration: 300000,
+            result: 'SUCCESS',
+            triggeredBy: 'user@example.com',
+            parameters: { VERSION: '1.0.0' },
+            metadata: {},
+            resultJson: {},
+            lastPolledAt: '2024-01-01T10:05:00Z',
+            pollingActive: false,
+            completedAt: '2024-01-01T10:05:00Z',
+            errorMessage: '',
+            pollAttempts: 5
+          }
+        ],
+        limit: 10,
+        offset: 0,
+        total: 1
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+
+      const result = await fetchJenkinsJobHistory();
+
+      expect(result).toEqual(mockHistoryResponse);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=10&offset=0&only_mine=true&last_updated=48'
+      );
+    });
+
+    it('should fetch job history with custom parameters', async () => {
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [],
+        limit: 50,
+        offset: 10,
+        total: 100
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+
+      const result = await fetchJenkinsJobHistory(50, 10, false, 168);
+
+      expect(result).toEqual(mockHistoryResponse);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=50&offset=10&only_mine=false&last_updated=168'
+      );
+    });
+
+    it('should fetch all jobs (onlyMine=false)', async () => {
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [
+          {
+            id: 'job-1',
+            triggeredBy: 'user1@example.com',
+            jobName: 'job-1',
+            status: 'success'
+          } as any,
+          {
+            id: 'job-2',
+            triggeredBy: 'user2@example.com',
+            jobName: 'job-2',
+            status: 'failed'
+          } as any
+        ],
+        limit: 10,
+        offset: 0,
+        total: 2
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+
+      const result = await fetchJenkinsJobHistory(10, 0, false, 48);
+
+      expect(result).toEqual(mockHistoryResponse);
+      expect(result.jobs).toHaveLength(2);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=10&offset=0&only_mine=false&last_updated=48'
+      );
+    });
+
+    it('should handle pagination correctly', async () => {
+      const mockPage1: JenkinsJobHistoryResponse = {
+        jobs: Array(10).fill(null).map((_, i) => ({
+          id: `job-${i}`,
+          jobName: `job-${i}`,
+          status: 'success'
+        })) as any,
+        limit: 10,
+        offset: 0,
+        total: 25
+      };
+
+      const mockPage2: JenkinsJobHistoryResponse = {
+        jobs: Array(10).fill(null).map((_, i) => ({
+          id: `job-${i + 10}`,
+          jobName: `job-${i + 10}`,
+          status: 'success'
+        })) as any,
+        limit: 10,
+        offset: 10,
+        total: 25
+      };
+
+      const mockPage3: JenkinsJobHistoryResponse = {
+        jobs: Array(5).fill(null).map((_, i) => ({
+          id: `job-${i + 20}`,
+          jobName: `job-${i + 20}`,
+          status: 'success'
+        })) as any,
+        limit: 10,
+        offset: 20,
+        total: 25
+      };
+
+      // Fetch page 1
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockPage1);
+      let result = await fetchJenkinsJobHistory(10, 0, true, 48);
+      expect(result.jobs).toHaveLength(10);
+      expect(result.offset).toBe(0);
+
+      // Fetch page 2
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockPage2);
+      result = await fetchJenkinsJobHistory(10, 10, true, 48);
+      expect(result.jobs).toHaveLength(10);
+      expect(result.offset).toBe(10);
+
+      // Fetch page 3 (last page with 5 items)
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockPage3);
+      result = await fetchJenkinsJobHistory(10, 20, true, 48);
+      expect(result.jobs).toHaveLength(5);
+      expect(result.offset).toBe(20);
+      expect(result.total).toBe(25);
+    });
+
+    it('should handle empty job history', async () => {
+      const mockEmptyResponse: JenkinsJobHistoryResponse = {
+        jobs: [],
+        limit: 10,
+        offset: 0,
+        total: 0
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockEmptyResponse);
+
+      const result = await fetchJenkinsJobHistory();
+
+      expect(result.jobs).toEqual([]);
+      expect(result.total).toBe(0);
+    });
+
+    it('should handle different time periods', async () => {
+      const mockResponse: JenkinsJobHistoryResponse = {
+        jobs: [],
+        limit: 10,
+        offset: 0,
+        total: 0
+      };
+
+      // Test 24 hours
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
+      await fetchJenkinsJobHistory(10, 0, true, 24);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=10&offset=0&only_mine=true&last_updated=24'
+      );
+
+      // Test 7 days (168 hours)
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
+      await fetchJenkinsJobHistory(10, 0, true, 168);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=10&offset=0&only_mine=true&last_updated=168'
+      );
+
+      // Test 30 days (720 hours)
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
+      await fetchJenkinsJobHistory(10, 0, true, 720);
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/self-service/jenkins/jobs?limit=10&offset=0&only_mine=true&last_updated=720'
+      );
+    });
+
+    it('should handle API errors', async () => {
+      const apiError = new Error('Failed to fetch job history');
+      vi.mocked(apiClient.get).mockRejectedValueOnce(apiError);
+
+      await expect(fetchJenkinsJobHistory())
+        .rejects.toThrow('Failed to fetch job history');
+    });
+
+    it('should handle jobs with various statuses', async () => {
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [
+          {
+            id: 'job-1',
+            jobName: 'job-1',
+            status: 'success',
+            result: 'SUCCESS'
+          } as any,
+          {
+            id: 'job-2',
+            jobName: 'job-2',
+            status: 'failed',
+            result: 'FAILURE'
+          } as any,
+          {
+            id: 'job-3',
+            jobName: 'job-3',
+            status: 'running',
+            result: null
+          } as any,
+          {
+            id: 'job-4',
+            jobName: 'job-4',
+            status: 'queued',
+            result: null
+          } as any,
+          {
+            id: 'job-5',
+            jobName: 'job-5',
+            status: 'aborted',
+            result: 'ABORTED'
+          } as any
+        ],
+        limit: 10,
+        offset: 0,
+        total: 5
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+
+      const result = await fetchJenkinsJobHistory();
+
+      expect(result.jobs).toHaveLength(5);
+      expect(result.jobs[0].status).toBe('success');
+      expect(result.jobs[1].status).toBe('failed');
+      expect(result.jobs[2].status).toBe('running');
+      expect(result.jobs[3].status).toBe('queued');
+      expect(result.jobs[4].status).toBe('aborted');
+    });
+
+    it('should include all job details', async () => {
+      const mockJob = {
+        id: 'job-123',
+        createdAt: '2024-01-01T10:00:00Z',
+        updatedAt: '2024-01-01T10:05:00Z',
+        jaasName: 'test-jaas',
+        jobName: 'deploy-app',
+        queueItemId: '12345',
+        queueUrl: 'https://jenkins.example.com/queue/item/12345',
+        baseJobUrl: 'https://jenkins.example.com/job/deploy-app',
+        status: 'success',
+        buildNumber: 100,
+        buildUrl: 'https://jenkins.example.com/job/deploy-app/100',
+        queuedReason: 'Waiting for executor',
+        waitTime: 5000,
+        building: false,
+        duration: 300000,
+        result: 'SUCCESS',
+        triggeredBy: 'user@example.com',
+        parameters: { 
+          VERSION: '1.0.0',
+          ENVIRONMENT: 'production'
+        },
+        metadata: { deploymentId: 'deploy-123' },
+        resultJson: { artifacts: [] },
+        lastPolledAt: '2024-01-01T10:05:00Z',
+        pollingActive: false,
+        completedAt: '2024-01-01T10:05:00Z',
+        errorMessage: '',
+        pollAttempts: 5
+      };
+
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [mockJob],
+        limit: 10,
+        offset: 0,
+        total: 1
+      };
+
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+
+      const result = await fetchJenkinsJobHistory();
+
+      expect(result.jobs[0]).toEqual(mockJob);
+      expect(result.jobs[0].parameters).toEqual({
+        VERSION: '1.0.0',
+        ENVIRONMENT: 'production'
+      });
+      expect(result.jobs[0].metadata).toEqual({ deploymentId: 'deploy-123' });
+    });
+  });
+
+  // ============================================================================
   // INTEGRATION TESTS
   // ============================================================================
 
@@ -651,6 +965,24 @@ describe('SelfServiceApi', () => {
       vi.mocked(apiClient.get).mockResolvedValueOnce(mockBuildStatus);
       const buildStatus = await fetchJenkinsBuildStatus('test-jaas', 'test-job', 123);
       expect(buildStatus.status).toBe('success');
+
+      // 5. Verify job appears in history
+      const mockHistoryResponse: JenkinsJobHistoryResponse = {
+        jobs: [{
+          id: 'job-1',
+          jobName: 'test-job',
+          buildNumber: 123,
+          status: 'success',
+          triggeredBy: 'user@example.com'
+        } as any],
+        limit: 10,
+        offset: 0,
+        total: 1
+      };
+      vi.mocked(apiClient.get).mockResolvedValueOnce(mockHistoryResponse);
+      const history = await fetchJenkinsJobHistory();
+      expect(history.jobs).toHaveLength(1);
+      expect(history.jobs[0].buildNumber).toBe(123);
     });
 
     it('should handle job failure scenario', async () => {
@@ -686,4 +1018,4 @@ describe('SelfServiceApi', () => {
       expect(buildStatus.status).toBe('failed');
     });
   });
-});
+});q

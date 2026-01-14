@@ -30,7 +30,6 @@ export const PortalContainer: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProject, setActiveProject] = useState("");
-  const isProduction = import.meta.env.PROD;
 
   // Build dynamic route maps including projects
   const routeToProjectMap: Record<string, string> = { ...staticRouteToProjectMap };

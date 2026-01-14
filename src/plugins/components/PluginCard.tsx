@@ -36,7 +36,6 @@ const PluginCard = ({ plugin, onOpen, onEdit, onDelete }: PluginCardProps) => {
 
     const getOwnerDisplayName = (): string => {
         // Try to get from metadata first
-        console.log(plugin.metadata)
         if (plugin.metadata?.author_name) {
             return `${plugin.metadata.author_name}`;
         }
