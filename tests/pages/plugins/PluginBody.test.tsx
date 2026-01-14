@@ -64,7 +64,7 @@ describe('PluginBody', () => {
         </BaseBody>
       );
 
-      const contentContainer = container.querySelector('.p-6');
+      const contentContainer = container.firstChild;
       expect(contentContainer).toHaveStyle({ minHeight: '400px' });
     });
 
@@ -75,7 +75,7 @@ describe('PluginBody', () => {
         </BaseBody>
       );
 
-      const contentContainer = container.querySelector('.p-6');
+      const contentContainer = container.firstChild;
       expect(contentContainer).toHaveStyle({ minHeight: '600px' });
     });
 
@@ -96,14 +96,14 @@ describe('PluginBody', () => {
       expect(screen.getByText('Button')).toBeInTheDocument();
     });
 
-    it('should apply p-6 padding class to content container', () => {
+    it('should render content container', () => {
       const { container } = render(
         <BaseBody>
           <div>Content</div>
         </BaseBody>
       );
 
-      const contentContainer = container.querySelector('.p-6');
+      const contentContainer = container.firstChild;
       expect(contentContainer).toBeInTheDocument();
     });
   });
@@ -651,13 +651,13 @@ describe('PluginBody', () => {
         <BaseBody minHeight="50vh">Content</BaseBody>
       );
 
-      expect(pxContainer.querySelector('.p-6')).toHaveStyle({
+      expect(pxContainer.firstChild).toHaveStyle({
         minHeight: '500px',
       });
-      expect(remContainer.querySelector('.p-6')).toHaveStyle({
+      expect(remContainer.firstChild).toHaveStyle({
         minHeight: '30rem',
       });
-      expect(vhContainer.querySelector('.p-6')).toHaveStyle({
+      expect(vhContainer.firstChild).toHaveStyle({
         minHeight: '50vh',
       });
     });

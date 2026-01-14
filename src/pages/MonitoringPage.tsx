@@ -5,10 +5,9 @@ import AlertsPage from '@/pages/AlertsPage';
 import { TriggeredAlertsTab } from '@/components/tabs/TriggeredAlertsTab';
 import { AlertTriangle, Settings } from 'lucide-react';
 import { useAlerts } from '@/hooks/api/useAlerts';
-import { TriggeredAlertsProvider, useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
 
 
-type MonitoringTabType = 'alerts-definitions' | 'alerts-history';
+type MonitoringTabType = 'alerts-definitions' | 'active-alerts' | 'alerts-history';
 
 interface MonitoringPageProps {
   projectId: string;
@@ -18,7 +17,7 @@ interface MonitoringPageProps {
 
 // Inner component that can access the triggered alerts context
 function MonitoringPageContent({ projectId, projectName, alertsUrl }: MonitoringPageProps) {
-  const [activeTab, setActiveTab] = useState<MonitoringTabType>('alerts-history');
+  const [activeTab, setActiveTab] = useState<MonitoringTabType>('active-alerts');
   const [alertSearchTerm, setAlertSearchTerm] = useState<string>('');
 
   // Function to switch to alerts definitions tab with search term
@@ -30,8 +29,6 @@ function MonitoringPageContent({ projectId, projectName, alertsUrl }: Monitoring
   // Fetch alerts data to get count
   const { data: alertsData } = useAlerts(projectId);
 
-  // Get triggered alerts count from context
-  const { totalCount } = useTriggeredAlertsContext();
 
   // Calculate alert counts
   const alertsCount = useMemo(() => {
@@ -44,16 +41,21 @@ function MonitoringPageContent({ projectId, projectName, alertsUrl }: Monitoring
   // Filter options for monitoring tabs with counts
   const monitoringFilterOptions: FilterOption<MonitoringTabType>[] = useMemo(() => [
     {
+      value: "active-alerts",
+      label: `Active Alerts`,
+      icon: AlertTriangle
+    },
+    {
       value: "alerts-history",
-      label: `Alerts History ${` (${totalCount})`}`,
+      label: `Alerts History`,
       icon: AlertTriangle
     },
     {
       value: "alerts-definitions",
       label: `Alerts Definitions${alertsCount > 0 ? ` (${alertsCount})` : ''}`,
-      icon:  Settings
+      icon: Settings
     },
-  ], [totalCount, alertsCount]);
+  ], [alertsCount]);
 
   return (
     <div>
@@ -76,10 +78,20 @@ function MonitoringPageContent({ projectId, projectName, alertsUrl }: Monitoring
           <CardContent className='pt-6'>
             {/* Tab Content */}
 
+            {activeTab === 'active-alerts' && (
+              <TriggeredAlertsTab
+                projectId={projectId}
+                onShowAlertDefinition={showAlertDefinition}
+                initialStatusFilter={['firing']}
+                title="Active Alerts"
+              />
+            )}
             {activeTab === 'alerts-history' && (
               <TriggeredAlertsTab
                 projectId={projectId}
                 onShowAlertDefinition={showAlertDefinition}
+                initialStatusFilter={['resolved']}
+                title="Alerts History"
               />
             )}
             {activeTab === 'alerts-definitions' && (
@@ -100,9 +112,5 @@ function MonitoringPageContent({ projectId, projectName, alertsUrl }: Monitoring
 }
 
 export default function MonitoringPage(props: MonitoringPageProps) {
-  return (
-    <TriggeredAlertsProvider projectId={props.projectId} onShowAlertDefinition={() => {}}>
-      <MonitoringPageContent {...props} />
-    </TriggeredAlertsProvider>
-  );
+  return <MonitoringPageContent {...props} />;
 }

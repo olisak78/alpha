@@ -157,8 +157,6 @@ export default function JobsHistoryTable({
       let currentOffset = 0;
       const pageSize = 10; // Backend caps at 10
       
-      console.log(`🔍 Fetching all jobs for service: ${filteredService.jobName}`);
-      
       try {
         // Keep fetching pages until we have all jobs
         while (true) {
@@ -173,18 +171,14 @@ export default function JobsHistoryTable({
           );
           
           accumulated.push(...pageData.jobs);
-          
-          console.log(`📦 Page ${currentOffset / pageSize + 1}: got ${pageData.jobs.length} jobs, accumulated: ${accumulated.length}/${pageData.total}`);
-          
+                    
           // Stop if we've fetched all jobs
           if (accumulated.length >= pageData.total) {
-            console.log(`✅ Fetched all ${accumulated.length} jobs`);
             break;
           }
           
           // Stop if last page returned fewer jobs than requested
           if (pageData.jobs.length < pageSize) {
-            console.log(`✅ Last page reached`);
             break;
           }
           
@@ -192,16 +186,12 @@ export default function JobsHistoryTable({
           
           // Safety: don't fetch more than 100 pages (1000 jobs)
           if (currentOffset >= 1000) {
-            console.log(`⚠️ Safety limit reached (1000 jobs)`);
             break;
           }
         }
         
-        setAllAccumulatedJobs(accumulated);
-        console.log(`✅ Accumulated ${accumulated.length} total jobs`);
-        
+        setAllAccumulatedJobs(accumulated);        
       } catch (error) {
-        console.error('❌ Error fetching all pages:', error);
         setAllAccumulatedJobs([]);
       } finally {
         setIsFetchingAllPages(false);
@@ -260,24 +250,13 @@ export default function JobsHistoryTable({
   const filteredJobs = useMemo(() => {
     let jobs = jobsToFilter;
 
-    console.log('=== FILTERING DEBUG ===');
-    console.log('Source:', filteredService && allAccumulatedJobs.length > 0 ? 'accumulated jobs' : 'normal page data');
-    console.log('Total jobs before filtering:', jobs.length);
-    console.log('filteredService:', filteredService);
-    console.log('debouncedSearchTerm:', debouncedSearchTerm);
-
-    // Filter by service if one is selected AND we're using normal page data
-    // (accumulated jobs are already from all pages, we just need to filter by jobName)
     if (filteredService) {
       const beforeFilter = jobs.length;
       jobs = jobs.filter((job) => job.jobName === filteredService.jobName);
-      console.log(`Service filter: ${beforeFilter} → ${jobs.length} jobs`);
-      console.log('Looking for jobName:', filteredService.jobName);
     }
 
     // Then apply search filter
     if (!debouncedSearchTerm.trim()) {
-      console.log('No search term, returning', jobs.length, 'jobs');
       return jobs;
     }
 
@@ -285,19 +264,18 @@ export default function JobsHistoryTable({
     
     const searchFiltered = jobs.filter((job) => {
       const jobName = job.jobName?.toLowerCase() || '';
-      const triggeredBy = job.triggeredBy?.toLowerCase() || '';
+      const triggeredByName = job.metadata?.name?.toLowerCase() || '';
       const status = job.status?.toLowerCase() || '';
       const buildNumber = job.buildNumber?.toString() || '';
       
       return (
         jobName.includes(searchLower) ||
-        triggeredBy.includes(searchLower) ||
+        triggeredByName.includes(searchLower) ||
         status.includes(searchLower) ||
         buildNumber.includes(searchLower)
       );
     });
-    
-    console.log(`Search filter: ${jobs.length} → ${searchFiltered.length} jobs`);
+  
     return searchFiltered;
   }, [jobsToFilter, debouncedSearchTerm, filteredService, allAccumulatedJobs.length]);
 
@@ -312,22 +290,16 @@ export default function JobsHistoryTable({
    * Calculate pagination based on whether we're filtering client-side or not
    */
   const paginationStats = useMemo(() => {
-    console.log('=== PAGINATION STATS DEBUG ===');
-    console.log('hasClientSideFiltering:', hasClientSideFiltering);
-    console.log('filteredJobs.length:', filteredJobs.length);
-    console.log('data?.total:', data?.total);
-    
+
     if (hasClientSideFiltering) {
       // Client-side filtering: use filtered count
       const totalItems = filteredJobs.length;
       const totalPages = Math.ceil(totalItems / itemsPerPage);
-      console.log('Using client-side pagination:', { totalItems, totalPages });
       return { totalItems, totalPages };
     } else {
       // Server-side pagination: use API total
       const totalItems = data?.total || 0;
       const totalPages = Math.ceil(totalItems / itemsPerPage);
-      console.log('Using server-side pagination:', { totalItems, totalPages });
       return { totalItems, totalPages };
     }
   }, [hasClientSideFiltering, filteredJobs.length, data?.total, itemsPerPage]);
@@ -337,21 +309,15 @@ export default function JobsHistoryTable({
    * For server-side pagination, display all items from current page
    */
   const paginatedJobs = useMemo(() => {
-    console.log('=== PAGINATED JOBS DEBUG ===');
-    console.log('hasClientSideFiltering:', hasClientSideFiltering);
-    console.log('currentPage:', currentPage);
-    console.log('itemsPerPage:', itemsPerPage);
     
     if (hasClientSideFiltering) {
       // Client-side: paginate the filtered results
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginated = filteredJobs.slice(startIndex, endIndex);
-      console.log('Client-side pagination:', { startIndex, endIndex, resultCount: paginated.length });
       return paginated;
     } else {
       // Server-side: show all jobs from API (already paginated by server)
-      console.log('Server-side: showing all', filteredJobs.length, 'jobs from API');
       return filteredJobs;
     }
   }, [hasClientSideFiltering, filteredJobs, currentPage, itemsPerPage]);
@@ -386,18 +352,6 @@ export default function JobsHistoryTable({
     const option = TIME_PERIODS.find(p => p.value === timePeriod);
     return option?.label || 'Last 48 hours';
   };
-
-  // 🐛 DEBUG: Final summary before rendering
-  console.log('=== FINAL RENDER DEBUG ===');
-  console.log('paginatedJobs to display:', paginatedJobs.length);
-  console.log('filteredJobs total:', filteredJobs.length);
-  console.log('First 3 jobs to render:', paginatedJobs.slice(0, 3).map(j => ({
-    id: j.id,
-    jobName: j.jobName,
-    buildNumber: j.buildNumber
-  })));
-  console.log('Will show pagination?', paginationStats.totalPages > 1);
-  console.log('=====================\n');
 
   // Show loading indicator while fetching all pages
   const effectiveIsLoading = isLoading || isFetchingAllPages;
@@ -514,7 +468,7 @@ export default function JobsHistoryTable({
                           {!onlyMine && (
                             <TableCell className="text-sm">
                               <span className={isMyJob(job) ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}>
-                                {job.triggeredBy || '-'}
+                                {job.metadata?.name || 'unknown'}
                               </span>
                             </TableCell>
                           )}

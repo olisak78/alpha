@@ -67,7 +67,6 @@ describe('AppliedFilters', () => {
         ...mockProps,
         searchTerm: 'test search',
         selectedSeverity: 'critical',
-        selectedStatus: 'firing',
         selectedLandscape: 'production',
         selectedRegion: 'us-east-1',
         selectedComponent: 'component-a',
@@ -76,7 +75,6 @@ describe('AppliedFilters', () => {
       
       expect(screen.getByText('Search: "test search"')).toBeInTheDocument();
       expect(screen.getByText('Severity: critical')).toBeInTheDocument();
-      expect(screen.getByText('Status: firing')).toBeInTheDocument();
       expect(screen.getByText('Landscape: production')).toBeInTheDocument();
       expect(screen.getByText('Region: us-east-1')).toBeInTheDocument();
       expect(screen.getByText('Component: component-a')).toBeInTheDocument();

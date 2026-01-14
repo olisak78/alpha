@@ -8,13 +8,11 @@ import { format } from 'date-fns';
 export interface FilterState {
   searchTerm: string;
   selectedSeverity: string[];
-  selectedStatus: string[];
   selectedLandscape: string[];
   selectedRegion: string[];
   startDate: string;
   endDate: string;
   excludedSeverity: string[];
-  excludedStatus: string[];
   excludedLandscape: string[];
   excludedRegion: string[];
   excludedAlertname: string[];
@@ -25,13 +23,11 @@ export interface FilterState {
 export interface FilterActions {
   setSearchTerm: (value: string) => void;
   setSelectedSeverity: (values: string[]) => void;
-  setSelectedStatus: (values: string[]) => void;
   setSelectedLandscape: (values: string[]) => void;
   setSelectedRegion: (values: string[]) => void;
   setStartDate: (value: string) => void;
   setEndDate: (value: string) => void;
   addExcludedSeverity: (value: string) => void;
-  addExcludedStatus: (value: string) => void;
   addExcludedLandscape: (value: string) => void;
   addExcludedRegion: (value: string) => void;
   addExcludedAlertname: (value: string) => void;
@@ -42,17 +38,14 @@ export interface FilterActions {
   // Individual filter removal functions
   removeSearchTerm: () => void;
   removeSeverity: () => void;
-  removeStatus: () => void;
   removeLandscape: () => void;
   removeRegion: () => void;
   removeDateRange: () => void;
   removeExcludedSeverity: (value: string) => void;
-  removeExcludedStatus: (value: string) => void;
   removeExcludedLandscape: (value: string) => void;
   removeExcludedRegion: (value: string) => void;
   removeExcludedAlertname: (value: string) => void;
   clearAllExcludedSeverity: () => void;
-  clearAllExcludedStatus: () => void;
   clearAllExcludedLandscape: () => void;
   clearAllExcludedRegion: () => void;
   clearAllExcludedAlertname: () => void;
@@ -60,7 +53,6 @@ export interface FilterActions {
 
 export interface FilterOptions {
   severities: string[];
-  statuses: string[];
   landscapes: string[];
   regions: string[];
 }
@@ -86,16 +78,24 @@ export interface UseTriggeredAlertsFiltersReturn {
   hasPreviousPage: boolean;
 }
 
-const LOCAL_STORAGE_FILTERS_KEY = 'triggeredAlertsFilters';
 const DEFAULT_PAGE_SIZE = 50; // Default page size as requested
 
-const getLocalStorageKey = (projectId: string): string => {
-  return `${LOCAL_STORAGE_FILTERS_KEY}_${projectId}`;
+const getLocalStorageKey = (projectId: string, initialStatusFilter?: string[]): string => {
+  // Determine the key suffix based on the status filter
+  if (initialStatusFilter && initialStatusFilter.length > 0) {
+    if (initialStatusFilter.includes('firing')) {
+      return `activeAlertsFilters_${projectId}`;
+    } else if (initialStatusFilter.includes('resolved')) {
+      return `historyAlertsFilters_${projectId}`;
+    }
+  }
+  // Fallback to the old key for backward compatibility
+  return `triggeredAlertsFilters_${projectId}`;
 };
 
-const getInitialFilterState = (projectId: string): FilterState => {
+const getInitialFilterState = (projectId: string, initialStatusFilter?: string[]): FilterState => {
   try {
-    const storageKey = getLocalStorageKey(projectId);
+    const storageKey = getLocalStorageKey(projectId, initialStatusFilter);
     const savedFilters = localStorage.getItem(storageKey);
     if (savedFilters) {
       const parsedFilters = JSON.parse(savedFilters);
@@ -103,13 +103,11 @@ const getInitialFilterState = (projectId: string): FilterState => {
       const defaultState: FilterState = {
         searchTerm: '',
         selectedSeverity: [],
-        selectedStatus: [],
         selectedLandscape: [],
         selectedRegion: [],
         startDate: '',
         endDate: '',
         excludedSeverity: [],
-        excludedStatus: [],
         excludedLandscape: [],
         excludedRegion: [],
         excludedAlertname: [],
@@ -118,7 +116,8 @@ const getInitialFilterState = (projectId: string): FilterState => {
       };
       
       // Merge saved filters with default state to ensure all properties exist
-      return { ...defaultState, ...parsedFilters };
+      const mergedFilters = { ...defaultState, ...parsedFilters };
+      return mergedFilters;
     }
   } catch (error) {
     console.warn('Failed to load filters from localStorage:', error);
@@ -128,13 +127,11 @@ const getInitialFilterState = (projectId: string): FilterState => {
   return {
     searchTerm: '',
     selectedSeverity: [],
-    selectedStatus: [],
     selectedLandscape: [],
     selectedRegion: [],
     startDate: '',
     endDate: '',
     excludedSeverity: [],
-    excludedStatus: [],
     excludedLandscape: [],
     excludedRegion: [],
     excludedAlertname: [],
@@ -143,9 +140,9 @@ const getInitialFilterState = (projectId: string): FilterState => {
   };
 };
 
-const saveFiltersToStorage = (projectId: string, filters: FilterState) => {
+const saveFiltersToStorage = (projectId: string, filters: FilterState, initialStatusFilter?: string[]) => {
   try {
-    const storageKey = getLocalStorageKey(projectId);
+    const storageKey = getLocalStorageKey(projectId, initialStatusFilter);
     // Exclude page and pageSize from being saved to localStorage
     const { page, pageSize, ...filtersToSave } = filters;
     localStorage.setItem(storageKey, JSON.stringify(filtersToSave));
@@ -154,8 +151,8 @@ const saveFiltersToStorage = (projectId: string, filters: FilterState) => {
   }
 };
 
-export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlertsFiltersReturn {
-  const [filters, setFilters] = useState<FilterState>(() => getInitialFilterState(projectId));
+export function useTriggeredAlertsFilters(projectId: string, initialStatusFilter?: string[]): UseTriggeredAlertsFiltersReturn {
+  const [filters, setFilters] = useState<FilterState>(() => getInitialFilterState(projectId, initialStatusFilter));
 
   // Convert filters to API query parameters
   const queryParams = useMemo((): TriggeredAlertsQueryParams => {
@@ -164,15 +161,16 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       pageSize: filters.pageSize,
     };
 
+    // Handle status filter from initialStatusFilter
+    if (initialStatusFilter && initialStatusFilter.length > 0) {
+      params.status = initialStatusFilter.join(',');
+    }
+
     // Handle severity - combine selected and excluded
     if (filters.selectedSeverity.length > 0) {
       params.severity = filters.selectedSeverity.join(',');
     }
 
-    // Handle status - combine selected and excluded
-    if (filters.selectedStatus.length > 0) {
-      params.status = filters.selectedStatus.join(',');
-    }
 
     // Handle landscape - combine selected and excluded
     if (filters.selectedLandscape.length > 0) {
@@ -198,7 +196,7 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     }
 
     return params;
-  }, [filters]);
+  }, [filters, initialStatusFilter]);
 
   // Fetch triggered alerts using the API hook with query parameters
   const { data: alertsResponse, isLoading, error } = useTriggeredAlerts(projectId, queryParams);
@@ -209,8 +207,8 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
-    saveFiltersToStorage(projectId, filters);
-  }, [projectId, filters]);
+    saveFiltersToStorage(projectId, filters, initialStatusFilter);
+  }, [projectId, filters, initialStatusFilter]);
 
   // Update filter state helper
   const updateFilters = useCallback((updates: Partial<FilterState>) => {
@@ -235,12 +233,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     });
   }, [updateFiltersWithPageReset, filters.excludedSeverity]);
 
-  const setSelectedStatus = useCallback((values: string[]) => {
-    updateFiltersWithPageReset({ 
-      selectedStatus: values,
-      excludedStatus: filters.excludedStatus.filter(item => !values.includes(item))
-    });
-  }, [updateFiltersWithPageReset, filters.excludedStatus]);
 
   const setSelectedLandscape = useCallback((values: string[]) => {
     updateFiltersWithPageReset({ 
@@ -285,16 +277,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     }
   }, [filters.selectedSeverity, filters.excludedSeverity, setSelectedSeverity, updateFiltersWithPageReset]);
 
-  const addExcludedStatus = useCallback((value: string) => {
-    if (filters.selectedStatus.includes(value)) {
-      setSelectedStatus(filters.selectedStatus.filter(item => item !== value));
-    } else {
-      const newExcluded = filters.excludedStatus.includes(value)
-        ? filters.excludedStatus.filter(item => item !== value)
-        : [...filters.excludedStatus, value];
-      updateFiltersWithPageReset({ excludedStatus: newExcluded });
-    }
-  }, [filters.selectedStatus, filters.excludedStatus, setSelectedStatus, updateFiltersWithPageReset]);
 
   const addExcludedLandscape = useCallback((value: string) => {
     if (filters.selectedLandscape.includes(value)) {
@@ -341,13 +323,11 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     const defaultState: FilterState = {
       searchTerm: '',
       selectedSeverity: [],
-      selectedStatus: [],
       selectedLandscape: [],
       selectedRegion: [],
       startDate: '',
       endDate: '',
       excludedSeverity: [],
-      excludedStatus: [],
       excludedLandscape: [],
       excludedRegion: [],
       excludedAlertname: [],
@@ -360,7 +340,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
   // Individual filter removal functions
   const removeSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
   const removeSeverity = useCallback(() => setSelectedSeverity([]), [setSelectedSeverity]);
-  const removeStatus = useCallback(() => setSelectedStatus([]), [setSelectedStatus]);
   const removeLandscape = useCallback(() => setSelectedLandscape([]), [setSelectedLandscape]);
   const removeRegion = useCallback(() => setSelectedRegion([]), [setSelectedRegion]);
   const removeDateRange = useCallback(() => {
@@ -373,11 +352,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     });
   }, [filters.excludedSeverity, updateFiltersWithPageReset]);
 
-  const removeExcludedStatus = useCallback((value: string) => {
-    updateFiltersWithPageReset({ 
-      excludedStatus: filters.excludedStatus.filter(item => item !== value) 
-    });
-  }, [filters.excludedStatus, updateFiltersWithPageReset]);
 
   const removeExcludedLandscape = useCallback((value: string) => {
     updateFiltersWithPageReset({ 
@@ -401,9 +375,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     updateFiltersWithPageReset({ excludedSeverity: [] });
   }, [updateFiltersWithPageReset]);
 
-  const clearAllExcludedStatus = useCallback(() => {
-    updateFiltersWithPageReset({ excludedStatus: [] });
-  }, [updateFiltersWithPageReset]);
 
   const clearAllExcludedLandscape = useCallback(() => {
     updateFiltersWithPageReset({ excludedLandscape: [] });
@@ -421,8 +392,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
   const severities = useMemo(() => 
     filtersResponse?.severity?.sort() || [], [filtersResponse?.severity]);
 
-  const statuses = useMemo(() => 
-    filtersResponse?.status?.sort() || [], [filtersResponse?.status]);
 
   const landscapes = useMemo(() => 
     filtersResponse?.landscape?.sort() || [], [filtersResponse?.landscape]);
@@ -436,7 +405,6 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     return triggeredAlerts.filter(alert => {
       // Apply exclusion filters
       if (filters.excludedSeverity.length > 0 && filters.excludedSeverity.includes(alert.severity)) return false;
-      if (filters.excludedStatus.length > 0 && filters.excludedStatus.includes(alert.status)) return false;
       if (filters.excludedLandscape.length > 0 && filters.excludedLandscape.includes(alert.landscape)) return false;
       if (filters.excludedRegion.length > 0 && filters.excludedRegion.includes(alert.region)) return false;
       if (filters.excludedAlertname.length > 0 && filters.excludedAlertname.includes(alert.alertname)) return false;
@@ -455,7 +423,7 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       const dateB = new Date(b.startsAt).getTime();
       return dateB - dateA;
     });
-  }, [triggeredAlerts, filters.excludedSeverity, filters.excludedStatus, filters.excludedLandscape, filters.excludedRegion, filters.excludedAlertname]);
+  }, [triggeredAlerts, filters.excludedSeverity, filters.excludedLandscape, filters.excludedRegion, filters.excludedAlertname]);
 
   // Use pagination info directly from API response
   const hasNextPage = alertsResponse ? alertsResponse.page < alertsResponse.totalPages : false;
@@ -468,13 +436,11 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
     actions: {
       setSearchTerm,
       setSelectedSeverity,
-      setSelectedStatus,
       setSelectedLandscape,
       setSelectedRegion,
       setStartDate,
       setEndDate,
       addExcludedSeverity,
-      addExcludedStatus,
       addExcludedLandscape,
       addExcludedRegion,
       addExcludedAlertname,
@@ -484,24 +450,20 @@ export function useTriggeredAlertsFilters(projectId: string): UseTriggeredAlerts
       setPageSize,
       removeSearchTerm,
       removeSeverity,
-      removeStatus,
       removeLandscape,
       removeRegion,
       removeDateRange,
       removeExcludedSeverity,
-      removeExcludedStatus,
       removeExcludedLandscape,
       removeExcludedRegion,
       removeExcludedAlertname,
       clearAllExcludedSeverity,
-      clearAllExcludedStatus,
       clearAllExcludedLandscape,
       clearAllExcludedRegion,
       clearAllExcludedAlertname,
     },
     options: {
       severities,
-      statuses,
       landscapes,
       regions,
     },

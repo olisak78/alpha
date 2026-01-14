@@ -2,7 +2,6 @@
 
 exports[`PluginBody > Snapshot > should match snapshot for content state 1`] = `
 <div
-  class="p-6"
   style="min-height: 400px;"
 >
   <div>

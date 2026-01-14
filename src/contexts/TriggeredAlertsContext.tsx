@@ -43,10 +43,11 @@ interface TriggeredAlertsProviderProps {
   children: ReactNode;
   projectId: string;
   onShowAlertDefinition?: (alertName: string) => void;
+  initialStatusFilter?: string[];
 }
 
-export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefinition }: TriggeredAlertsProviderProps) {
-  const alertsFiltersData = useTriggeredAlertsFilters(projectId);
+export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefinition, initialStatusFilter }: TriggeredAlertsProviderProps) {
+  const alertsFiltersData = useTriggeredAlertsFilters(projectId, initialStatusFilter);
   
   // Centralized applied filters logic
   const appliedFilters: AppliedFilter[] = React.useMemo(() => {
@@ -74,18 +75,6 @@ export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefini
       });
     }
 
-    // Status filter
-    if (Array.isArray(alertsFiltersData.filters.selectedStatus) && alertsFiltersData.filters.selectedStatus.length > 0) {
-      alertsFiltersData.filters.selectedStatus.forEach((status, index) => {
-        filters.push({
-          key: `status-${index}`,
-          label: `Status: ${status}`,
-          onRemove: () => alertsFiltersData.actions.setSelectedStatus(
-            alertsFiltersData.filters.selectedStatus.filter(s => s !== status)
-          ),
-        });
-      });
-    }
 
     // Landscape filter
     if (Array.isArray(alertsFiltersData.filters.selectedLandscape) && alertsFiltersData.filters.selectedLandscape.length > 0) {
@@ -148,16 +137,6 @@ export function TriggeredAlertsProvider({ children, projectId, onShowAlertDefini
       });
     }
 
-    if (Array.isArray(alertsFiltersData.filters.excludedStatus)) {
-      alertsFiltersData.filters.excludedStatus.forEach((value, index) => {
-        filters.push({
-          key: `excludedStatus-${index}`,
-          label: `Not: ${value}`,
-          onRemove: () => alertsFiltersData.actions.removeExcludedStatus(value),
-          isExclusion: true,
-        });
-      });
-    }
 
     if (Array.isArray(alertsFiltersData.filters.excludedLandscape)) {
       alertsFiltersData.filters.excludedLandscape.forEach((value, index) => {

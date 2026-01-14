@@ -7,10 +7,12 @@ import { TriggeredAlertsProvider, useTriggeredAlertsContext } from '@/contexts/T
 interface TriggeredAlertsTabProps {
   projectId: string;
   onShowAlertDefinition?: (alertName: string) => void;
+  initialStatusFilter?: string[];
+  title?: string;
 }
 
 // Inner component that uses the context
-function TriggeredAlertsContent({ onShowAlertDefinition }: { onShowAlertDefinition?: (alertName: string) => void }) {
+function TriggeredAlertsContent({ onShowAlertDefinition, title }: { onShowAlertDefinition?: (alertName: string) => void; title?: string }) {
   const { isLoading, filtersLoading, error, options } = useTriggeredAlertsContext();
 
   // Show error state
@@ -38,7 +40,7 @@ function TriggeredAlertsContent({ onShowAlertDefinition }: { onShowAlertDefiniti
       {/* Show loading indicator in header but keep filters visible */}
       <div className="border-b border-border pb-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold text-foreground">Triggered Alerts</h2>
+          <h2 className="text-xl font-semibold text-foreground">{title || 'Triggered Alerts'}</h2>
           {(isLoading || filtersLoading) && <Loader2 className="h-4 w-4 animate-spin" />}
         </div>
       </div>
@@ -61,8 +63,16 @@ function TriggeredAlertsContent({ onShowAlertDefinition }: { onShowAlertDefiniti
   );
 }
 
-export function TriggeredAlertsTab({ projectId, onShowAlertDefinition }: TriggeredAlertsTabProps) {
-  // The provider is now handled by the parent MonitoringPage
-  // We need to pass the callback to the content component
-  return <TriggeredAlertsContent onShowAlertDefinition={onShowAlertDefinition} />;
+export function TriggeredAlertsTab({ projectId, onShowAlertDefinition, initialStatusFilter, title }: TriggeredAlertsTabProps) {
+  // If we have an initial status filter, we need our own provider
+  if (initialStatusFilter) {
+    return (
+      <TriggeredAlertsProvider projectId={projectId} onShowAlertDefinition={onShowAlertDefinition} initialStatusFilter={initialStatusFilter}>
+        <TriggeredAlertsContent onShowAlertDefinition={onShowAlertDefinition} title={title} />
+      </TriggeredAlertsProvider>
+    );
+  }
+  
+  // Otherwise, use the existing provider from parent
+  return <TriggeredAlertsContent onShowAlertDefinition={onShowAlertDefinition} title={title} />;
 }

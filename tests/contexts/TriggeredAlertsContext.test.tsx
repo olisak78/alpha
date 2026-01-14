@@ -34,67 +34,59 @@ const mockFiltersData = {
   filters: {
     searchTerm: '',
     selectedSeverity: [],
-    selectedStatus: [],
     selectedLandscape: [],
     selectedRegion: [],
-    selectedComponent: [],
     startDate: '',
     endDate: '',
     excludedSeverity: [],
-    excludedStatus: [],
     excludedLandscape: [],
     excludedRegion: [],
-    excludedComponent: [],
     excludedAlertname: [],
+    page: 1,
+    pageSize: 50,
   },
   actions: {
     setSearchTerm: vi.fn(),
     setSelectedSeverity: vi.fn(),
-    setSelectedStatus: vi.fn(),
     setSelectedLandscape: vi.fn(),
     setSelectedRegion: vi.fn(),
-    setSelectedComponent: vi.fn(),
     setStartDate: vi.fn(),
     setEndDate: vi.fn(),
     addExcludedSeverity: vi.fn(),
-    addExcludedStatus: vi.fn(),
     addExcludedLandscape: vi.fn(),
     addExcludedRegion: vi.fn(),
-    addExcludedComponent: vi.fn(),
     addExcludedAlertname: vi.fn(),
     handleDateRangeSelect: vi.fn(),
     resetFilters: vi.fn(),
+    setPage: vi.fn(),
+    setPageSize: vi.fn(),
     removeSearchTerm: vi.fn(),
     removeSeverity: vi.fn(),
-    removeStatus: vi.fn(),
     removeLandscape: vi.fn(),
     removeRegion: vi.fn(),
-    removeComponent: vi.fn(),
     removeDateRange: vi.fn(),
     removeExcludedSeverity: vi.fn(),
-    removeExcludedStatus: vi.fn(),
     removeExcludedLandscape: vi.fn(),
     removeExcludedRegion: vi.fn(),
-    removeExcludedComponent: vi.fn(),
     removeExcludedAlertname: vi.fn(),
     clearAllExcludedSeverity: vi.fn(),
-    clearAllExcludedStatus: vi.fn(),
     clearAllExcludedLandscape: vi.fn(),
     clearAllExcludedRegion: vi.fn(),
-    clearAllExcludedComponent: vi.fn(),
     clearAllExcludedAlertname: vi.fn(),
   },
   options: {
     severities: ['critical', 'warning', 'info'],
-    statuses: ['firing', 'resolved'],
     landscapes: ['production', 'staging'],
     regions: ['us-east-1', 'eu-west-1'],
-    components: ['test-component', 'another-component'],
   },
   filteredAlerts: [mockTriggeredAlert],
   isLoading: false,
   filtersLoading: false,
   error: null,
+  totalCount: 1,
+  totalPages: 1,
+  hasNextPage: false,
+  hasPreviousPage: false,
 };
 
 // Test component to access context
@@ -105,17 +97,13 @@ const TestComponent = () => {
     <div>
       <div data-testid="filters-search">{context.filters.searchTerm}</div>
       <div data-testid="filters-severity">{context.filters.selectedSeverity}</div>
-      <div data-testid="filters-status">{context.filters.selectedStatus}</div>
       <div data-testid="filters-landscape">{context.filters.selectedLandscape}</div>
       <div data-testid="filters-region">{context.filters.selectedRegion}</div>
-      <div data-testid="filters-component">{context.filters.selectedComponent}</div>
       <div data-testid="filters-start-date">{context.filters.startDate}</div>
       <div data-testid="filters-end-date">{context.filters.endDate}</div>
       <div data-testid="options-severities">{context.options.severities.join(',')}</div>
-      <div data-testid="options-statuses">{context.options.statuses.join(',')}</div>
       <div data-testid="options-landscapes">{context.options.landscapes.join(',')}</div>
       <div data-testid="options-regions">{context.options.regions.join(',')}</div>
-      <div data-testid="options-components">{context.options.components.join(',')}</div>
       <div data-testid="filtered-alerts-count">{context.filteredAlerts.length}</div>
       <div data-testid="is-loading">{context.isLoading.toString()}</div>
       <div data-testid="filters-loading">{context.filtersLoading.toString()}</div>
@@ -155,11 +143,9 @@ describe('TriggeredAlertsContext', () => {
       // Verify filter state
       expect(screen.getByTestId('filters-search')).toHaveTextContent('');
       expect(screen.getByTestId('filters-severity')).toHaveTextContent('');
-      expect(screen.getByTestId('filters-status')).toHaveTextContent('');
 
       // Verify filter options
       expect(screen.getByTestId('options-severities')).toHaveTextContent('critical,warning,info');
-      expect(screen.getByTestId('options-statuses')).toHaveTextContent('firing,resolved');
       expect(screen.getByTestId('options-landscapes')).toHaveTextContent('production,staging');
 
       // Verify data and loading states
@@ -171,7 +157,7 @@ describe('TriggeredAlertsContext', () => {
     it('should call useTriggeredAlertsFilters with correct projectId and handle actions', async () => {
       renderWithProvider(<TestComponent />, 'custom-project-id');
 
-      expect(mockUseTriggeredAlertsFilters).toHaveBeenCalledWith('custom-project-id');
+      expect(mockUseTriggeredAlertsFilters).toHaveBeenCalledWith('custom-project-id', undefined);
 
       // Test action functions
       const searchButton = screen.getByTestId('search-action');
@@ -228,14 +214,13 @@ describe('TriggeredAlertsContext', () => {
           ...mockFiltersData.filters,
           searchTerm: 'test',
           selectedSeverity: ['critical'],
-          selectedStatus: ['firing'],
           startDate: '2023-12-01',
           endDate: '2023-12-31',
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithMultiple);
       renderWithProvider(<TestComponent />);
-      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('4');
+      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('3');
     });
 
     it('should not generate applied filters for empty arrays', () => {
@@ -475,13 +460,12 @@ describe('TriggeredAlertsContext', () => {
         filters: {
           ...mockFiltersData.filters,
           excludedSeverity: ['warning', 'info'],
-          excludedStatus: ['resolved'],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithExcluded);
 
       renderWithProvider(<TestComponent />);
-      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('3');
+      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('2');
     });
 
     it('should create excluded applied filters with correct structure and isExclusion flag', () => {
@@ -739,7 +723,6 @@ describe('TriggeredAlertsContext', () => {
         filters: {
           ...mockFiltersData.filters,
           selectedSeverity: ['critical', 'warning'],
-          selectedStatus: ['firing', 'resolved'],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithMultiple);
@@ -749,10 +732,6 @@ describe('TriggeredAlertsContext', () => {
       // Test removing from severity array
       screen.getByTestId('remove-0').click();
       expect(mockFiltersData.actions.setSelectedSeverity).toHaveBeenCalledWith(['warning']);
-
-      // Test removing from status array
-      screen.getByTestId('remove-2').click();
-      expect(mockFiltersData.actions.setSelectedStatus).toHaveBeenCalledWith(['resolved']);
     });
   });
 
@@ -826,10 +805,8 @@ describe('TriggeredAlertsContext', () => {
         ...mockFiltersData,
         options: {
           severities: [],
-          statuses: [],
           landscapes: [],
           regions: [],
-          components: [],
         },
       };
       mockUseTriggeredAlertsFilters.mockReturnValue(filtersWithEmptyOptions);
@@ -837,10 +814,8 @@ describe('TriggeredAlertsContext', () => {
       renderWithProvider(<TestComponent />);
 
       expect(screen.getByTestId('options-severities')).toHaveTextContent('');
-      expect(screen.getByTestId('options-statuses')).toHaveTextContent('');
       expect(screen.getByTestId('options-landscapes')).toHaveTextContent('');
       expect(screen.getByTestId('options-regions')).toHaveTextContent('');
-      expect(screen.getByTestId('options-components')).toHaveTextContent('');
     });
 
     it('should handle empty filtered alerts', () => {
@@ -901,8 +876,8 @@ describe('TriggeredAlertsContext', () => {
 
       renderWithProvider(<TestComponent />);
 
-      // Should have 4 applied filters: search, severity, excluded status, date range
-      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('4');
+      // Should have 3 applied filters: search, severity, date range (excludedStatus doesn't exist in our mock)
+      expect(screen.getByTestId('applied-filters-count')).toHaveTextContent('3');
     });
   });
 });

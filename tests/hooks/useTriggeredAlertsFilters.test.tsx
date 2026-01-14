@@ -138,13 +138,11 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.filters).toEqual({
       searchTerm: '',
       selectedSeverity: [],
-      selectedStatus: [],
       selectedLandscape: [],
       selectedRegion: [],
       startDate: '',
       endDate: '',
       excludedSeverity: [],
-      excludedStatus: [],
       excludedLandscape: [],
       excludedRegion: [],
       excludedAlertname: [],
@@ -161,7 +159,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     // Test that all actions are available
     expect(result.current.actions).toHaveProperty('setSearchTerm');
     expect(result.current.actions).toHaveProperty('setSelectedSeverity');
-    expect(result.current.actions).toHaveProperty('setSelectedStatus');
     expect(result.current.actions).toHaveProperty('setSelectedLandscape');
     expect(result.current.actions).toHaveProperty('setSelectedRegion');
     expect(result.current.actions).toHaveProperty('setStartDate');
@@ -196,7 +193,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     });
 
     expect(result.current.options.severities).toEqual(['critical', 'info', 'warning']);
-    expect(result.current.options.statuses).toEqual(['firing', 'resolved']);
     expect(result.current.options.landscapes).toEqual(['production', 'staging']);
     expect(result.current.options.regions).toEqual(['us-east-1', 'us-west-2']);
   });
@@ -225,36 +221,7 @@ describe('useTriggeredAlertsFilters Hook', () => {
 
     // Current implementation returns empty arrays when API filters are unavailable
     expect(result.current.options.severities).toEqual([]);
-    expect(result.current.options.statuses).toEqual([]);
     expect(result.current.options.landscapes).toEqual([]);
-    expect(result.current.options.regions).toEqual([]);
-  });
-
-  it('should return empty arrays when API filters are unavailable', () => {
-    const mockAlerts = [
-      createMockTriggeredAlert({ component: 'api-gateway' }),
-      createMockTriggeredAlert({ component: 'user-service' }),
-      createMockTriggeredAlert({ component: undefined }),
-      createMockTriggeredAlert({ component: '' }),
-    ];
-
-    mockUseTriggeredAlerts.mockReturnValue({
-      data: createMockAlertsResponse(mockAlerts),
-      isLoading: false,
-      error: null,
-    } as any);
-
-    mockUseTriggeredAlertsFiltersApi.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-    } as any);
-
-    const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
-      wrapper: createWrapper(),
-    });
-
-    // Current implementation returns empty arrays when API filters are unavailable
     expect(result.current.options.regions).toEqual([]);
   });
 
@@ -270,7 +237,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     act(() => {
       result.current.actions.setSearchTerm('test-search');
       result.current.actions.setSelectedSeverity(['critical']);
-      result.current.actions.setSelectedStatus(['firing']);
       result.current.actions.setSelectedLandscape(['production']);
       result.current.actions.setSelectedRegion(['us-east-1']);
       result.current.actions.setStartDate('2025-01-01');
@@ -279,7 +245,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
 
     expect(result.current.filters.searchTerm).toBe('test-search');
     expect(result.current.filters.selectedSeverity).toEqual(['critical']);
-    expect(result.current.filters.selectedStatus).toEqual(['firing']);
     expect(result.current.filters.selectedLandscape).toEqual(['production']);
     expect(result.current.filters.selectedRegion).toEqual(['us-east-1']);
     expect(result.current.filters.startDate).toBe('2025-01-01');
@@ -295,7 +260,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     act(() => {
       result.current.actions.setSearchTerm('test');
       result.current.actions.setSelectedSeverity(['critical']);
-      result.current.actions.setSelectedStatus(['firing']);
     });
 
     // Reset filters
@@ -306,13 +270,11 @@ describe('useTriggeredAlertsFilters Hook', () => {
     expect(result.current.filters).toEqual({
       searchTerm: '',
       selectedSeverity: [],
-      selectedStatus: [],
       selectedLandscape: [],
       selectedRegion: [],
       startDate: '',
       endDate: '',
       excludedSeverity: [],
-      excludedStatus: [],
       excludedLandscape: [],
       excludedRegion: [],
       excludedAlertname: [],
@@ -418,7 +380,6 @@ describe('useTriggeredAlertsFilters Hook', () => {
     act(() => {
       result.current.actions.setStartDate('');
       result.current.actions.setEndDate('');
-      result.current.actions.setSelectedStatus(['firing']);
       result.current.actions.setSelectedSeverity(['critical']);
     });
     // Backend would filter, but mock returns all alerts
@@ -620,5 +581,401 @@ describe('useTriggeredAlertsFilters Hook', () => {
 
     // Test invalid date handling should return all alerts
     expect(result.current.filteredAlerts).toHaveLength(4); // Should return all alerts
+  });
+
+  // ============================================================================
+  // UTILITY FUNCTIONS TESTS (Essential only)
+  // ============================================================================
+
+  describe('Utility Functions', () => {
+    it('should use correct localStorage keys based on initialStatusFilter', () => {
+      // Test firing key
+      const { result: firingResult } = renderHook(() => useTriggeredAlertsFilters('project-123', ['firing']), {
+        wrapper: createWrapper(),
+      });
+      act(() => firingResult.current.actions.setSearchTerm('test'));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('activeAlertsFilters_project-123', expect.any(String));
+
+      // Test resolved key
+      const { result: resolvedResult } = renderHook(() => useTriggeredAlertsFilters('project-123', ['resolved']), {
+        wrapper: createWrapper(),
+      });
+      act(() => resolvedResult.current.actions.setSearchTerm('test'));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('historyAlertsFilters_project-123', expect.any(String));
+
+      // Test fallback key
+      const { result: fallbackResult } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+      act(() => fallbackResult.current.actions.setSearchTerm('test'));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('triggeredAlertsFilters_project-123', expect.any(String));
+    });
+
+    it('should load and merge saved filters from localStorage', () => {
+      const savedFilters = {
+        searchTerm: 'saved-search',
+        selectedSeverity: ['critical'],
+        excludedSeverity: ['info'],
+      };
+      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFilters));
+
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123', ['firing']), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.filters.searchTerm).toBe('saved-search');
+      expect(result.current.filters.selectedSeverity).toEqual(['critical']);
+      expect(result.current.filters.excludedSeverity).toEqual(['info']);
+    });
+
+    it('should handle localStorage errors gracefully', () => {
+      mockLocalStorage.getItem.mockReturnValue('invalid-json');
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to load filters from localStorage:', expect.any(Error));
+      expect(result.current.filters.searchTerm).toBe(''); // Should use defaults
+      consoleSpy.mockRestore();
+    });
+  });
+
+  // ============================================================================
+  // EXCLUSION HANDLERS TESTS
+  // ============================================================================
+
+  describe('Exclusion Handlers', () => {
+    describe('addExcludedAlertname', () => {
+      it('should clear searchTerm if value matches current searchTerm', () => {
+        const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+          wrapper: createWrapper(),
+        });
+
+        act(() => {
+          result.current.actions.setSearchTerm('HighCPUUsage');
+        });
+
+        act(() => {
+          result.current.actions.addExcludedAlertname('HighCPUUsage');
+        });
+
+        expect(result.current.filters.searchTerm).toBe('');
+        expect(result.current.filters.excludedAlertname).toEqual([]);
+      });
+
+      it('should add to excludedAlertname if not matching searchTerm', () => {
+        const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+          wrapper: createWrapper(),
+        });
+
+        act(() => {
+          result.current.actions.setSearchTerm('DifferentAlert');
+        });
+
+        act(() => {
+          result.current.actions.addExcludedAlertname('HighCPUUsage');
+        });
+
+        expect(result.current.filters.searchTerm).toBe('DifferentAlert');
+        expect(result.current.filters.excludedAlertname).toEqual(['HighCPUUsage']);
+      });
+
+      it('should toggle exclusion for alertname', () => {
+        const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+          wrapper: createWrapper(),
+        });
+
+        // Add exclusion
+        act(() => {
+          result.current.actions.addExcludedAlertname('HighCPUUsage');
+        });
+        expect(result.current.filters.excludedAlertname).toEqual(['HighCPUUsage']);
+
+        // Toggle exclusion (remove)
+        act(() => {
+          result.current.actions.addExcludedAlertname('HighCPUUsage');
+        });
+        expect(result.current.filters.excludedAlertname).toEqual([]);
+      });
+    });
+  });
+
+  // ============================================================================
+  // CLEAR ALL EXCLUDED TESTS (Essential only)
+  // ============================================================================
+
+  describe('Clear All Excluded Functions', () => {
+    it('should clear all excluded filters and reset page', () => {
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      // Set page and add exclusions
+      act(() => {
+        result.current.actions.setPage(5);
+        result.current.actions.addExcludedSeverity('critical');
+        result.current.actions.addExcludedAlertname('HighCPUUsage');
+      });
+
+      expect(result.current.filters.page).toBe(1); // Should be reset by exclusions
+      expect(result.current.filters.excludedSeverity).toEqual(['critical']);
+      expect(result.current.filters.excludedAlertname).toEqual(['HighCPUUsage']);
+
+      // Clear all exclusions
+      act(() => {
+        result.current.actions.clearAllExcludedSeverity();
+        result.current.actions.clearAllExcludedAlertname();
+      });
+
+      expect(result.current.filters.excludedSeverity).toEqual([]);
+      expect(result.current.filters.excludedAlertname).toEqual([]);
+    });
+  });
+
+  // ============================================================================
+  // DATE RANGE HANDLING TESTS (Essential only)
+  // ============================================================================
+
+  describe('Date Range Handling', () => {
+    it('should handle date range selection and reset page', () => {
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      // Set page first
+      act(() => {
+        result.current.actions.setPage(3);
+      });
+      expect(result.current.filters.page).toBe(3);
+
+      // Test full date range
+      const dateRange = {
+        from: new Date('2025-01-01T00:00:00Z'),
+        to: new Date('2025-01-31T23:59:59Z'),
+      };
+
+      act(() => {
+        result.current.actions.handleDateRangeSelect(dateRange);
+      });
+
+      expect(result.current.filters.startDate).toBe('2025-01-01T00:00:00.000Z');
+      expect(result.current.filters.endDate).toBe('2025-01-31T23:59:59.000Z');
+      expect(result.current.filters.page).toBe(1); // Should reset page
+
+      // Test clearing date range
+      act(() => {
+        result.current.actions.handleDateRangeSelect(undefined);
+      });
+
+      expect(result.current.filters.startDate).toBe('');
+      expect(result.current.filters.endDate).toBe('');
+    });
+  });
+
+  // ============================================================================
+  // CLIENT-SIDE EXCLUSION FILTERING TESTS (Consolidated)
+  // ============================================================================
+
+  describe('Client-Side Exclusion Filtering', () => {
+    it('should filter and sort alerts based on exclusions', () => {
+      const mockAlerts = [
+        createMockTriggeredAlert({ 
+          fingerprint: 'alert-1', 
+          severity: 'critical', 
+          status: 'resolved', 
+          landscape: 'production',
+          region: 'us-east-1',
+          alertname: 'CriticalAlert',
+          startsAt: '2025-01-03T10:00:00Z'
+        }),
+        createMockTriggeredAlert({ 
+          fingerprint: 'alert-2', 
+          severity: 'warning', 
+          status: 'firing', 
+          landscape: 'staging',
+          region: 'us-west-2',
+          alertname: 'WarningAlert',
+          startsAt: '2025-01-04T10:00:00Z'
+        }),
+        createMockTriggeredAlert({ 
+          fingerprint: 'alert-3', 
+          severity: 'info', 
+          status: 'firing', 
+          landscape: 'development',
+          region: 'eu-central-1',
+          alertname: 'InfoAlert',
+          startsAt: '2025-01-01T10:00:00Z'
+        }),
+      ];
+
+      mockUseTriggeredAlerts.mockReturnValue({
+        data: createMockAlertsResponse(mockAlerts),
+        isLoading: false,
+        error: null,
+      } as any);
+
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      // Initially all alerts should be visible
+      expect(result.current.filteredAlerts).toHaveLength(3);
+
+      // Test exclusion by severity
+      act(() => {
+        result.current.actions.addExcludedSeverity('critical');
+      });
+      expect(result.current.filteredAlerts).toHaveLength(2);
+      expect(result.current.filteredAlerts.every(alert => alert.severity !== 'critical')).toBe(true);
+
+      // Reset and test multiple exclusions
+      act(() => {
+        result.current.actions.clearAllExcludedSeverity();
+      });
+      expect(result.current.filteredAlerts).toHaveLength(3);
+
+      // Test sorting: firing alerts first, then by startsAt descending
+      const sortedAlerts = result.current.filteredAlerts;
+      expect(sortedAlerts[0].status).toBe('firing');
+      expect(sortedAlerts[0].fingerprint).toBe('alert-2'); // Newer firing alert
+      expect(sortedAlerts[1].status).toBe('firing');
+      expect(sortedAlerts[1].fingerprint).toBe('alert-3'); // Older firing alert
+      expect(sortedAlerts[2].status).toBe('resolved');
+      expect(sortedAlerts[2].fingerprint).toBe('alert-1'); // Resolved alert
+    });
+  });
+
+  // ============================================================================
+  // ADDITIONAL EDGE CASES AND INTEGRATION TESTS
+  // ============================================================================
+
+  describe('Additional Edge Cases and Integration', () => {
+    it('should handle pagination info from API response correctly', () => {
+      const mockAlertsResponse = {
+        data: [createMockTriggeredAlert()],
+        page: 2,
+        pageSize: 25,
+        totalCount: 100,
+        totalPages: 4,
+      };
+
+      mockUseTriggeredAlerts.mockReturnValue({
+        data: mockAlertsResponse,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.totalCount).toBe(100);
+      expect(result.current.totalPages).toBe(4);
+      expect(result.current.hasNextPage).toBe(true);
+      expect(result.current.hasPreviousPage).toBe(true);
+    });
+
+    it('should handle pagination edge cases', () => {
+      // Test first page
+      let mockAlertsResponse = {
+        data: [createMockTriggeredAlert()],
+        page: 1,
+        pageSize: 25,
+        totalCount: 50,
+        totalPages: 2,
+      };
+
+      mockUseTriggeredAlerts.mockReturnValue({
+        data: mockAlertsResponse,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      const { result, rerender } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.hasNextPage).toBe(true);
+      expect(result.current.hasPreviousPage).toBe(false);
+
+      // Test last page
+      mockAlertsResponse = {
+        data: [createMockTriggeredAlert()],
+        page: 2,
+        pageSize: 25,
+        totalCount: 50,
+        totalPages: 2,
+      };
+
+      mockUseTriggeredAlerts.mockReturnValue({
+        data: mockAlertsResponse,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      rerender();
+
+      expect(result.current.hasNextPage).toBe(false);
+      expect(result.current.hasPreviousPage).toBe(true);
+    });
+
+    it('should handle empty API responses gracefully', () => {
+      mockUseTriggeredAlerts.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      mockUseTriggeredAlertsFiltersApi.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.filteredAlerts).toEqual([]);
+      expect(result.current.options.severities).toEqual([]);
+      expect(result.current.options.landscapes).toEqual([]);
+      expect(result.current.options.regions).toEqual([]);
+      expect(result.current.totalCount).toBe(0);
+      expect(result.current.totalPages).toBe(1);
+      expect(result.current.hasNextPage).toBe(false);
+      expect(result.current.hasPreviousPage).toBe(false);
+    });
+
+    it('should handle conflicting selected and excluded filters correctly', () => {
+      const { result } = renderHook(() => useTriggeredAlertsFilters('project-123'), {
+        wrapper: createWrapper(),
+      });
+
+      // Set selected severity
+      act(() => {
+        result.current.actions.setSelectedSeverity(['critical', 'warning']);
+      });
+
+      expect(result.current.filters.selectedSeverity).toEqual(['critical', 'warning']);
+      expect(result.current.filters.excludedSeverity).toEqual([]);
+
+      // Now add exclusion for warning - should remove it from selected and not add to excluded (since it was selected)
+      act(() => {
+        result.current.actions.addExcludedSeverity('warning');
+      });
+
+      expect(result.current.filters.selectedSeverity).toEqual(['critical']);
+      expect(result.current.filters.excludedSeverity).toEqual([]); // Should be empty because warning was removed from selected
+
+      // Now add exclusion for something not selected - should add to excluded
+      act(() => {
+        result.current.actions.addExcludedSeverity('info');
+      });
+
+      expect(result.current.filters.selectedSeverity).toEqual(['critical']);
+      expect(result.current.filters.excludedSeverity).toEqual(['info']);
+    });
   });
 });

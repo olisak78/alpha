@@ -18,10 +18,15 @@ vi.mock('../../../src/hooks/use-toast', () => ({
   }),
 }));
 
-// Mock the useUser hook
+// Mock the useMembers hooks
 vi.mock('../../../src/hooks/api/useMembers', () => ({
   useUser: vi.fn(() => ({
     data: null,
+    isLoading: false,
+    error: null,
+  })),
+  useUserSearch: vi.fn(() => ({
+    data: { users: [] },
     isLoading: false,
     error: null,
   })),
@@ -833,6 +838,10 @@ describe('MemberList Component', () => {
     it('should be keyboard navigable', async () => {
       const user = userEvent.setup();
       renderWithQueryClient(<MemberList showActions={true} />);
+
+      // Tab to search input first (it appears before the add member button)
+      await user.tab();
+      expect(screen.getByPlaceholderText('Search users...')).toHaveFocus();
 
       // Tab to add member button
       await user.tab();

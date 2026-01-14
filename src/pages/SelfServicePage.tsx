@@ -11,11 +11,9 @@ import JobsHistoryTable from '@/components/SelfService/JobsHistoryTable';
 import { useJenkinsJobHistory } from '@/hooks/api/useJenkinsJobHistory';
 import { isProduction } from '@/utils/environment';
 import { type TimePeriod, getHoursForPeriod } from '@/utils/selfServiceUtils';
-import { useAuth } from '@/contexts/AuthContext';
 import { useCurrentUser } from "@/hooks/api/useMembers";
 
 export default function SelfServicePage() {
-  const { user } = useAuth();
 
   const [activeBlock, setActiveBlock] = useState<SelfServiceDialog | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -297,9 +295,6 @@ export default function SelfServicePage() {
         {/* Page Header */}
         <div className="border-b border-border pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Wrench className="h-6 w-6 text-primary" />
-            </div>
             <div>
               <h1 className="text-2xl font-semibold text-foreground">Self Service</h1>
               <p className="text-sm text-muted-foreground mt-0.5">

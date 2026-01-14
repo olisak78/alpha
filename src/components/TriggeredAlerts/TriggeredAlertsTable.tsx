@@ -126,7 +126,7 @@ export function TriggeredAlertsTable({ showRegion = true, onShowAlertDefinition 
 
                     {/* End Time */}
                     <div className="col-span-1 text-xs text-muted-foreground">
-                      {alert.endsAt ? formatAlertDate(alert.endsAt) : '-'}
+                      {alert.endsAt ? formatAlertDate(alert.endsAt) : ''}
                     </div>
 
                     {/* Status */}
@@ -134,10 +134,6 @@ export function TriggeredAlertsTable({ showRegion = true, onShowAlertDefinition 
                       <Badge className={`text-xs ${getStatusColor(alert.status)} flex-shrink-0 hover:${getStatusColor(alert.status)}`}>
                         {alert.status}
                       </Badge>
-                      <FilterButtons 
-                        filterType="status" 
-                        value={alert.status}
-                      />
                     </div>
 
                     {/* Landscape */}

@@ -8,7 +8,7 @@ import { useOptionalTriggeredAlertsContext } from '@/contexts/TriggeredAlertsCon
 import { MultiSelect, MultiSelectOption } from '@/components/multi-select';
 
 export interface FilterControlConfig {
-  type: 'timeRange' | 'severity' | 'status' | 'landscape' | 'region' | 'component';
+  type: 'timeRange' | 'severity' | 'landscape' | 'region' | 'component';
   label: string;
   options?: string[];
   selected?: string[];
@@ -29,7 +29,6 @@ export const FilterControls = memo(function FilterControls({ filterConfigs }: Fi
   const configs = filterConfigs || (contextData ? [
     { type: 'timeRange' as const, label: 'Time Range' },
     { type: 'severity' as const, label: 'Severity', options: contextData.options.severities, selected: contextData.filters.selectedSeverity, onChange: contextData.actions.setSelectedSeverity },
-    { type: 'status' as const, label: 'Status', options: contextData.options.statuses, selected: contextData.filters.selectedStatus, onChange: contextData.actions.setSelectedStatus },
     { type: 'landscape' as const, label: 'Landscape', options: contextData.options.landscapes, selected: contextData.filters.selectedLandscape, onChange: contextData.actions.setSelectedLandscape },
     { type: 'region' as const, label: 'Region', options: contextData.options.regions, selected: contextData.filters.selectedRegion, onChange: contextData.actions.setSelectedRegion },
   ] : []);

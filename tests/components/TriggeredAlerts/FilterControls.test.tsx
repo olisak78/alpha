@@ -217,7 +217,6 @@ describe('FilterControls', () => {
 
       expect(screen.getByText('Time Range')).toBeInTheDocument();
       expect(screen.getByText('Severity')).toBeInTheDocument();
-      expect(screen.getByText('Status')).toBeInTheDocument();
       expect(screen.getByText('Landscape')).toBeInTheDocument();
       expect(screen.getByText('Region')).toBeInTheDocument();
       // Component filter may not always be rendered depending on the context configuration
@@ -341,7 +340,6 @@ describe('FilterControls', () => {
 
       // Check that all filter sections are rendered
       expect(screen.getByText('Severity').parentElement).toBeInTheDocument();
-      expect(screen.getByText('Status').parentElement).toBeInTheDocument();
       expect(screen.getByText('Landscape').parentElement).toBeInTheDocument();
       expect(screen.getByText('Region').parentElement).toBeInTheDocument();
       // Component filter may not always be rendered
@@ -352,7 +350,7 @@ describe('FilterControls', () => {
 
       // Check that MultiSelect components are rendered
       const multiSelects = screen.getAllByTestId('multi-select');
-      expect(multiSelects).toHaveLength(4); // severity, status, landscape, region (component is not always rendered)
+      expect(multiSelects).toHaveLength(3); // severity, landscape, region (component is not always rendered)
 
       // Check that options are rendered with expected values
       const options = screen.getAllByTestId('multi-select-option');
@@ -360,7 +358,6 @@ describe('FilterControls', () => {
       
       // Verify key options are present
       expect(optionTexts).toContain('critical');
-      expect(optionTexts).toContain('firing');
       expect(optionTexts).toContain('production');
       expect(optionTexts).toContain('us-east-1');
       // Component options may not always be rendered depending on the context configuration
@@ -412,12 +409,11 @@ describe('FilterControls', () => {
 
       const triggers = screen.getAllByTestId('multi-select-trigger');
       expect(triggers[0]).toHaveTextContent('critical');
-      expect(triggers[1]).toHaveTextContent('firing');
-      expect(triggers[2]).toHaveTextContent('production');
-      expect(triggers[3]).toHaveTextContent('us-east-1');
+      expect(triggers[1]).toHaveTextContent('production');
+      expect(triggers[2]).toHaveTextContent('us-east-1');
       // Component filter may not always be rendered, so we check if it exists
-      if (triggers[4]) {
-        expect(triggers[4]).toHaveTextContent('api-service');
+      if (triggers[3]) {
+        expect(triggers[3]).toHaveTextContent('api-service');
       }
     });
 
@@ -426,12 +422,11 @@ describe('FilterControls', () => {
 
       const triggers = screen.getAllByTestId('multi-select-trigger');
       expect(triggers[0]).toHaveTextContent('Select severity...');
-      expect(triggers[1]).toHaveTextContent('Select status...');
-      expect(triggers[2]).toHaveTextContent('Select landscape...');
-      expect(triggers[3]).toHaveTextContent('Select region...');
+      expect(triggers[1]).toHaveTextContent('Select landscape...');
+      expect(triggers[2]).toHaveTextContent('Select region...');
       // Component filter may not always be rendered, so we check if it exists
-      if (triggers[4]) {
-        expect(triggers[4]).toHaveTextContent('Select component...');
+      if (triggers[3]) {
+        expect(triggers[3]).toHaveTextContent('Select component...');
       }
     });
   });
@@ -459,7 +454,6 @@ describe('FilterControls', () => {
 
       expect(screen.getByText('Time Range')).toHaveClass('text-sm', 'font-medium', 'text-foreground', 'mb-2', 'block');
       expect(screen.getByText('Severity')).toHaveClass('text-sm', 'font-medium', 'text-foreground', 'mb-2', 'block');
-      expect(screen.getByText('Status')).toHaveClass('text-sm', 'font-medium', 'text-foreground', 'mb-2', 'block');
       expect(screen.getByText('Landscape')).toHaveClass('text-sm', 'font-medium', 'text-foreground', 'mb-2', 'block');
       expect(screen.getByText('Region')).toHaveClass('text-sm', 'font-medium', 'text-foreground', 'mb-2', 'block');
       // Component filter is not always rendered, so we check if it exists first

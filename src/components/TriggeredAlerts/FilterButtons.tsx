@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useTriggeredAlertsContext } from '@/contexts/TriggeredAlertsContext';
 
 interface FilterButtonsProps {
-  filterType: 'severity' | 'status' | 'landscape' | 'region' | 'component' | 'alertname';
+  filterType: 'severity' | 'landscape' | 'region' | 'component' | 'alertname';
   value: string;
   className?: string;
   // Optional callbacks for custom handling (when not using TriggeredAlertsContext)
@@ -44,13 +44,6 @@ export function FilterButtons({
           const currentSeverity = contextFilters.selectedSeverity || [];
           if (!currentSeverity.includes(value)) {
             contextActions.setSelectedSeverity([...currentSeverity, value]);
-          }
-          break;
-        }
-        case 'status': {
-          const currentStatus = contextFilters.selectedStatus || [];
-          if (!currentStatus.includes(value)) {
-            contextActions.setSelectedStatus([...currentStatus, value]);
           }
           break;
         }
@@ -96,9 +89,6 @@ export function FilterButtons({
       switch (filterType) {
         case 'severity':
           contextActions.addExcludedSeverity(value);
-          break;
-        case 'status':
-          contextActions.addExcludedStatus(value);
           break;
         case 'landscape':
           contextActions.addExcludedLandscape(value);

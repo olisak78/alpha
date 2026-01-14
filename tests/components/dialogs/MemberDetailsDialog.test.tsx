@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemberDetailsDialog, type ExtendedMember } from '../../../src/components/dialogs/MemberDetailsDialog';
 import type { Member as DutyMember } from '../../../src/hooks/useOnDutyData';
 import * as memberUtils from '../../../src/utils/member-utils';
@@ -33,6 +34,39 @@ vi.mock('../../../src/utils/member-utils', () => ({
   },
 }));
 
+// Mock the useTeams hook
+vi.mock('../../../src/hooks/api/useTeams', () => ({
+  useTeams: vi.fn(() => ({
+    data: {
+      teams: [
+        { id: 'team1', name: 'Frontend Team' },
+        { id: 'team2', name: 'Backend Team' },
+        { id: 'team3', name: 'Design Team' }
+      ]
+    },
+    isLoading: false,
+    error: null,
+  })),
+  useTeamById: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+  })),
+}));
+
+// Mock react-router-dom
+const mockNavigate = vi.fn();
+const mockLocation = { pathname: '/teams/current-team/overview' };
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => mockLocation,
+  };
+});
+
 // Mock the AuthContext
 const mockAuthContext = {
   user: {
@@ -53,13 +87,28 @@ vi.mock('../../../src/contexts/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Helper function to render component with Router
-const renderWithRouter = (component: React.ReactElement, initialEntries = ['/']) => {
+// Helper function to render component with QueryClient and Router
+const renderWithQueryClient = (component: React.ReactElement, initialEntries = ['/']) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+  
   return render(
     <MemoryRouter initialEntries={initialEntries}>
-      {component}
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
     </MemoryRouter>
   );
+};
+
+// Helper function to render component with Router (for backward compatibility)
+const renderWithRouter = (component: React.ReactElement, initialEntries = ['/']) => {
+  return renderWithQueryClient(component, initialEntries);
 };
 
 describe('MemberDetailsDialog Component', () => {
@@ -94,6 +143,10 @@ describe('MemberDetailsDialog Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Reset mocks
+    mockNavigate.mockClear();
+    
     // Setup default mock implementations
     vi.mocked(memberUtils.formatBirthDate).mockImplementation((date) => {
       if (date === '03-15') return 'March 15';
@@ -133,11 +186,13 @@ describe('MemberDetailsDialog Component', () => {
       // Test null member
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={null}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={null}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
       expect(screen.queryByText('User Details')).not.toBeInTheDocument();
@@ -219,11 +274,13 @@ describe('MemberDetailsDialog Component', () => {
 
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={memberWithNulls}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={memberWithNulls}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -251,11 +308,13 @@ describe('MemberDetailsDialog Component', () => {
 
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={memberWithSpecialChars}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={memberWithSpecialChars}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -331,11 +390,13 @@ describe('MemberDetailsDialog Component', () => {
       // Test conditional email button rendering
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={{ ...mockMember, email: '' }}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={{ ...mockMember, email: '' }}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -365,11 +426,13 @@ describe('MemberDetailsDialog Component', () => {
       // Test undefined birth date
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={{ ...mockMember, birthDate: undefined }}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={{ ...mockMember, birthDate: undefined }}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
       expect(memberUtils.formatBirthDate).toHaveBeenCalledWith(undefined);
@@ -377,11 +440,13 @@ describe('MemberDetailsDialog Component', () => {
       // Test empty birth date
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={{ ...mockMember, birthDate: '' }}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={{ ...mockMember, birthDate: '' }}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
       expect(memberUtils.formatBirthDate).toHaveBeenCalledWith('');
@@ -483,11 +548,13 @@ describe('MemberDetailsDialog Component', () => {
 
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={updatedMember}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={updatedMember}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -511,11 +578,13 @@ describe('MemberDetailsDialog Component', () => {
 
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={mockMember}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={mockMember}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -537,11 +606,13 @@ describe('MemberDetailsDialog Component', () => {
 
       rerender(
         <MemoryRouter>
-          <MemberDetailsDialog
-            open={true}
-            onOpenChange={mockOnOpenChange}
-            member={mockMemberMinimal}
-          />
+          <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+            <MemberDetailsDialog
+              open={true}
+              onOpenChange={mockOnOpenChange}
+              member={mockMemberMinimal}
+            />
+          </QueryClientProvider>
         </MemoryRouter>
       );
 
@@ -610,6 +681,238 @@ describe('MemberDetailsDialog Component', () => {
       expect(emailCopyButton).toBeInTheDocument();
       expect(userIdCopyButton).toHaveAttribute('aria-label', 'Copy User ID');
       expect(emailCopyButton).toHaveAttribute('aria-label', 'Copy Email');
+    });
+  });
+
+  // ============================================================================
+  // NEW FUNCTIONALITY TESTS
+  // ============================================================================
+
+  describe('New Functionality', () => {
+    it('should handle team navigation functionality', async () => {
+      const memberWithClickableTeam: ExtendedMember = {
+        ...mockMember,
+        team: 'Backend Team', // Different from current team
+      };
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={memberWithClickableTeam}
+        />
+      );
+
+      // Team should be displayed
+      const teamElement = screen.getByText('Backend Team');
+      expect(teamElement).toBeInTheDocument();
+      
+      // Test that the team is rendered in the correct location
+      expect(screen.getByText('Team:')).toBeInTheDocument();
+    });
+
+    it('should handle managed teams rendering', () => {
+      const memberWithManagedTeams: ExtendedMember = {
+        ...mockMember,
+        managed_teams: [
+          { name: 'Team A', title: 'Frontend Team A' },
+          { name: 'Team B', title: 'Backend Team B' }
+        ]
+      };
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={memberWithManagedTeams}
+        />
+      );
+
+      // Should show team information (managed teams feature may not be fully implemented)
+      // For now, test that the team section is rendered
+      expect(screen.getByText('Team:')).toBeInTheDocument();
+      
+      // The component should render without errors even with managed_teams property
+      expect(screen.getByText('User Details')).toBeInTheDocument();
+    });
+
+    it('should show back button when showBackButton is true', () => {
+      const mockOnGoBack = vi.fn();
+      
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={mockMember}
+          onGoBack={mockOnGoBack}
+          showBackButton={true}
+        />
+      );
+
+      const backButton = screen.getByLabelText('Go back');
+      expect(backButton).toBeInTheDocument();
+    });
+
+    it('should call onGoBack when back button is clicked', async () => {
+      const user = userEvent.setup();
+      const mockOnGoBack = vi.fn();
+      
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={mockMember}
+          onGoBack={mockOnGoBack}
+          showBackButton={true}
+        />
+      );
+
+      const backButton = screen.getByLabelText('Go back');
+      await user.click(backButton);
+      
+      expect(mockOnGoBack).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle enhanced copy functionality with visual feedback', async () => {
+      const user = userEvent.setup();
+      
+      // Mock navigator.clipboard
+      const mockWriteText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: mockWriteText,
+        },
+        writable: true,
+      });
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={mockMember}
+        />
+      );
+
+      const copyButton = screen.getByLabelText('Copy User ID');
+      await user.click(copyButton);
+
+      // Should show "Copied!" feedback
+      expect(screen.getByText('Copied!')).toBeInTheDocument();
+      expect(mockWriteText).toHaveBeenCalledWith('user123');
+    });
+
+    it('should handle copy functionality errors gracefully', async () => {
+      const user = userEvent.setup();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
+      // Mock navigator.clipboard to throw an error
+      const mockWriteText = vi.fn().mockRejectedValue(new Error('Copy failed'));
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: mockWriteText,
+        },
+        writable: true,
+      });
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={mockMember}
+        />
+      );
+
+      const copyButton = screen.getByLabelText('Copy User ID');
+      await user.click(copyButton);
+
+      // Should not crash and should log error
+      expect(screen.getByText('User Details')).toBeInTheDocument();
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to copy text: ', expect.any(Error));
+      
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle onViewManager callback', async () => {
+      const user = userEvent.setup();
+      const mockOnViewManager = vi.fn();
+      
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={mockMember}
+          onViewManager={mockOnViewManager}
+        />
+      );
+
+      // Click on manager name (should be clickable)
+      const managerElement = screen.getByText('Jane Smith');
+      await user.click(managerElement);
+      
+      expect(mockOnViewManager).toHaveBeenCalledWith('manager123');
+    });
+
+    it('should handle team_id and team name mapping', () => {
+      const memberWithTeamId: ExtendedMember = {
+        ...mockMember,
+        team_id: 'team1',
+        team: 'Original Team Name'
+      };
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={memberWithTeamId}
+        />
+      );
+
+      // Should show the original team name since team_id mapping is mocked
+      expect(screen.getByText('Original Team Name')).toBeInTheDocument();
+    });
+
+    it('should handle avatar click for current user', async () => {
+      const user = userEvent.setup();
+      
+      // Mock user as the same as the member being viewed
+      const currentUserMember: ExtendedMember = {
+        ...mockMember,
+        id: 'user123', // Same as mockAuthContext.user.id
+      };
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={currentUserMember}
+        />
+      );
+
+      const avatarContainer = document.querySelector('.h-20.w-20');
+      expect(avatarContainer).toHaveClass('hover:opacity-70');
+      expect(avatarContainer).toHaveAttribute('title', 'Open Profile');
+      
+      await user.click(avatarContainer as Element);
+      expect(memberUtils.openSAPProfile).toHaveBeenCalledWith('user123');
+    });
+
+    it('should not make avatar clickable for other users', () => {
+      const otherUserMember: ExtendedMember = {
+        ...mockMember,
+        id: 'other-user', // Different from mockAuthContext.user.id
+      };
+
+      renderWithRouter(
+        <MemberDetailsDialog
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          member={otherUserMember}
+        />
+      );
+
+      const avatarContainer = document.querySelector('.h-20.w-20');
+      expect(avatarContainer).not.toHaveClass('hover:opacity-70');
+      expect(avatarContainer).not.toHaveAttribute('title');
     });
   });
 

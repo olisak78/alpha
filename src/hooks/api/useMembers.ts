@@ -55,6 +55,15 @@ async function fetchUser(userId: string): Promise<User> {
 }
 
 /**
+ * Search users using the users?q= endpoint
+ */
+async function searchUsers(query: string): Promise<UsersListResponse> {
+  return apiClient.get<UsersListResponse>('/users', { 
+    params: { q: query }
+  });
+}
+
+/**
  * Search users using the new API endpoint
  */
 async function searchLdapUsers(name: string): Promise<LdapUserSearchResponse> {
@@ -106,6 +115,29 @@ export function usePrefetchUsers() {
       queryFn: () => fetchUsers(params),
     });
   };
+}
+
+/**
+ * Hook to search users using the users?q= endpoint
+ */
+export function useUserSearch(
+  query: string,
+  options?: Omit<
+    UseQueryOptions<UsersListResponse, Error>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<UsersListResponse, Error> {
+  return useQuery({
+    queryKey: ['users', 'search', 'q', query],
+    queryFn: () => searchUsers(query),
+    // Only run if we have a query parameter and it's not empty
+    enabled: !!query && query.trim().length > 0 && (options?.enabled ?? true),
+    // Don't refetch on window focus for search results
+    refetchOnWindowFocus: false,
+    // Cache search results for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    ...options,
+  });
 }
 
 /**

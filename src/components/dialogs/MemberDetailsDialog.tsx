@@ -21,14 +21,15 @@ import { openTeamsChat, formatBirthDate, openSAPProfile, openEmailClient, SAP_PE
 import { TeamsIcon } from "../icons/TeamsIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { get } from "http";
+import { useTeams } from "@/hooks/api/useTeams";
 
-// Extended member interface with additional fields for the details dialog
+// Constants
 export interface ExtendedMember extends DutyMember {
   phoneNumber?: string;
   room?: string;
   managerName?: string;
   birthDate?: string; // Format: MM-DD (no year)
+  team_id?: string; // Team UUID for API operations and navigation
 }
 
 interface MemberDetailsDialogProps {
@@ -46,6 +47,19 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Fetch teams data for team name mapping
+  const { data: teamsResponse } = useTeams({
+    page: 1,
+    page_size: 100,
+  });
+  
+  // Helper function to get team name from team ID
+  const getTeamNameFromId = (teamId: string): string | undefined => {
+    if (!teamsResponse?.teams) return undefined;
+    const team = teamsResponse.teams.find(t => t.id === teamId);
+    return team?.name;
+  };
   
   // Enhanced copy function with visual feedback
   const handleCopyToClipboard = useCallback(async (e: React.MouseEvent, text: string, fieldLabel: string) => {
@@ -65,9 +79,6 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
   // Check if current user can edit this member's picture
   const canEditPicture = user?.id === member.id;
 
-  // Check if current user can navigate to teams (manager or mmm role)
-  const canNavigateToTeams = member.managed_teams && member.managed_teams.length > 0;
-
   // Get current team from URL to disable navigation to the current team
   const currentUserTeam = (() => {
     const pathParts = location.pathname.split('/');
@@ -77,25 +88,78 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
   })();
 
   // Helper function to handle team navigation
-  const handleTeamNavigation = (teamName: string, teamId: string) => {
-    if (!canNavigateToTeams) return;
+  const handleTeamNavigation = (teamName: string) => {   
     
     // Don't navigate if it's the current user's own team
-    if (teamId === currentUserTeam) return;
+    if (teamName === currentUserTeam) return;
     
     // Navigate to teams page with the team name and default tab
-    navigate(`/teams/${encodeURIComponent(teamId)}/overview`);
+    navigate(`/teams/${encodeURIComponent(teamName)}/overview`);
     
     // Close the dialog after navigation
     onOpenChange(false);
   };
 
   // Helper function to check if a team should be clickable
-  const isTeamClickable = (teamId: string) => {
-    return canNavigateToTeams && teamId !== currentUserTeam && teamId !== "Not specified";
+  const isTeamClickable = (teamName: string) => {
+    return teamName !== currentUserTeam;
   };
 
-  const getManagetFullName = () => {
+  // Render managed teams (multiple teams that the member manages)
+  const renderManagedTeams = () => {
+    if (!member.managed_teams || member.managed_teams.length === 0) {
+      return null;
+    }
+
+    return member.managed_teams.map((team, teamIndex) => {
+      const clickable = isTeamClickable(team.name);
+      return (
+        <span
+          key={teamIndex}
+          className={`text-sm ${
+            clickable 
+              ? 'text-primary hover:underline cursor-pointer' 
+              : 'text-foreground'
+          }`}
+          onClick={clickable ? () => handleTeamNavigation(team.name) : undefined}
+          title={team.title}
+        >
+          {team.title}
+          {teamIndex < member.managed_teams!.length - 1 && ', '}
+        </span>
+      );
+    });
+  };
+
+  // Render member's primary team (single team assignment)
+  const renderMemberTeam = () => {
+    const teamName = member.team_id && getTeamNameFromId ? getTeamNameFromId(member.team_id) : null;
+    const clickable = teamName && isTeamClickable(teamName);
+    const teamDisplayName = member.team || "Not specified";
+    
+    return (
+      <span 
+        className={`text-sm ${
+          clickable
+            ? 'text-primary hover:underline cursor-pointer' 
+            : 'text-foreground'
+        }`}
+        onClick={clickable ? () => handleTeamNavigation(teamName!) : undefined}
+        title={member.team}
+      >
+        {teamDisplayName}
+      </span>
+    );
+  };
+
+  // Render team information with proper navigation handling
+  const renderTeamInfo = () => {
+    // Prioritize managed teams if they exist, otherwise show member's primary team
+    const managedTeams = renderManagedTeams();
+    return managedTeams || renderMemberTeam();
+  };
+
+  const getManagerFullName = () => {
     if(member.manager)
       return `${member?.manager?.first_name} ${member?.manager?.last_name}`;
     return "Not specified";
@@ -117,7 +181,7 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
     {
       icon: Users,
       label: "Team",
-      value: member.managed_teams?.map(team => team.title).join(', ') || member.team || "Not specified"
+      value: "" // Value not used - custom rendering via renderTeamInfo()
     },
     {
       icon: MapPin,
@@ -127,7 +191,7 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
     {
       icon: UserCheck,
       label: "Manager Name",
-      value: getManagetFullName(),
+      value: getManagerFullName(),
       onClick: member.id && onViewManager 
         ? () => onViewManager(member.manager.id!) 
         : undefined,
@@ -230,30 +294,7 @@ export function MemberDetailsDialog({ open, onOpenChange, member, onViewManager,
                         {item.label}:
                       </span>
                       <div className="flex-1 flex flex-wrap gap-1">
-                        {member.managed_teams && member.managed_teams.length > 0 ? (
-                          member.managed_teams.map((team, teamIndex) => {
-                            const clickable = isTeamClickable(team.name);
-                            return (
-                              <span
-                                key={teamIndex}
-                                className={`text-sm ${
-                                  clickable 
-                                    ? 'text-primary hover:underline cursor-pointer' 
-                                    : 'text-foreground'
-                                }`}
-                                onClick={clickable ? () => handleTeamNavigation(team.title, team.name) : undefined}
-                                title={team.title}
-                              >
-                                {team.title}
-                                {teamIndex < member.managed_teams!.length - 1 && ', '}
-                              </span>
-                            );
-                          })
-                        ) : (
-                          <span className="text-sm text-foreground">
-                            {member.team || "Not specified"}
-                          </span>
-                        )}
+                        {renderTeamInfo()}
                       </div>
                     </div>
                   );

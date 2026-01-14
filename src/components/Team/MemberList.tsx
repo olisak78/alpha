@@ -10,6 +10,9 @@ import { MemberCard } from "./MemberCard";
 import { useToast } from "@/hooks/use-toast";
 import { useTeamContext } from "@/contexts/TeamContext";
 import { useUser } from "@/hooks/api/useMembers";
+import { useTeamById } from "@/hooks/api/useTeams";
+import { SearchUser } from "./SearchUser";
+import type { User } from "@/types/api";
 
 interface MemberListProps {
   showActions?: boolean;
@@ -44,10 +47,16 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
   const [targetTeam, setTargetTeam] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [managerIdToFetch, setManagerIdToFetch] = useState<string>("");
+  const [selectedUserTeamId, setSelectedUserTeamId] = useState<string>("");
   const { toast } = useToast();
 
   const managerMember = currentTeam?.members?.find(m => m.team_role === 'manager');
   const manager = managerMember ? `${managerMember.first_name || ''} ${managerMember.last_name || ''}`.trim() : '';
+
+  // Fetch team data when selectedUserTeamId is set
+  const { data: selectedUserTeamData } = useTeamById(selectedUserTeamId, {
+    enabled: !!selectedUserTeamId
+  });
 
   // Fetch manager data from API when managerIdToFetch is set
   const { data: managerUserData } = useUser(managerIdToFetch, {
@@ -70,6 +79,23 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
       setManagerIdToFetch(""); // Reset the fetch trigger
     }
   }, [managerUserData, managerIdToFetch, manager]);
+
+  // Effect to handle selected user team data when it's fetched
+  useEffect(() => {
+    if (selectedUserTeamData && selectedUserTeamId) {
+      // Update the memberToView with the proper team name
+      setMemberToView(prevMember => {
+        if (prevMember) {
+          return {
+            ...prevMember,
+            team: selectedUserTeamData.title || selectedUserTeamData.name || selectedUserTeamId
+          };
+        }
+        return prevMember;
+      });
+      setSelectedUserTeamId(""); // Reset the fetch trigger
+    }
+  }, [selectedUserTeamData, selectedUserTeamId]);
 
   const confirmRemoveMember = () => {
     if (!memberToRemove) return;
@@ -179,6 +205,29 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
     }
   };
 
+  const handleUserSelect = (user: User) => {
+    // Convert User to ExtendedMember format for the dialog
+    const extendedMember: ExtendedMember = {
+      ...user,
+      fullName: `${user.first_name} ${user.last_name}`,
+      role: user.team_role || "",
+      room: "", // Not available in User type
+      managerName: user.manager ? `${user.manager.first_name} ${user.manager.last_name}` : "",
+      birthDate: "", // Not available in User type
+      phoneNumber: user.mobile || ""
+    };
+    
+    // Reset navigation state and show the dialog
+    setPreviousMember(null);
+    setMemberToView(extendedMember);
+    setIsDetailsDialogOpen(true);
+    
+    // Trigger team fetch if user has a team_id
+    if (user.team_id) {
+      setSelectedUserTeamId(user.team_id);
+    }
+  };
+
   return (
     <section className="mr-6">
       <ApprovalDialog
@@ -228,24 +277,31 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
       />
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-        <h2 className="text-lg font-semibold">Team Members</h2>
-        <Badge variant="outline">{members.length}</Badge>
-      </div>
-       {isAdmin && (
-          <div className="flex items-center gap-2 h-9">
-            {colorPickerProps && (
-              <TeamColorPicker
-                currentColor={colorPickerProps.currentColor}
-                onColorChange={colorPickerProps.onColorChange}
-                disabled={colorPickerProps.disabled}
-                usedColors={colorPickerProps.usedColors}
-              />
-            )}
-            <Button size="sm" onClick={openAddMember} className="h-9">
-              Add Member
-            </Button>
-          </div>
-        )}
+          <h2 className="text-lg font-semibold">Team Members</h2>
+          <Badge variant="outline">{members.length}</Badge>
+        </div>
+        <div className="flex items-center gap-2 h-9">
+          <SearchUser
+            onUserSelect={handleUserSelect}
+            placeholder="Search users..."
+            className="w-64"
+          />
+          {isAdmin && (
+            <>
+              {colorPickerProps && (
+                <TeamColorPicker
+                  currentColor={colorPickerProps.currentColor}
+                  onColorChange={colorPickerProps.onColorChange}
+                  disabled={colorPickerProps.disabled}
+                  usedColors={colorPickerProps.usedColors}
+                />
+              )}
+              <Button size="sm" onClick={openAddMember} className="h-9">
+                Add Member
+              </Button>
+            </>
+          )}
+        </div>
       </div>
       {members.length === 0 ? (
         <div className="text-center py-8">

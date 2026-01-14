@@ -127,7 +127,7 @@ export const BaseBody: React.FC<BaseBodyProps> = ({
 
   // Render content
   return (
-    <div className="p-6" style={{ minHeight }}>
+    <div style={{ minHeight }}>
       {children}
     </div>
   );

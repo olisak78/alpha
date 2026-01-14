@@ -22,7 +22,6 @@ interface AppliedFiltersProps {
 interface LegacyAppliedFiltersProps {
   searchTerm: string;
   selectedSeverity: string;
-  selectedStatus: string;
   selectedLandscape: string;
   selectedRegion: string;
   selectedComponent: string;
@@ -30,7 +29,6 @@ interface LegacyAppliedFiltersProps {
   endDate: string;
   onRemoveSearchTerm: () => void;
   onRemoveSeverity: () => void;
-  onRemoveStatus: () => void;
   onRemoveLandscape: () => void;
   onRemoveRegion: () => void;
   onRemoveComponent: () => void;
@@ -53,7 +51,6 @@ export function AppliedFilters(props: AppliedFiltersProps | LegacyAppliedFilters
     const {
       searchTerm,
       selectedSeverity,
-      selectedStatus,
       selectedLandscape,
       selectedRegion,
       selectedComponent,
@@ -61,7 +58,6 @@ export function AppliedFilters(props: AppliedFiltersProps | LegacyAppliedFilters
       endDate,
       onRemoveSearchTerm,
       onRemoveSeverity,
-      onRemoveStatus,
       onRemoveLandscape,
       onRemoveRegion,
       onRemoveComponent,
@@ -90,14 +86,6 @@ export function AppliedFilters(props: AppliedFiltersProps | LegacyAppliedFilters
       });
     }
 
-    // Status filter
-    if (selectedStatus && selectedStatus !== 'all') {
-      appliedFilters.push({
-        key: 'status',
-        label: `Status: ${selectedStatus}`,
-        onRemove: onRemoveStatus,
-      });
-    }
 
     // Landscape filter
     if (selectedLandscape && selectedLandscape !== 'all') {

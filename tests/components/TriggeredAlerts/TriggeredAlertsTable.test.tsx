@@ -466,13 +466,11 @@ describe('TriggeredAlertsTable', () => {
 
       renderWithProvider(<TriggeredAlertsTable />);
       
-      // Should render filter buttons for alertname, severity, status, landscape, and region
+      // Should render filter buttons for alertname, severity, landscape, and region (status doesn't have filter buttons)
       expect(screen.getByTitle('Filter by alertname: Test Alert')).toBeInTheDocument();
       expect(screen.getByTitle('Exclude alertname: Test Alert')).toBeInTheDocument();
       expect(screen.getByTitle('Filter by severity: critical')).toBeInTheDocument();
       expect(screen.getByTitle('Exclude severity: critical')).toBeInTheDocument();
-      expect(screen.getByTitle('Filter by status: firing')).toBeInTheDocument();
-      expect(screen.getByTitle('Exclude status: firing')).toBeInTheDocument();
       expect(screen.getByTitle('Filter by landscape: production')).toBeInTheDocument();
       expect(screen.getByTitle('Exclude landscape: production')).toBeInTheDocument();
       expect(screen.getByTitle('Filter by region: us-east-1')).toBeInTheDocument();

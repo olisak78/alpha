@@ -19,15 +19,32 @@ vi.mock('../../src/pages/AlertsPage', () => ({
 }));
 
 vi.mock('../../src/components/tabs/TriggeredAlertsTab', () => ({
-  TriggeredAlertsTab: ({ projectId, onShowAlertDefinition }: any) => (
-    <div data-testid="triggered-alerts-tab">
-      <div data-testid="triggered-alerts-project-id">{projectId}</div>
-      <button 
-        data-testid="show-alert-definition-btn"
-        onClick={() => onShowAlertDefinition?.('test-alert')}
-      >
-        Show Alert Definition
-      </button>
+  TriggeredAlertsTab: ({ projectId, onShowAlertDefinition, initialStatusFilter }: any) => (
+    <div>
+      {initialStatusFilter && (
+        <div data-testid="triggered-alerts-provider" data-project-id={projectId}>
+          <div data-testid="triggered-alerts-tab">
+            <div data-testid="triggered-alerts-project-id">{projectId}</div>
+            <button 
+              data-testid="show-alert-definition-btn"
+              onClick={() => onShowAlertDefinition?.('test-alert')}
+            >
+              Show Alert Definition
+            </button>
+          </div>
+        </div>
+      )}
+      {!initialStatusFilter && (
+        <div data-testid="triggered-alerts-tab">
+          <div data-testid="triggered-alerts-project-id">{projectId}</div>
+          <button 
+            data-testid="show-alert-definition-btn"
+            onClick={() => onShowAlertDefinition?.('test-alert')}
+          >
+            Show Alert Definition
+          </button>
+        </div>
+      )}
     </div>
   ),
 }));
@@ -225,13 +242,13 @@ describe('MonitoringPage', () => {
   });
 
   describe('Filter State Management', () => {
-    it('should default to alerts-history tab', () => {
+    it('should default to active-alerts tab', () => {
       render(<MonitoringPage {...defaultProps} />, {
         wrapper: createWrapper(),
       });
 
-      const alertsHistoryButton = screen.getByTestId('filter-button-alerts-history');
-      expect(alertsHistoryButton).toHaveClass('active');
+      const activeAlertsButton = screen.getByTestId('filter-button-active-alerts');
+      expect(activeAlertsButton).toHaveClass('active');
     });
   });
 
