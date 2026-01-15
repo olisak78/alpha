@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import QuickFilterButtons, { FilterOption } from '@/components/QuickFilterButtons';
 import AlertsPage from '@/pages/AlertsPage';
 import { TriggeredAlertsTab } from '@/components/tabs/TriggeredAlertsTab';
-import { AlertTriangle, Settings } from 'lucide-react';
+import { AlertTriangle, Settings, History } from 'lucide-react';
 import { useAlerts } from '@/hooks/api/useAlerts';
 
 
@@ -48,7 +48,7 @@ function MonitoringPageContent({ projectId, projectName, alertsUrl }: Monitoring
     {
       value: "alerts-history",
       label: `Alerts History`,
-      icon: AlertTriangle
+      icon: History
     },
     {
       value: "alerts-definitions",

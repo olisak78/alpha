@@ -66,13 +66,24 @@ export function MemberList({ showActions = true, colorPickerProps }: MemberListP
   // Effect to handle manager data when it's fetched
   useEffect(() => {
     if (managerUserData && managerIdToFetch) {
+      // Construct fullName from first_name and last_name
+      const fullName = `${managerUserData.first_name || ''} ${managerUserData.last_name || ''}`.trim();
+      
+      // Create a clean ExtendedMember object with only required fields
       const extendedManagerMember: ExtendedMember = {
-        ...managerUserData,
-        room: "", // Sample data
-        managerName: manager,
+        id: managerUserData.id,
+        uuid: managerUserData.uuid,
+        email: managerUserData.email,
+        fullName: fullName,
+        role: managerUserData.team_role || "member",
+        mobile: managerUserData.mobile || "",
+        room: "",
         birthDate: "",
-        fullName: "",
-        role: ""
+        manager: managerUserData.manager,
+        managerName: managerUserData.manager ? `${managerUserData.manager.first_name} ${managerUserData.manager.last_name}` : "",
+        team: "", // Will be set by team data fetch if available
+        team_id: managerUserData.team_id,
+        managed_teams: managerUserData.managed_teams || []
       };
       
       setMemberToView(extendedManagerMember);

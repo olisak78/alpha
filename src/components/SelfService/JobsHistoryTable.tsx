@@ -24,6 +24,7 @@ import {
   getTimeAgo,
   type TimePeriod 
 } from "@/utils/selfServiceUtils";
+import type { CustomDateRange } from "./DateRangePicker";
 
 /**
  * Custom hook for debounced value
@@ -42,6 +43,35 @@ const useDebounce = <T,>(value: T, delay: number): T => {
   }, [value, delay]);
 
   return debouncedValue;
+};
+
+/**
+ * Calculate hours between two dates
+ */
+const getHoursBetweenDates = (startDate: Date, endDate: Date = new Date()): number => {
+  const diffMs = endDate.getTime() - startDate.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60));
+};
+
+/**
+ * Check if a job's lastPolledAt falls within a date range
+ */
+const isJobInDateRange = (job: JenkinsJobHistoryItem, range: CustomDateRange): boolean => {
+  if (!range.from) return true;
+  
+  const jobDate = new Date(job.lastPolledAt);
+  const startDate = new Date(range.from);
+  startDate.setHours(0, 0, 0, 0);
+  
+  if (!range.to) {
+    // Only start date specified - include all jobs from that date onwards
+    return jobDate >= startDate;
+  }
+  
+  const endDate = new Date(range.to);
+  endDate.setHours(23, 59, 59, 999);
+  
+  return jobDate >= startDate && jobDate <= endDate;
 };
 
 interface JobsHistoryTableProps {
@@ -73,6 +103,23 @@ export default function JobsHistoryTable({
   // Debounce search term to avoid excessive filtering
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   
+  // Custom date range state
+  const [customDateRange, setCustomDateRange] = useState<CustomDateRange>(() => {
+    const stored = localStorage.getItem('jobsHistory_customDateRange');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return {
+          from: parsed.from ? new Date(parsed.from) : undefined,
+          to: parsed.to ? new Date(parsed.to) : undefined,
+        };
+      } catch {
+        return { from: undefined, to: undefined };
+      }
+    }
+    return { from: undefined, to: undefined };
+  });
+  
   // When filtering by service, always use onlyMine=false
   // Otherwise load from localStorage
   const [onlyMine, setOnlyMine] = useState<boolean>(() => {
@@ -89,6 +136,9 @@ export default function JobsHistoryTable({
 
   // Use controlled time period if provided, otherwise use internal state
   const timePeriod = controlledTimePeriod !== undefined ? controlledTimePeriod : internalTimePeriod;
+  
+  // Check if custom date range is active
+  const hasCustomDateRange = !!(customDateRange.from);
 
   // Persist onlyMine state to localStorage whenever it changes
   useEffect(() => {
@@ -101,6 +151,18 @@ export default function JobsHistoryTable({
       localStorage.setItem('jobsHistory_timePeriod', internalTimePeriod);
     }
   }, [internalTimePeriod, controlledTimePeriod]);
+
+  // Persist custom date range to localStorage
+  useEffect(() => {
+    if (customDateRange.from || customDateRange.to) {
+      localStorage.setItem('jobsHistory_customDateRange', JSON.stringify({
+        from: customDateRange.from?.toISOString(),
+        to: customDateRange.to?.toISOString(),
+      }));
+    } else {
+      localStorage.removeItem('jobsHistory_customDateRange');
+    }
+  }, [customDateRange]);
 
   // When filteredService changes, force onlyMine to false and reset page
   // This ensures we see all users' jobs for the selected service
@@ -127,8 +189,22 @@ export default function JobsHistoryTable({
     setCurrentPage(1);
   }, [debouncedSearchTerm]);
   
+  // Reset to page 1 when custom date range changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [customDateRange.from, customDateRange.to]);
+  
   const offset = (currentPage - 1) * itemsPerPage;
-  const lastUpdatedHours = getHoursForPeriod(timePeriod);
+  
+  // Calculate hours for API call based on custom date range or predefined period
+  const lastUpdatedHours = useMemo(() => {
+    if (hasCustomDateRange && customDateRange.from) {
+      // Calculate hours from custom start date to now (or end date)
+      const endDate = customDateRange.to || new Date();
+      return getHoursBetweenDates(customDateRange.from, endDate);
+    }
+    return getHoursForPeriod(timePeriod);
+  }, [hasCustomDateRange, customDateRange.from, customDateRange.to, timePeriod]);
   
   /**
    * When filtering by service, we need to fetch ALL jobs from backend
@@ -250,9 +326,14 @@ export default function JobsHistoryTable({
   const filteredJobs = useMemo(() => {
     let jobs = jobsToFilter;
 
+    // First apply service filter if active
     if (filteredService) {
-      const beforeFilter = jobs.length;
       jobs = jobs.filter((job) => job.jobName === filteredService.jobName);
+    }
+
+    // Then apply custom date range filter if active
+    if (hasCustomDateRange) {
+      jobs = jobs.filter((job) => isJobInDateRange(job, customDateRange));
     }
 
     // Then apply search filter
@@ -277,14 +358,14 @@ export default function JobsHistoryTable({
     });
   
     return searchFiltered;
-  }, [jobsToFilter, debouncedSearchTerm, filteredService, allAccumulatedJobs.length]);
+  }, [jobsToFilter, debouncedSearchTerm, filteredService, hasCustomDateRange, customDateRange, allAccumulatedJobs.length]);
 
   /**
    * Determine if we're using client-side filtering
-   * If search, service filter, or time period filter is active, we need to show filtered count
+   * If search, service filter, custom date range, or time period filter is active, we need to show filtered count
    * Otherwise, use server-side total
    */
-  const hasClientSideFiltering = !!(debouncedSearchTerm || filteredService);
+  const hasClientSideFiltering = !!(debouncedSearchTerm || filteredService || hasCustomDateRange);
 
   /**
    * Calculate pagination based on whether we're filtering client-side or not
@@ -332,6 +413,9 @@ export default function JobsHistoryTable({
   };
 
   const handleTimePeriodChange = (period: TimePeriod) => {
+    // When selecting a predefined period, clear custom date range
+    setCustomDateRange({ from: undefined, to: undefined });
+    
     if (onTimePeriodChange) {
       // Controlled mode - notify parent
       onTimePeriodChange(period);
@@ -339,6 +423,15 @@ export default function JobsHistoryTable({
       // Uncontrolled mode - update internal state
       setInternalTimePeriod(period);
     }
+  };
+
+  const handleCustomDateRangeChange = (range: CustomDateRange) => {
+    setCustomDateRange(range);
+    // Don't clear the predefined time period - it will just be ignored when custom range is active
+  };
+
+  const handleClearCustomDateRange = () => {
+    setCustomDateRange({ from: undefined, to: undefined });
   };
 
   const handleClearSearch = () => {
@@ -376,6 +469,10 @@ export default function JobsHistoryTable({
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onClearSearch={handleClearSearch}
+        customDateRange={customDateRange}
+        onCustomDateRangeChange={handleCustomDateRangeChange}
+        onClearCustomDateRange={handleClearCustomDateRange}
+        hasCustomDateRange={hasCustomDateRange}
       />
 
       {!isCollapsed && (

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TIME_PERIODS, type TimePeriod } from "@/utils/selfServiceUtils";
+import { DateRangePicker, type CustomDateRange } from "./DateRangePicker";
 
 
 interface JobsHistoryTableHeaderProps {
@@ -35,6 +36,10 @@ interface JobsHistoryTableHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
+  customDateRange: CustomDateRange;
+  onCustomDateRangeChange: (range: CustomDateRange) => void;
+  onClearCustomDateRange: () => void;
+  hasCustomDateRange: boolean;
 }
 
 export const JobsHistoryTableHeader = ({
@@ -55,6 +60,10 @@ export const JobsHistoryTableHeader = ({
   searchTerm,
   onSearchChange,
   onClearSearch,
+  customDateRange,
+  onCustomDateRangeChange,
+  onClearCustomDateRange,
+  hasCustomDateRange,
 }: JobsHistoryTableHeaderProps) => {
   return (
     <CardHeader className="border-b">
@@ -82,7 +91,7 @@ export const JobsHistoryTableHeader = ({
             </Button>
             {totalJobs > 0 && (
               <Badge variant="secondary" className="text-xs">
-                {hasSearchTerm ? `${totalFilteredItems} / ${totalJobs}` : (filteredService ? totalFilteredItems : totalJobs)}
+                {hasSearchTerm || hasCustomDateRange ? `${totalFilteredItems} / ${totalJobs}` : (filteredService ? totalFilteredItems : totalJobs)}
               </Badge>
             )}
             {filteredService && onClearFilter && (
@@ -107,13 +116,21 @@ export const JobsHistoryTableHeader = ({
           </div>
           
           <div className="flex items-center gap-4">
+            {/* Custom Date Range Picker */}
+            <DateRangePicker
+              value={customDateRange}
+              onChange={onCustomDateRangeChange}
+              onClear={onClearCustomDateRange}
+            />
+
             {/* Time Period Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant={hasCustomDateRange ? "outline" : "default"}
                   size="sm"
                   className="gap-2"
+                  disabled={hasCustomDateRange}
                 >
                   <Calendar className="h-4 w-4" />
                   {currentPeriodLabel}
