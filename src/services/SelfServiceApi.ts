@@ -231,3 +231,25 @@ export async function fetchJenkinsJobHistory(
     `/self-service/jenkins/jobs?limit=${limit}&offset=${offset}&only_mine=${onlyMine}&last_updated=${lastUpdated}`
   );
 }
+
+export interface JenkinsJobOutputItem {
+  description: string;
+  displayName: string;
+  id: string;
+  type: string;
+  value: string;
+}
+
+/**
+ * Fetch output for a specific Jenkins job build
+ */
+export const fetchJenkinsJobOutput = async (
+  jaasName: string,
+  jobName: string,
+  buildNumber: number
+): Promise<JenkinsJobOutputItem[]> => {
+  const response = await apiClient.get<JenkinsJobOutputItem[]>(
+    `/self-service/jenkins/${jaasName}/${jobName}/${buildNumber}/output`
+  );
+  return response;
+};

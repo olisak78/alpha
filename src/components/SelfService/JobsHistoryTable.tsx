@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { ExternalLink, CheckCircle2, XCircle, Loader2, Clock, StopCircle, Search, ChevronRight } from "lucide-react";
+import { ExternalLink, CheckCircle2, XCircle, Loader2, Clock, StopCircle, Search, ChevronRight, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -17,12 +17,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { StatusBadge } from "./StatusBadge";
 import { JobsHistoryTableHeader } from "./JobsHistoryTableHeader";
-import { 
-  TIME_PERIODS, 
+import {
+  TIME_PERIODS,
   getHoursForPeriod,
   formatDuration,
   getTimeAgo,
-  type TimePeriod 
+  type TimePeriod
 } from "@/utils/selfServiceUtils";
 import type { CustomDateRange } from "./DateRangePicker";
 
@@ -58,19 +58,19 @@ const getHoursBetweenDates = (startDate: Date, endDate: Date = new Date()): numb
  */
 const isJobInDateRange = (job: JenkinsJobHistoryItem, range: CustomDateRange): boolean => {
   if (!range.from) return true;
-  
+
   const jobDate = new Date(job.lastPolledAt);
   const startDate = new Date(range.from);
   startDate.setHours(0, 0, 0, 0);
-  
+
   if (!range.to) {
     // Only start date specified - include all jobs from that date onwards
     return jobDate >= startDate;
   }
-  
+
   const endDate = new Date(range.to);
   endDate.setHours(23, 59, 59, 999);
-  
+
   return jobDate >= startDate && jobDate <= endDate;
 };
 
@@ -84,25 +84,25 @@ interface JobsHistoryTableProps {
   onTimePeriodChange?: (period: TimePeriod) => void;
 }
 
-export default function JobsHistoryTable({ 
-  filteredService, 
+export default function JobsHistoryTable({
+  filteredService,
   onClearFilter,
   timePeriod: controlledTimePeriod,
-  onTimePeriodChange 
+  onTimePeriodChange
 }: JobsHistoryTableProps = {}) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const itemsPerPage = 10;
-  
+
   // State for accumulating all jobs when filtering by service
   const [allAccumulatedJobs, setAllAccumulatedJobs] = useState<JenkinsJobHistoryItem[]>([]);
   const [isFetchingAllPages, setIsFetchingAllPages] = useState(false);
-  
+
   // Debounce search term to avoid excessive filtering
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  
+
   // Custom date range state
   const [customDateRange, setCustomDateRange] = useState<CustomDateRange>(() => {
     const stored = localStorage.getItem('jobsHistory_customDateRange');
@@ -119,7 +119,7 @@ export default function JobsHistoryTable({
     }
     return { from: undefined, to: undefined };
   });
-  
+
   // When filtering by service, always use onlyMine=false
   // Otherwise load from localStorage
   const [onlyMine, setOnlyMine] = useState<boolean>(() => {
@@ -136,7 +136,7 @@ export default function JobsHistoryTable({
 
   // Use controlled time period if provided, otherwise use internal state
   const timePeriod = controlledTimePeriod !== undefined ? controlledTimePeriod : internalTimePeriod;
-  
+
   // Check if custom date range is active
   const hasCustomDateRange = !!(customDateRange.from);
 
@@ -188,14 +188,14 @@ export default function JobsHistoryTable({
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchTerm]);
-  
+
   // Reset to page 1 when custom date range changes
   useEffect(() => {
     setCurrentPage(1);
   }, [customDateRange.from, customDateRange.to]);
-  
+
   const offset = (currentPage - 1) * itemsPerPage;
-  
+
   // Calculate hours for API call based on custom date range or predefined period
   const lastUpdatedHours = useMemo(() => {
     if (hasCustomDateRange && customDateRange.from) {
@@ -205,14 +205,14 @@ export default function JobsHistoryTable({
     }
     return getHoursForPeriod(timePeriod);
   }, [hasCustomDateRange, customDateRange.from, customDateRange.to, timePeriod]);
-  
+
   /**
    * When filtering by service, we need to fetch ALL jobs from backend
    * Backend caps responses at 10 jobs per request, so we make normal request first
    */
   const effectiveLimit = itemsPerPage; // Always use 10
   const effectiveOffset = offset; // Use normal pagination
-  
+
   const { data, isLoading, refetch, isFetching } = useJenkinsJobHistory(
     effectiveLimit,
     effectiveOffset,
@@ -232,41 +232,41 @@ export default function JobsHistoryTable({
       const accumulated: JenkinsJobHistoryItem[] = [];
       let currentOffset = 0;
       const pageSize = 10; // Backend caps at 10
-      
+
       try {
         // Keep fetching pages until we have all jobs
         while (true) {
           // Import the API function dynamically
           const { fetchJenkinsJobHistory } = await import('@/services/SelfServiceApi');
-          
+
           const pageData = await fetchJenkinsJobHistory(
             pageSize,
             currentOffset,
             false, // Always fetch all users when filtering by service
             lastUpdatedHours
           );
-          
+
           accumulated.push(...pageData.jobs);
-                    
+
           // Stop if we've fetched all jobs
           if (accumulated.length >= pageData.total) {
             break;
           }
-          
+
           // Stop if last page returned fewer jobs than requested
           if (pageData.jobs.length < pageSize) {
             break;
           }
-          
+
           currentOffset += pageSize;
-          
+
           // Safety: don't fetch more than 100 pages (1000 jobs)
           if (currentOffset >= 1000) {
             break;
           }
         }
-        
-        setAllAccumulatedJobs(accumulated);        
+
+        setAllAccumulatedJobs(accumulated);
       } catch (error) {
         setAllAccumulatedJobs([]);
       } finally {
@@ -287,7 +287,7 @@ export default function JobsHistoryTable({
   const isMyJob = (job: JenkinsJobHistoryItem): boolean => {
     if (onlyMine) return false; // Don't highlight in "Only My Jobs" mode
     if (!currentUserEmail || !job.triggeredBy) return false;
-    
+
     // Case-insensitive comparison
     return job.triggeredBy.toLowerCase() === currentUserEmail.toLowerCase();
   };
@@ -342,13 +342,13 @@ export default function JobsHistoryTable({
     }
 
     const searchLower = debouncedSearchTerm.toLowerCase().trim();
-    
+
     const searchFiltered = jobs.filter((job) => {
       const jobName = job.jobName?.toLowerCase() || '';
       const triggeredByName = job.metadata?.name?.toLowerCase() || '';
       const status = job.status?.toLowerCase() || '';
       const buildNumber = job.buildNumber?.toString() || '';
-      
+
       return (
         jobName.includes(searchLower) ||
         triggeredByName.includes(searchLower) ||
@@ -356,7 +356,7 @@ export default function JobsHistoryTable({
         buildNumber.includes(searchLower)
       );
     });
-  
+
     return searchFiltered;
   }, [jobsToFilter, debouncedSearchTerm, filteredService, hasCustomDateRange, customDateRange, allAccumulatedJobs.length]);
 
@@ -390,7 +390,7 @@ export default function JobsHistoryTable({
    * For server-side pagination, display all items from current page
    */
   const paginatedJobs = useMemo(() => {
-    
+
     if (hasClientSideFiltering) {
       // Client-side: paginate the filtered results
       const startIndex = (currentPage - 1) * itemsPerPage;
@@ -415,7 +415,7 @@ export default function JobsHistoryTable({
   const handleTimePeriodChange = (period: TimePeriod) => {
     // When selecting a predefined period, clear custom date range
     setCustomDateRange({ from: undefined, to: undefined });
-    
+
     if (onTimePeriodChange) {
       // Controlled mode - notify parent
       onTimePeriodChange(period);
@@ -508,17 +508,17 @@ export default function JobsHistoryTable({
                       <TableHead className="w-[100px]">Build</TableHead>
                       <TableHead className="w-[150px]">Last Updated</TableHead>
                       <TableHead className="w-[120px]">Duration</TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedJobs.map((job: JenkinsJobHistoryItem) => (
                       <React.Fragment key={job.id}>
-                        <TableRow 
-                          className={`hover:bg-muted/30 ${
-                            isMyJob(job) 
-                              ? 'bg-blue-50 dark:bg-blue-950/20' 
+                        <TableRow
+                          className={`hover:bg-muted/30 ${isMyJob(job)
+                              ? 'bg-blue-50 dark:bg-blue-950/20'
                               : ''
-                          }`}
+                            }`}
                         >
                           <TableCell>
                             <Button
@@ -528,9 +528,8 @@ export default function JobsHistoryTable({
                               className="h-8 w-8 p-0"
                             >
                               <ChevronRight
-                                className={`h-4 w-4 transition-transform ${
-                                  isRowExpanded(job.id) ? 'rotate-90' : ''
-                                }`}
+                                className={`h-4 w-4 transition-transform ${isRowExpanded(job.id) ? 'rotate-90' : ''
+                                  }`}
                               />
                             </Button>
                           </TableCell>
@@ -556,7 +555,18 @@ export default function JobsHistoryTable({
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium">{job.jobName}</span>
+                              {job.baseJobUrl ? (
+                                <a
+                                  href={job.baseJobUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                                >
+                                  {job.jobName}
+                                </a>
+                              ) : (
+                                <span className="font-medium">{job.jobName}</span>
+                              )}
                               <span className="text-xs text-muted-foreground">
                                 Build #{job.buildNumber} • {job.buildNumber ? `${job.buildNumber}m ago` : getTimeAgo(job.lastPolledAt)}
                               </span>
@@ -589,6 +599,20 @@ export default function JobsHistoryTable({
                           </TableCell>
                           <TableCell className="text-sm">
                             {formatDuration(job.duration)}
+                          </TableCell>
+                          <TableCell>
+                            {job.buildUrl && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(`${job.buildUrl}rebuild/parameterized`, '_blank')}
+                                className="h-8 gap-2"
+                                title="Rebuild this job"
+                              >
+                                <RotateCw className="h-4 w-4" />
+                                Rebuild
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                         {isRowExpanded(job.id) && (

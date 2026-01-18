@@ -1,7 +1,7 @@
 // src/hooks/api/useClosePullRequest.ts
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { closePullRequest} from '@/services/githubApi';
+import { closePullRequest } from '@/services/githubApi';
 import { useToast } from '@/hooks/use-toast';
 import { ClosePullRequestParams } from '@/types/developer-portal';
 
@@ -13,11 +13,11 @@ export function useClosePullRequest() {
     mutationFn: (params: ClosePullRequestParams) => closePullRequest(params),
     onSuccess: (data, variables) => {
       // Invalidate PR queries to refresh the list
-      queryClient.invalidateQueries({ queryKey: ['github-prs'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['github', 'pull-requests'] });
+
       toast({
         title: 'Pull Request Closed',
-        description: variables.delete_branch 
+        description: variables.delete_branch
           ? `PR #${variables.prNumber} closed and branch deleted successfully.`
           : `PR #${variables.prNumber} closed successfully.`,
       });

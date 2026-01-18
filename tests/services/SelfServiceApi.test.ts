@@ -1018,4 +1018,4 @@ describe('SelfServiceApi', () => {
       expect(buildStatus.status).toBe('failed');
     });
   });
-});q
+});

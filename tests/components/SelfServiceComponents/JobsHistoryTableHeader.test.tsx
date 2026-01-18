@@ -83,6 +83,18 @@ vi.mock('@/components/ui/dropdown-menu', () => ({
   ),
 }));
 
+// Mock DateRangePicker
+vi.mock('@/components/SelfService/DateRangePicker', () => ({
+  DateRangePicker: ({ value, onChange, onClear }: any) => (
+    <div data-testid="date-range-picker">
+      <button onClick={() => onChange({ from: new Date(), to: new Date() })}>
+        Select Range
+      </button>
+      <button onClick={onClear}>Clear Range</button>
+    </div>
+  ),
+}));
+
 describe('JobsHistoryTableHeader', () => {
   const defaultProps = {
     isCollapsed: false,
@@ -102,6 +114,10 @@ describe('JobsHistoryTableHeader', () => {
     searchTerm: '',
     onSearchChange: vi.fn(),
     onClearSearch: vi.fn(),
+    customDateRange: { from: undefined, to: undefined },
+    onCustomDateRangeChange: vi.fn(),
+    onClearCustomDateRange: vi.fn(),
+    hasCustomDateRange: false,
   };
 
   beforeEach(() => {
@@ -152,17 +168,21 @@ describe('JobsHistoryTableHeader', () => {
       expect(screen.getByText('Latest Executions')).toBeInTheDocument();
     });
 
-    it('should show service title when filtering by service', () => {
+    it('should keep the same title when filtering by service', () => {
       render(
         <JobsHistoryTableHeader
           {...defaultProps}
+          onlyMine={true}
           filteredService={{
             jobName: 'create-cluster',
             serviceTitle: 'Create Dev Landscape',
           }}
         />
       );
-      expect(screen.getByText(/All executions for: Create Dev Landscape/i)).toBeInTheDocument();
+      // Title should remain "My Latest Executions" instead of changing
+      expect(screen.getByText('My Latest Executions')).toBeInTheDocument();
+      // Should NOT show the old "All executions for:" text
+      expect(screen.queryByText(/All executions for:/i)).not.toBeInTheDocument();
     });
   });
 
@@ -244,7 +264,7 @@ describe('JobsHistoryTableHeader', () => {
   });
 
   describe('Service Filter', () => {
-    it('should show "Back to All Jobs" button when filtering by service', () => {
+    it('should show job name button when filtering by service', () => {
       render(
         <JobsHistoryTableHeader
           {...defaultProps}
@@ -254,10 +274,11 @@ describe('JobsHistoryTableHeader', () => {
           }}
         />
       );
-      expect(screen.getByText('Back to All Jobs')).toBeInTheDocument();
+      // Should show the job name instead of "Back to All Jobs"
+      expect(screen.getByText('create-cluster')).toBeInTheDocument();
     });
 
-    it('should call onClearFilter when "Back to All Jobs" is clicked', async () => {
+    it('should call onClearFilter when job name button is clicked', async () => {
       const onClearFilter = vi.fn();
       render(
         <JobsHistoryTableHeader
@@ -270,15 +291,15 @@ describe('JobsHistoryTableHeader', () => {
         />
       );
 
-      const button = screen.getByText('Back to All Jobs');
+      const button = screen.getByText('create-cluster');
       await userEvent.click(button);
 
       expect(onClearFilter).toHaveBeenCalledTimes(1);
     });
 
-    it('should not show "Back to All Jobs" button when not filtering', () => {
+    it('should not show job name button when not filtering', () => {
       render(<JobsHistoryTableHeader {...defaultProps} filteredService={null} />);
-      expect(screen.queryByText('Back to All Jobs')).not.toBeInTheDocument();
+      expect(screen.queryByText('create-cluster')).not.toBeInTheDocument();
     });
 
     it('should hide "Click to collapse" text when filtering by service', () => {
@@ -488,6 +509,43 @@ describe('JobsHistoryTableHeader', () => {
     });
   });
 
+  describe('Date Range Picker', () => {
+    it('should render date range picker', () => {
+      render(<JobsHistoryTableHeader {...defaultProps} />);
+      expect(screen.getByTestId('date-range-picker')).toBeInTheDocument();
+    });
+
+    it('should call onCustomDateRangeChange when range is selected', async () => {
+      const onCustomDateRangeChange = vi.fn();
+      render(
+        <JobsHistoryTableHeader
+          {...defaultProps}
+          onCustomDateRangeChange={onCustomDateRangeChange}
+        />
+      );
+
+      const selectButton = screen.getByText('Select Range');
+      await userEvent.click(selectButton);
+
+      expect(onCustomDateRangeChange).toHaveBeenCalled();
+    });
+
+    it('should call onClearCustomDateRange when clear is clicked', async () => {
+      const onClearCustomDateRange = vi.fn();
+      render(
+        <JobsHistoryTableHeader
+          {...defaultProps}
+          onClearCustomDateRange={onClearCustomDateRange}
+        />
+      );
+
+      const clearButton = screen.getByText('Clear Range');
+      await userEvent.click(clearButton);
+
+      expect(onClearCustomDateRange).toHaveBeenCalled();
+    });
+  });
+
   describe('Component Integration', () => {
     it('should handle all props being updated', () => {
       const { rerender } = render(<JobsHistoryTableHeader {...defaultProps} />);
@@ -525,9 +583,9 @@ describe('JobsHistoryTableHeader', () => {
         />
       );
 
-      // Toggle should be hidden, clear button should show
+      // Toggle should be hidden, job name button should show
       expect(screen.queryByTestId('switch')).not.toBeInTheDocument();
-      expect(screen.getByText('Back to All Jobs')).toBeInTheDocument();
+      expect(screen.getByText('test-job')).toBeInTheDocument();
     });
   });
 
@@ -569,7 +627,7 @@ describe('JobsHistoryTableHeader', () => {
       );
 
       // Should not render clear button without callback
-      expect(screen.queryByText('Back to All Jobs')).not.toBeInTheDocument();
+      expect(screen.queryByText('test')).not.toBeInTheDocument();
     });
 
     it('should handle zero totalJobs', () => {

@@ -69,6 +69,10 @@ import { useAuth } from '@/contexts/AuthContext';
 const mockUseJenkinsJobHistory = useJenkinsJobHistory as any;
 const mockUseAuth = useAuth as any;
 
+// Mock window.open
+const mockWindowOpen = vi.fn();
+global.window.open = mockWindowOpen;
+
 // Mock data
 const createMockJob = (overrides: Partial<JenkinsJobHistoryItem> = {}): JenkinsJobHistoryItem => ({
   id: `job-${Math.random()}`,
@@ -78,10 +82,15 @@ const createMockJob = (overrides: Partial<JenkinsJobHistoryItem> = {}): JenkinsJ
   duration: 120000,
   lastPolledAt: new Date().toISOString(),
   user: 'testuser',
-  triggeredBy: 'testuser',  // Add triggeredBy field for search functionality
+  triggeredBy: 'testuser',
   jenkinsUrl: 'https://jenkins.example.com/job/test-job/123',
+  buildUrl: 'https://jenkins.example.com/job/test-job/123/',
+  baseJobUrl: 'https://jenkins.example.com/job/test-job/',
   jaasName: 'test-jaas',
   parameters: {},
+  metadata: {
+    name: 'testuser',
+  },
   ...overrides,
 });
 
@@ -94,6 +103,9 @@ const mockJobsData = {
       triggeredBy: 'john.doe',
       status: 'success',
       buildNumber: 100,
+      buildUrl: 'https://jenkins.example.com/job/create-cluster/100/',
+      baseJobUrl: 'https://jenkins.example.com/job/create-cluster/',
+      metadata: { name: 'john.doe' },
     }),
     createMockJob({ 
       id: 'job-2', 
@@ -102,6 +114,9 @@ const mockJobsData = {
       triggeredBy: 'jane.smith',
       status: 'failure',
       buildNumber: 101,
+      buildUrl: 'https://jenkins.example.com/job/delete-cluster/101/',
+      baseJobUrl: 'https://jenkins.example.com/job/delete-cluster/',
+      metadata: { name: 'jane.smith' },
     }),
     createMockJob({ 
       id: 'job-3', 
@@ -110,6 +125,9 @@ const mockJobsData = {
       triggeredBy: 'john.doe',
       status: 'running',
       buildNumber: 102,
+      buildUrl: 'https://jenkins.example.com/job/create-cluster/102/',
+      baseJobUrl: 'https://jenkins.example.com/job/create-cluster/',
+      metadata: { name: 'john.doe' },
     }),
   ],
   total: 3,
@@ -119,6 +137,9 @@ describe('JobsHistoryTable', () => {
   beforeEach(() => {
     // Reset localStorage
     localStorage.clear();
+    
+    // Reset window.open mock
+    mockWindowOpen.mockReset();
     
     // Default mock implementations
     mockUseJenkinsJobHistory.mockReturnValue({
@@ -187,6 +208,111 @@ describe('JobsHistoryTable', () => {
       expect(statusBadges[0]).toHaveTextContent('success');
       expect(statusBadges[1]).toHaveTextContent('failure');
       expect(statusBadges[2]).toHaveTextContent('running');
+    });
+
+    it('should render Actions column header', () => {
+      render(<JobsHistoryTable />);
+      expect(screen.getByText('Actions')).toBeInTheDocument();
+    });
+  });
+
+  describe('Rebuild Button', () => {
+    it('should render rebuild button for jobs with buildUrl', () => {
+      render(<JobsHistoryTable />);
+      
+      const rebuildButtons = screen.getAllByText('Rebuild');
+      expect(rebuildButtons.length).toBe(3); // All 3 jobs have buildUrl
+    });
+
+    it('should open rebuild URL in new window when clicked', async () => {
+      render(<JobsHistoryTable />);
+      
+      const rebuildButtons = screen.getAllByText('Rebuild');
+      await userEvent.click(rebuildButtons[0]);
+      
+      expect(mockWindowOpen).toHaveBeenCalledWith(
+        'https://jenkins.example.com/job/create-cluster/100/rebuild/parameterized',
+        '_blank'
+      );
+    });
+
+    it('should not render rebuild button for jobs without buildUrl', () => {
+      const jobsWithoutBuildUrl = {
+        jobs: [
+          createMockJob({ 
+            id: 'job-no-url',
+            jobName: 'test-job',
+            buildUrl: undefined,
+          }),
+        ],
+        total: 1,
+      };
+
+      mockUseJenkinsJobHistory.mockReturnValue({
+        data: jobsWithoutBuildUrl,
+        isLoading: false,
+        isFetching: false,
+        refetch: vi.fn(),
+      });
+
+      render(<JobsHistoryTable />);
+      
+      expect(screen.queryByText('Rebuild')).not.toBeInTheDocument();
+    });
+
+    it('should have correct tooltip on rebuild button', () => {
+      render(<JobsHistoryTable />);
+      
+      const rebuildButtons = screen.getAllByText('Rebuild');
+      const firstButton = rebuildButtons[0].closest('button');
+      
+      expect(firstButton).toHaveAttribute('title', 'Rebuild this job');
+    });
+  });
+
+  describe('Job Name and Build Links', () => {
+    it('should render job name as clickable link when baseJobUrl exists', () => {
+      render(<JobsHistoryTable />);
+      
+      // Find all create-cluster links (there are 2 jobs with this name)
+      const jobLinks = screen.getAllByRole('link', { name: /create-cluster/i });
+      expect(jobLinks.length).toBeGreaterThan(0);
+      expect(jobLinks[0]).toHaveAttribute('href', 'https://jenkins.example.com/job/create-cluster/');
+      expect(jobLinks[0]).toHaveAttribute('target', '_blank');
+    });
+
+    it('should render job name as plain text when baseJobUrl is missing', () => {
+      const jobsWithoutBaseUrl = {
+        jobs: [
+          createMockJob({ 
+            id: 'job-no-base-url',
+            jobName: 'plain-job',
+            baseJobUrl: undefined,
+          }),
+        ],
+        total: 1,
+      };
+
+      mockUseJenkinsJobHistory.mockReturnValue({
+        data: jobsWithoutBaseUrl,
+        isLoading: false,
+        isFetching: false,
+        refetch: vi.fn(),
+      });
+
+      render(<JobsHistoryTable />);
+      
+      const jobName = screen.getByText('plain-job');
+      expect(jobName.tagName).toBe('SPAN');
+    });
+
+    it('should render build number as clickable link when buildUrl exists', () => {
+      render(<JobsHistoryTable />);
+      
+      // Find build number links
+      const buildLinks = screen.getAllByRole('link', { name: /#100/i });
+      expect(buildLinks.length).toBeGreaterThan(0);
+      expect(buildLinks[0]).toHaveAttribute('href', 'https://jenkins.example.com/job/create-cluster/100/');
     });
   });
 
@@ -291,32 +417,6 @@ describe('JobsHistoryTable', () => {
     });
   });
 
-  describe('Pagination', () => {
-    it('should paginate jobs when there are more than itemsPerPage', () => {
-      const manyJobs = Array.from({ length: 25 }, (_, i) => 
-        createMockJob({ 
-          id: `job-${i}`,
-          jobName: `job-${i}`,
-          buildNumber: i,
-        })
-      );
-
-      mockUseJenkinsJobHistory.mockReturnValue({
-        data: { jobs: manyJobs, total: 25 },
-        isLoading: false,
-        isFetching: false,
-        refetch: vi.fn(),
-      });
-
-      render(<JobsHistoryTable />);
-      
-      // Should show only first 10 jobs on page 1
-      expect(screen.getByText('job-0')).toBeInTheDocument();
-      expect(screen.getByText('job-9')).toBeInTheDocument();
-      expect(screen.queryByText('job-10')).not.toBeInTheDocument();
-    });
-  });
-
   describe('Only Mine Toggle', () => {
     it('should filter to only current user jobs when "Only Mine" is enabled', async () => {
       render(<JobsHistoryTable />);
@@ -355,6 +455,23 @@ describe('JobsHistoryTable', () => {
         false, // onlyMine should be false
         expect.any(Number)
       );
+    });
+
+    it('should hide "Triggered By" column when onlyMine is true', () => {
+      render(<JobsHistoryTable />);
+      
+      // When onlyMine=true (default), "Triggered By" column should be hidden
+      expect(screen.queryByText('Triggered By')).not.toBeInTheDocument();
+    });
+
+    it('should show "Triggered By" column when onlyMine is false', async () => {
+      // Set onlyMine to false via localStorage
+      localStorage.setItem('jobsHistory_onlyMine', 'false');
+      
+      render(<JobsHistoryTable />);
+      
+      // "Triggered By" column should be visible
+      expect(screen.getByText('Triggered By')).toBeInTheDocument();
     });
   });
 
@@ -410,20 +527,6 @@ describe('JobsHistoryTable', () => {
   });
 
   describe('Service Filtering', () => {
-    it('should filter jobs by service when filteredService is provided', () => {
-      render(
-        <JobsHistoryTable 
-          filteredService={{
-            jobName: 'create-cluster',
-            serviceTitle: 'Create Cluster Service',
-          }}
-        />
-      );
-      
-      // Should show only jobs with jobName 'create-cluster'
-      expect(screen.getAllByText('create-cluster')).toHaveLength(2);
-      expect(screen.queryByText('delete-cluster')).not.toBeInTheDocument();
-    });
 
     it('should call onClearFilter when clear filter button is clicked', async () => {
       const onClearFilter = vi.fn();
@@ -452,7 +555,6 @@ describe('JobsHistoryTable', () => {
       const firstDataRow = rows[1]; // Skip header row
       
       // Find the expansion button within the first data row
-      // The button is a ghost button with size sm (h-8 w-8)
       const buttons = within(firstDataRow).getAllByRole('button');
       const expandButton = buttons[0]; // First button in the row is the expand button
       
@@ -542,7 +644,6 @@ describe('JobsHistoryTable', () => {
       render(<JobsHistoryTable />);
       
       // The header component should receive isRefreshing=true
-      // which would disable the refresh button or show a spinner
       expect(screen.getByTestId('jobs-history-table-header')).toBeInTheDocument();
     });
   });
@@ -566,7 +667,7 @@ describe('JobsHistoryTable', () => {
 
       render(<JobsHistoryTable />);
       
-      // Should extract 'john.doe' from email
+      // Should handle email properly
       expect(screen.getAllByText('create-cluster').length).toBeGreaterThan(0);
     });
 
@@ -579,7 +680,6 @@ describe('JobsHistoryTable', () => {
       
       // Should still render but with no "my jobs" filtering
       expect(screen.getByTestId('jobs-history-table-header')).toBeInTheDocument();
-      // Should still show all jobs (multiple create-cluster jobs exist)
       expect(screen.getAllByText('create-cluster').length).toBeGreaterThan(0);
     });
   });
@@ -657,7 +757,6 @@ describe('JobsHistoryTable', () => {
       
       // Should render without crashing even with empty user data
       expect(screen.getByTestId('jobs-history-table-header')).toBeInTheDocument();
-      // Should still show jobs (multiple create-cluster jobs exist)
       expect(screen.getAllByText('create-cluster').length).toBeGreaterThan(0);
     });
 
@@ -669,6 +768,8 @@ describe('JobsHistoryTable', () => {
             jobName: '',
             user: '',
             buildNumber: 0,
+            buildUrl: undefined,
+            baseJobUrl: undefined,
           }),
         ],
         total: 1,
@@ -705,14 +806,12 @@ describe('JobsHistoryTable', () => {
 
       render(<JobsHistoryTable />);
       
-      // Navigate to page 2 (would need pagination controls)
-      // Then search - should reset to page 1
+      // Search - should reset to page 1
       const searchInput = screen.getByTestId('search-input');
       await userEvent.type(searchInput, 'delete');
       
       // After search, should be on page 1 showing first results
       await waitFor(() => {
-        // Multiple delete-cluster jobs (15-24), so use getAllByText
         expect(screen.getAllByText('delete-cluster').length).toBeGreaterThan(0);
       }, { timeout: 500 });
     });

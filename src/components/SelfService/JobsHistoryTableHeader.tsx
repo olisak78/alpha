@@ -83,10 +83,7 @@ export const JobsHistoryTableHeader = ({
                 <ChevronUp className="h-4 w-4" />
               )}
               <h2 className="text-lg font-semibold">
-                {filteredService 
-                  ? `All executions for: ${filteredService.serviceTitle}`
-                  : (onlyMine ? 'My Latest Executions' : 'Latest Executions')
-                }
+                {onlyMine ? 'My Latest Executions' : 'Latest Executions'}
               </h2>
             </Button>
             {totalJobs > 0 && (
@@ -95,14 +92,9 @@ export const JobsHistoryTableHeader = ({
               </Badge>
             )}
             {filteredService && onClearFilter && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onClearFilter}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={onClearFilter} className="gap-2">
                 <X className="h-3 w-3" />
-                Back to All Jobs
+                {filteredService.jobName}
               </Button>
             )}
             {!filteredService && (
@@ -114,7 +106,7 @@ export const JobsHistoryTableHeader = ({
               </button>
             )}
           </div>
-          
+
           <div className="flex items-center gap-4">
             {/* Custom Date Range Picker */}
             <DateRangePicker
