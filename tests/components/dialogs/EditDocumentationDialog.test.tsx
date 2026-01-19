@@ -35,7 +35,6 @@ vi.mock('../../../src/hooks/api/useDocumentation', () => ({
   })),
 }));
 
-// ✅ ADD THIS MOCK
 vi.mock('../../../src/hooks/api/useTeams', () => ({
   useTeamById: vi.fn(() => ({
     data: mockTeamData,
@@ -50,6 +49,7 @@ describe('EditDocumentationDialog Component', () => {
   const mockDocumentation: Documentation = {
     id: 'doc1',
     team_id: 'team1',
+    provider: 'github', // NEW: Add provider field
     title: 'Test Documentation',
     description: 'Test description',
     owner: 'test-org',
@@ -99,7 +99,7 @@ describe('EditDocumentationDialog Component', () => {
   // ============================================================================
 
   describe('Form Initialization', () => {
-    it('should initialize form with documentation data', () => {
+    it('should initialize form with documentation data for github.com provider', () => {
       render(<EditDocumentationDialog {...defaultProps} />);
 
       expect(screen.getByDisplayValue('Test Documentation')).toBeInTheDocument();
@@ -107,15 +107,28 @@ describe('EditDocumentationDialog Component', () => {
       expect(screen.getByDisplayValue('https://github.com/test-org/test-repo/tree/main/docs')).toBeInTheDocument();
     });
 
-    it('should handle github.tools.sap domain', () => {
+    it('should handle githubtools provider (github.tools.sap domain)', () => {
       const sapDocumentation: Documentation = {
         ...mockDocumentation,
-        owner: 'sap-org/sub-org',
+        provider: 'githubtools', // NEW: Use githubtools provider
+        owner: 'sap-org',
       };
 
       render(<EditDocumentationDialog {...defaultProps} documentation={sapDocumentation} />);
 
-      expect(screen.getByDisplayValue('https://github.tools.sap/sap-org/sub-org/test-repo/tree/main/docs')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('https://github.tools.sap/sap-org/test-repo/tree/main/docs')).toBeInTheDocument();
+    });
+
+    it('should handle githubwdf provider (github.wdf.sap.corp domain)', () => {
+      const wdfDocumentation: Documentation = {
+        ...mockDocumentation,
+        provider: 'githubwdf', // NEW: Use githubwdf provider
+        owner: 'wdf-org',
+      };
+
+      render(<EditDocumentationDialog {...defaultProps} documentation={wdfDocumentation} />);
+
+      expect(screen.getByDisplayValue('https://github.wdf.sap.corp/wdf-org/test-repo/tree/main/docs')).toBeInTheDocument();
     });
 
     it('should handle empty description', () => {
@@ -176,7 +189,7 @@ describe('EditDocumentationDialog Component', () => {
         });
       });
 
-      it('should accept valid GitHub URLs', async () => {
+      it('should accept valid GitHub URLs from github.com', async () => {
         render(<EditDocumentationDialog {...defaultProps} />);
 
         const urlInput = screen.getByLabelText(/github url/i);
@@ -185,6 +198,30 @@ describe('EditDocumentationDialog Component', () => {
 
         await waitFor(() => {
           expect(screen.queryByText(/Please enter a valid GitHub URL/)).not.toBeInTheDocument();
+        });
+      });
+
+      it('should accept valid GitHub URLs from github.tools.sap', async () => {
+        render(<EditDocumentationDialog {...defaultProps} />);
+
+        const urlInput = screen.getByLabelText(/github url/i);
+        fireEvent.change(urlInput, { target: { value: 'https://github.tools.sap/org/repo/tree/main/docs' } });
+        fireEvent.blur(urlInput);
+
+        await waitFor(() => {
+          expect(screen.queryByText(/Please enter a valid GitHub URL/)).not.toBeInTheDocument();
+        });
+      });
+
+      it('should reject URLs from unsupported providers', async () => {
+        render(<EditDocumentationDialog {...defaultProps} />);
+
+        const urlInput = screen.getByLabelText(/github url/i);
+        fireEvent.change(urlInput, { target: { value: 'https://gitlab.com/org/repo/tree/main/docs' } });
+        fireEvent.blur(urlInput);
+
+        await waitFor(() => {
+          expect(screen.getByText(/Please enter a valid GitHub URL/)).toBeInTheDocument();
         });
       });
     });
@@ -264,6 +301,29 @@ describe('EditDocumentationDialog Component', () => {
           id: 'doc1',
           team_id: 'team1',
           url: 'https://github.com/test-org/test-repo/tree/main/docs',
+          title: 'Test Documentation',
+          description: 'Test description',
+        });
+      });
+    });
+
+    it('should call updateDocumentation with githubtools provider URL', async () => {
+      const sapDocumentation: Documentation = {
+        ...mockDocumentation,
+        provider: 'githubtools',
+        owner: 'sap-org',
+      };
+
+      render(<EditDocumentationDialog {...defaultProps} documentation={sapDocumentation} />);
+
+      const submitButton = screen.getByRole('button', { name: /update documentation/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          id: 'doc1',
+          team_id: 'team1',
+          url: 'https://github.tools.sap/sap-org/test-repo/tree/main/docs',
           title: 'Test Documentation',
           description: 'Test description',
         });
@@ -399,6 +459,57 @@ describe('EditDocumentationDialog Component', () => {
 
       await waitFor(() => {
         expect(titleInput).toHaveClass('border-red-500');
+      });
+    });
+  });
+
+  // ============================================================================
+  // PROVIDER-SPECIFIC TESTS
+  // ============================================================================
+
+  describe('Provider-Specific Tests', () => {
+    it('should correctly construct URL for different providers', () => {
+      const providers = [
+        { provider: 'github', expectedUrl: 'https://github.com/test-org/test-repo/tree/main/docs' },
+        { provider: 'githubtools', expectedUrl: 'https://github.tools.sap/test-org/test-repo/tree/main/docs' },
+        { provider: 'githubwdf', expectedUrl: 'https://github.wdf.sap.corp/test-org/test-repo/tree/main/docs' },
+      ];
+
+      providers.forEach(({ provider, expectedUrl }) => {
+        const documentation: Documentation = {
+          ...mockDocumentation,
+          provider,
+        };
+
+        const { unmount } = render(<EditDocumentationDialog {...defaultProps} documentation={documentation} />);
+        expect(screen.getByDisplayValue(expectedUrl)).toBeInTheDocument();
+        unmount();
+      });
+    });
+
+    it('should preserve provider when updating documentation', async () => {
+      const githubToolsDoc: Documentation = {
+        ...mockDocumentation,
+        provider: 'githubtools',
+      };
+
+      render(<EditDocumentationDialog {...defaultProps} documentation={githubToolsDoc} />);
+
+      // Change title but keep the URL
+      const titleInput = screen.getByLabelText(/title/i);
+      fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
+
+      const submitButton = screen.getByRole('button', { name: /update documentation/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+          id: 'doc1',
+          team_id: 'team1',
+          url: 'https://github.tools.sap/test-org/test-repo/tree/main/docs',
+          title: 'Updated Title',
+          description: 'Test description',
+        });
       });
     });
   });

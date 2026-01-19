@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { authService, checkAuthStatus, logoutUser } from '../../src/services/authService';
+import { tokenManager } from '../../src/lib/tokenManager';
 
 const NEW_BACKEND_URL = 'http://localhost:7008';
 
@@ -12,6 +13,9 @@ describe('authService', () => {
     // Store originals
     originalFetch = global.fetch;
     originalWindowOpen = window.open;
+
+    // Clear token manager state
+    tokenManager.clearToken();
 
     // Setup session storage mock
     mockSessionStorage = {};
@@ -43,6 +47,8 @@ describe('authService', () => {
     // Restore originals
     global.fetch = originalFetch;
     window.open = originalWindowOpen;
+    // Clear token manager state
+    tokenManager.clearToken();
     vi.clearAllTimers();
     vi.useRealTimers();
     vi.restoreAllMocks();
@@ -194,32 +200,23 @@ describe('authService', () => {
   // ============================================================================
 
   describe('checkAuthStatus', () => {
-    it('should return user data when authenticated', async () => {
-      const mockUserData = {
-        profile: { id: '123', name: 'Test User', email: 'test@example.com' },
-      };
+    it('should return auth status when authenticated', async () => {
+      const mockToken = 'test-jwt-token';
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 
       global.fetch = vi.fn(() =>
         Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockUserData),
+          json: () => Promise.resolve({
+            accessToken: mockToken,
+            expirationTime: mockExpirationTime
+          }),
         } as Response)
       );
 
       const result = await checkAuthStatus();
 
-      expect(fetch).toHaveBeenCalledWith(
-        `${NEW_BACKEND_URL}/api/auth/refresh`,
-        {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-        }
-      );
-
-      expect(result).toEqual(mockUserData);
+      expect(result).toEqual({ accessToken: mockToken, authenticated: true });
     });
 
     it('should return null when not authenticated', async () => {
@@ -235,7 +232,7 @@ describe('authService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null and log error on network failure', async () => {
+    it('should return null and log error on token validation failure', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       global.fetch = vi.fn(() => Promise.reject(new Error('Network error')));
@@ -251,26 +248,15 @@ describe('authService', () => {
       consoleErrorSpy.mockRestore();
     });
 
-    it('should include correct headers in the request', async () => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({}),
-        } as Response)
-      );
+    it('should return null when justLoggedOut flag is set', async () => {
+      // Set the justLoggedOut flag
+      mockSessionStorage['justLoggedOut'] = 'true';
 
-      await checkAuthStatus();
+      const result = await checkAuthStatus();
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-        })
-      );
+      expect(result).toBeNull();
+      // Should remove the flag
+      expect(sessionStorage.removeItem).toHaveBeenCalledWith('justLoggedOut');
     });
   });
 

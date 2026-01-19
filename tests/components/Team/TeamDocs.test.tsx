@@ -139,6 +139,7 @@ describe('TeamDocs Component', () => {
   const mockDocumentations: Documentation[] = [
     {
       id: 'doc-1',
+      provider: 'githubtools',
       title: 'API Documentation',
       description: 'API documentation for the team',
       team_id: 'team-1',
@@ -153,6 +154,7 @@ describe('TeamDocs Component', () => {
     },
     {
       id: 'doc-2',
+      provider: 'githubtools',
       title: 'User Guide',
       description: 'User guide documentation',
       team_id: 'team-1',

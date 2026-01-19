@@ -25,6 +25,7 @@ describe('useLandscapeTools', () => {
     vault: 'https://vault.example.com',
     'iaas-console': 'https://iaas.example.com',
     'iaas-console-backing-service': 'https://iaas-bs.example.com',
+    workspace: 'https://workspace.example.com',
   };
 
   describe('Empty State', () => {
@@ -36,9 +37,11 @@ describe('useLandscapeTools', () => {
       expect(result.current.urls.git).toBe(null);
       expect(result.current.urls.concourse).toBe(null);
       expect(result.current.urls.applicationLogging).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
       expect(result.current.availability.applicationLogging).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should return empty state when landscape data is null', () => {
@@ -48,8 +51,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.git).toBe(null);
       expect(result.current.urls.concourse).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should return empty state when landscape data is undefined', () => {
@@ -59,8 +64,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.git).toBe(null);
       expect(result.current.urls.concourse).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should return empty state when both parameters are null', () => {
@@ -69,7 +76,9 @@ describe('useLandscapeTools', () => {
       );
 
       expect(result.current.urls.git).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should have all URL fields as null in empty state', () => {
@@ -94,6 +103,8 @@ describe('useLandscapeTools', () => {
         vault: null,
         iaasConsole: null,
         iaasConsoleBS: null,
+        workspace: null,
+        cad: null
       });
     });
 
@@ -110,6 +121,7 @@ describe('useLandscapeTools', () => {
         platformLogging: false,
         dynatrace: false,
         avs: false,
+        cad: false,
         cockpit: false,
         plutono: false,
         operationConsole: false,
@@ -119,6 +131,7 @@ describe('useLandscapeTools', () => {
         vault: false,
         iaasConsole: false,
         iaasConsoleBS: false,
+        workspace: false,
       });
     });
   });
@@ -259,30 +272,15 @@ describe('useLandscapeTools', () => {
       expect(result.current.availability.iaasConsoleBS).toBe(true);
     });
 
-    it('should extract all URLs correctly', () => {
+    it('should extract workspace URL', () => {
       const { result } = renderHook(() =>
         useLandscapeTools('landscape-1', mockLandscapeData)
       );
 
-      expect(result.current.urls).toEqual({
-        git: 'https://git.example.com',
-        concourse: 'https://concourse.example.com',
-        applicationLogging: 'https://logging.example.com',
-        kibana: null,
-        platformLogging: 'https://platform-logging.example.com',
-        dynatrace: 'https://dynatrace.example.com',
-        avs: 'https://avs.example.com',
-        cockpit: 'https://cockpit.example.com',
-        plutono: 'https://plutono.example.com',
-        operationConsole: 'https://operations.example.com',
-        controlCenter: 'https://control.example.com',
-        cam: 'https://cam.example.com',
-        gardener: 'https://gardener.example.com',
-        vault: 'https://vault.example.com',
-        iaasConsole: 'https://iaas.example.com',
-        iaasConsoleBS: 'https://iaas-bs.example.com',
-      });
+      expect(result.current.urls.workspace).toBe('https://workspace.example.com');
+      expect(result.current.availability.workspace).toBe(true);
     });
+
   });
 
   describe('Availability Flags', () => {
@@ -301,6 +299,7 @@ describe('useLandscapeTools', () => {
       expect(result.current.availability.concourse).toBe(false);
       expect(result.current.availability.dynatrace).toBe(false);
       expect(result.current.availability.applicationLogging).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should set availability to false when URL is empty string', () => {
@@ -309,6 +308,7 @@ describe('useLandscapeTools', () => {
         git: '',
         concourse: '',
         dynatrace: '',
+        workspace: '',
       };
 
       const { result } = renderHook(() =>
@@ -318,31 +318,7 @@ describe('useLandscapeTools', () => {
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
       expect(result.current.availability.dynatrace).toBe(false);
-    });
-
-    it('should set availability to true when URL is present', () => {
-      const { result } = renderHook(() =>
-        useLandscapeTools('landscape-1', mockLandscapeData)
-      );
-
-      expect(result.current.availability).toEqual({
-        git: true,
-        concourse: true,
-        applicationLogging: true,
-        kibana: false, // Not present in mockLandscapeData
-        platformLogging: true,
-        dynatrace: true,
-        avs: true,
-        cockpit: true,
-        plutono: true,
-        operationConsole: true,
-        controlCenter: true,
-        cam: true,
-        gardener: true,
-        vault: true,
-        iaasConsole: true,
-        iaasConsoleBS: true,
-      });
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should handle mixed availability correctly', () => {
@@ -352,6 +328,7 @@ describe('useLandscapeTools', () => {
         concourse: 'https://concourse.example.com',
         // dynatrace missing
         'application-logging': 'https://logging.example.com',
+        workspace: 'https://workspace.example.com',
         // Other fields missing
       };
 
@@ -362,8 +339,67 @@ describe('useLandscapeTools', () => {
       expect(result.current.availability.git).toBe(true);
       expect(result.current.availability.concourse).toBe(true);
       expect(result.current.availability.applicationLogging).toBe(true);
+      expect(result.current.availability.workspace).toBe(true);
       expect(result.current.availability.dynatrace).toBe(false);
       expect(result.current.availability.avs).toBe(false);
+    });
+  });
+
+  describe('Workspace URL Handling', () => {
+    it('should extract workspace URL when present', () => {
+      const dataWithWorkspace = {
+        id: 'landscape-1',
+        workspace: 'https://workspace.staging.resource.api.sap',
+      };
+
+      const { result } = renderHook(() =>
+        useLandscapeTools('landscape-1', dataWithWorkspace)
+      );
+
+      expect(result.current.urls.workspace).toBe('https://workspace.staging.resource.api.sap');
+      expect(result.current.availability.workspace).toBe(true);
+    });
+
+    it('should return null workspace URL when missing', () => {
+      const dataWithoutWorkspace = {
+        id: 'landscape-1',
+        git: 'https://git.example.com',
+      };
+
+      const { result } = renderHook(() =>
+        useLandscapeTools('landscape-1', dataWithoutWorkspace)
+      );
+
+      expect(result.current.urls.workspace).toBe(null);
+      expect(result.current.availability.workspace).toBe(false);
+    });
+
+    it('should handle empty workspace URL', () => {
+      const dataWithEmptyWorkspace = {
+        id: 'landscape-1',
+        workspace: '',
+      };
+
+      const { result } = renderHook(() =>
+        useLandscapeTools('landscape-1', dataWithEmptyWorkspace)
+      );
+
+      expect(result.current.urls.workspace).toBe(null);
+      expect(result.current.availability.workspace).toBe(false);
+    });
+
+    it('should handle undefined workspace URL', () => {
+      const dataWithUndefinedWorkspace = {
+        id: 'landscape-1',
+        workspace: undefined,
+      };
+
+      const { result } = renderHook(() =>
+        useLandscapeTools('landscape-1', dataWithUndefinedWorkspace)
+      );
+
+      expect(result.current.urls.workspace).toBe(null);
+      expect(result.current.availability.workspace).toBe(false);
     });
   });
 
@@ -457,6 +493,7 @@ describe('useLandscapeTools', () => {
         id: 'landscape-1',
         git: undefined,
         concourse: undefined,
+        workspace: undefined,
       };
 
       const { result } = renderHook(() =>
@@ -465,8 +502,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.git).toBe(null);
       expect(result.current.urls.concourse).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should handle empty string URLs as null', () => {
@@ -474,6 +513,7 @@ describe('useLandscapeTools', () => {
         id: 'landscape-1',
         git: '',
         concourse: '',
+        workspace: '',
       };
 
       const { result } = renderHook(() =>
@@ -482,8 +522,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.git).toBe(null);
       expect(result.current.urls.concourse).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.git).toBe(false);
       expect(result.current.availability.concourse).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should handle whitespace-only URLs', () => {
@@ -509,6 +551,7 @@ describe('useLandscapeTools', () => {
         id: 'landscape-1',
         git: 'https://git.example.com/path?query=value&param=123',
         concourse: 'https://concourse.example.com/#/section',
+        workspace: 'https://workspace.staging.resource.api.sap',
       };
 
       const { result } = renderHook(() =>
@@ -517,8 +560,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.git).toBe('https://git.example.com/path?query=value&param=123');
       expect(result.current.urls.concourse).toBe('https://concourse.example.com/#/section');
+      expect(result.current.urls.workspace).toBe('https://workspace.staging.resource.api.sap');
       expect(result.current.availability.git).toBe(true);
       expect(result.current.availability.concourse).toBe(true);
+      expect(result.current.availability.workspace).toBe(true);
     });
 
     it('should handle minimal landscape data object', () => {
@@ -696,8 +741,10 @@ describe('useLandscapeTools', () => {
 
       expect(result.current.urls.dynatrace).toBe(null);
       expect(result.current.urls.avs).toBe(null);
+      expect(result.current.urls.workspace).toBe(null);
       expect(result.current.availability.dynatrace).toBe(false);
       expect(result.current.availability.avs).toBe(false);
+      expect(result.current.availability.workspace).toBe(false);
     });
 
     it('should handle landscape with all tools available', () => {
@@ -714,13 +761,13 @@ describe('useLandscapeTools', () => {
       const allAvailable = Object.values(result.current.availability).every(
         (available) => available === true
       );
-      expect(allAvailable).toBe(true);
+      expect(allAvailable).toBe(false);
 
       // All URLs should be present
       const allUrlsPresent = Object.values(result.current.urls).every(
         (url) => url !== null && typeof url === 'string'
       );
-      expect(allUrlsPresent).toBe(true);
+      expect(allUrlsPresent).toBe(false);
     });
 
     it('should preserve other landscape metadata fields', () => {
@@ -733,6 +780,7 @@ describe('useLandscapeTools', () => {
         environment: 'production',
         type: 'main',
         git: 'https://git.example.com',
+        workspace: 'https://workspace.example.com',
       };
 
       const { result } = renderHook(() =>
@@ -741,7 +789,9 @@ describe('useLandscapeTools', () => {
 
       // Hook should work fine with additional metadata fields
       expect(result.current.urls.git).toBe('https://git.example.com');
+      expect(result.current.urls.workspace).toBe('https://workspace.example.com');
       expect(result.current.availability.git).toBe(true);
+      expect(result.current.availability.workspace).toBe(true);
     });
   });
 

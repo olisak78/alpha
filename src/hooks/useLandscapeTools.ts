@@ -26,6 +26,8 @@ interface LandscapeData {
   vault?: string;
   'iaas-console'?: string;
   'iaas-console-backing-service'?: string;
+  workspace?: string;
+  cad?: string;
 }
 
 interface LandscapeToolUrls {
@@ -45,6 +47,8 @@ interface LandscapeToolUrls {
   vault: string | null;
   iaasConsole: string | null;
   iaasConsoleBS: string | null;
+  workspace: string | null;
+  cad: string | null;
 }
 
 interface LandscapeToolsAvailability {
@@ -64,12 +68,15 @@ interface LandscapeToolsAvailability {
   vault: boolean;
   iaasConsole: boolean;
   iaasConsoleBS: boolean;
+  workspace: boolean;
+  cad: boolean;
 }
 
 interface UseLandscapeToolsReturn {
   urls: LandscapeToolUrls;
   availability: LandscapeToolsAvailability;
 }
+
 
 export function useLandscapeTools(
   selectedLandscapeId: string | null,
@@ -93,7 +100,9 @@ export function useLandscapeTools(
         gardener: null,
         vault: null,
         iaasConsole: null,
-        iaasConsoleBS: null
+        iaasConsoleBS: null,
+        workspace: null,
+        cad: null
       },
       availability: {
         git: false,
@@ -111,7 +120,9 @@ export function useLandscapeTools(
         gardener: false,
         vault: false,
         iaasConsole: false,
-        iaasConsoleBS: false
+        iaasConsoleBS: false,
+        workspace: false,
+        cad: false
       }
     };
 
@@ -135,6 +146,8 @@ export function useLandscapeTools(
     const vaultUrl = landscapeData.vault || null;
     const iaasConsoleUrl = landscapeData['iaas-console'] || null;
     const iaasConsoleBSUrl = landscapeData['iaas-console-backing-service'] || null;
+    const workspaceUrl = landscapeData['workspace'] || null;
+    const cadUrl = landscapeData['cad'] || null;
 
     return {
       urls: {
@@ -153,7 +166,9 @@ export function useLandscapeTools(
         gardener: gardenerUrl,
         vault: vaultUrl,
         iaasConsole: iaasConsoleUrl,
-        iaasConsoleBS: iaasConsoleBSUrl
+        iaasConsoleBS: iaasConsoleBSUrl,
+        workspace: workspaceUrl,
+        cad: cadUrl
       },
       availability: {
         git: !!gitUrl,
@@ -171,7 +186,9 @@ export function useLandscapeTools(
         gardener: !!gardenerUrl,
         vault: !!vaultUrl,
         iaasConsole: !!iaasConsoleUrl,
-        iaasConsoleBS: !!iaasConsoleBSUrl
+        iaasConsoleBS: !!iaasConsoleBSUrl,
+        workspace: !!workspaceUrl,
+        cad: !!cadUrl
       }
     };
   }, [selectedLandscapeId, landscapeData]);

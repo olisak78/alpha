@@ -16,6 +16,7 @@ export interface DocsConfig {
   repo: string;
   branch: string;
   docsPath: string;
+  provider: string;
 }
 
 /**

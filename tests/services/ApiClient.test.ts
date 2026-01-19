@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ApiClient, apiClient } from '../../src/services/ApiClient';
+import { tokenManager } from '../../src/lib/tokenManager';
 
 const BASE_URL = 'http://localhost:7008/api/v1';
 const AUTH_BASE_URL = 'http://localhost:7008/api/auth';
@@ -15,6 +16,9 @@ describe('ApiClient', () => {
     // Create new client instance for each test
     client = new ApiClient();
 
+    // Clear token manager state
+    tokenManager.clearToken();
+
     // Mock console methods to avoid noise in test output
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -23,6 +27,8 @@ describe('ApiClient', () => {
   afterEach(() => {
     // Restore original fetch
     global.fetch = originalFetch;
+    // Clear token manager state
+    tokenManager.clearToken();
     vi.restoreAllMocks();
   });
 
@@ -49,6 +55,7 @@ describe('ApiClient', () => {
   describe('Token Management', () => {
     it('should fetch and store access token on first request', async () => {
       const mockToken = 'test-jwt-token';
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 
       global.fetch = vi.fn()
         // First call: token refresh
@@ -56,9 +63,7 @@ describe('ApiClient', () => {
           ok: true,
           json: async () => ({
             accessToken: mockToken,
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         // Second call: actual API request
@@ -75,6 +80,7 @@ describe('ApiClient', () => {
 
     it('should reuse existing token for subsequent requests', async () => {
       const mockToken = 'test-jwt-token';
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 
       global.fetch = vi.fn()
         // First call: token refresh
@@ -82,9 +88,7 @@ describe('ApiClient', () => {
           ok: true,
           json: async () => ({
             accessToken: mockToken,
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         // Second call: first API request
@@ -107,15 +111,14 @@ describe('ApiClient', () => {
 
     it('should clear token when clearToken is called', async () => {
       const mockToken = 'test-jwt-token';
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: mockToken,
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         .mockResolvedValueOnce({
@@ -144,8 +147,7 @@ describe('ApiClient', () => {
       global.fetch = vi.fn().mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          valid: false,
-          accessToken: null
+          // Missing accessToken should trigger error
         }),
       } as Response);
 
@@ -154,6 +156,7 @@ describe('ApiClient', () => {
 
     it('should prevent multiple simultaneous token refreshes', async () => {
       const mockToken = 'test-jwt-token';
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       let tokenRefreshCount = 0;
 
       global.fetch = vi.fn().mockImplementation((url) => {
@@ -165,9 +168,7 @@ describe('ApiClient', () => {
               ok: true,
               json: async () => ({
                 accessToken: mockToken,
-                valid: true,
-                expiresInSeconds: 3600,
-                tokenType: 'Bearer'
+                expirationTime: mockExpirationTime
               }),
             }), 100)
           );
@@ -202,14 +203,13 @@ describe('ApiClient', () => {
   describe('GET Requests', () => {
     beforeEach(() => {
       // Mock successful token refresh for all tests
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
@@ -325,14 +325,13 @@ describe('ApiClient', () => {
 
   describe('POST Requests', () => {
     beforeEach(() => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
@@ -368,14 +367,13 @@ describe('ApiClient', () => {
 
   describe('PUT Requests', () => {
     beforeEach(() => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
@@ -406,14 +404,13 @@ describe('ApiClient', () => {
 
   describe('PATCH Requests', () => {
     beforeEach(() => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
@@ -444,14 +441,13 @@ describe('ApiClient', () => {
 
   describe('DELETE Requests', () => {
     beforeEach(() => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
@@ -492,49 +488,17 @@ describe('ApiClient', () => {
 
   describe('Error Handling', () => {
     beforeEach(() => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response);
     });
 
-    it('should handle 401 and retry with token refresh', async () => {
-      (global.fetch as any)
-        // First API call returns 401
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 401,
-          statusText: 'Unauthorized',
-          json: async () => ({ error: 'Token expired' }),
-        } as Response)
-        // Token refresh
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            accessToken: 'new-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
-          }),
-        } as Response)
-        // Retry with new token succeeds
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ data: 'success' }),
-        } as Response);
-
-      const result = await client.get('/teams');
-
-      expect(result).toEqual({ data: 'success' });
-      // Initial token + 401 response + refresh token + retry = 4 calls
-      expect(fetch).toHaveBeenCalledTimes(4);
-    });
 
     it('should handle 400 Bad Request', async () => {
       (global.fetch as any).mockResolvedValueOnce({
@@ -607,14 +571,13 @@ describe('ApiClient', () => {
 
   describe('Authentication Flow', () => {
     it('should call refresh endpoint with correct parameters', async () => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         .mockResolvedValueOnce({
@@ -638,14 +601,13 @@ describe('ApiClient', () => {
     });
 
     it('should include Authorization header in API requests', async () => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-jwt-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         .mockResolvedValueOnce({
@@ -666,14 +628,13 @@ describe('ApiClient', () => {
     });
 
     it('should include credentials in all requests', async () => {
+      const mockExpirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             accessToken: 'test-token',
-            valid: true,
-            expiresInSeconds: 3600,
-            tokenType: 'Bearer'
+            expirationTime: mockExpirationTime
           }),
         } as Response)
         .mockResolvedValueOnce({

@@ -51,7 +51,6 @@ export function LandscapeLinksSection({
     }, {} as Record<string, any[]>);
   }, [landscapeGroups]);
 
-
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between gap-4">

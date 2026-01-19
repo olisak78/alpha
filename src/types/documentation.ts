@@ -1,6 +1,7 @@
 export interface Documentation {
   id: string;
   team_id: string;
+  provider: string;
   owner: string;  // GitHub org/user
   repo: string;   // Repository name
   branch: string; // Branch name
@@ -31,4 +32,5 @@ export interface DocumentationConfig {
   repo: string;
   branch: string;
   docsPath: string;
+  provider: string; 
 }

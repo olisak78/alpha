@@ -282,7 +282,7 @@ export function ProjectLayout({
               selectedLandscapeData={selectedApiLandscape}
               landscapeGroups={landscapeGroupsArray}
               onLandscapeChange={handleLandscapeChange}
-              onShowLandscapeDetails={handleShowLandscapeDetails} 
+              onShowLandscapeDetails={handleShowLandscapeDetails}
               projectId={projectId}
             />
 

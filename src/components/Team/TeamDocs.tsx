@@ -183,32 +183,33 @@ export function TeamDocs({ teamId, teamName }: TeamDocsProps) {
             </div>
           </div>
 
-        {documentations.map((doc) => (
-          <TabsContent key={doc.id} value={doc.id} className="mt-0 flex-1 overflow-hidden">
-            <DocsPage
-              owner={doc.owner}
-              repo={doc.repo}
-              branch={doc.branch}
-              docsPath={doc.docs_path}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
-    </div>
+          {documentations.map((doc) => (
+            <TabsContent key={doc.id} value={doc.id} className="mt-0 flex-1 overflow-hidden">
+              <DocsPage
+                owner={doc.owner}
+                repo={doc.repo}
+                branch={doc.branch}
+                docsPath={doc.docs_path}
+                provider={doc.provider}
+              />
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
 
-    <AddDocumentationDialog
-      open={showAddDialog}
-      onOpenChange={setShowAddDialog}
-      teamId={teamId}
-    />
-
-    {selectedDoc && (
-      <EditDocumentationDialog
-        open={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        documentation={selectedDoc}
+      <AddDocumentationDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        teamId={teamId}
       />
-    )}
+
+      {selectedDoc && (
+        <EditDocumentationDialog
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+          documentation={selectedDoc}
+        />
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { getNewBackendUrl } from '@/constants/developer-portal';
 import type { ApiError } from '../types/api';
+import { tokenManager } from '../lib/tokenManager';
 
 /**
  * Enhanced Error with API details
@@ -92,9 +93,6 @@ export class ApiClient {
   private baseURL: string;
   private authBaseURL: string;
   private defaultHeaders: Record<string, string>;
-  private accessToken: string | null = null;
-  private isRefreshing: boolean = false;
-  private refreshPromise: Promise<string> | null = null;
 
   constructor() {
     this.baseURL = API_CONFIG.baseURL;
@@ -142,80 +140,23 @@ export class ApiClient {
     };
 
     // Add Authorization header if we have a token
-    if (this.accessToken) {
-      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    const token = tokenManager.getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
     return headers;
   }
 
   /**
-   * Get access token from refresh endpoint
-   * This fetches a new JWT token using the httpOnly cookie authentication
-   *
-   * @returns JWT access token
-   */
-  private async getAccessToken(): Promise<string> {
-    // Prevent multiple simultaneous refresh attempts
-    if (this.isRefreshing && this.refreshPromise) {
-      return this.refreshPromise;
-    }
-
-    this.isRefreshing = true;
-    this.refreshPromise = (async () => {
-      try {
-        const response = await fetch(
-          `${this.authBaseURL}/refresh`,
-          {
-            method: 'GET',
-            credentials: 'include', // Send httpOnly cookies
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest',
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Token refresh failed: ${response.status} ${response.statusText}`);
-        }
-
-        const data: AuthRefreshResponse = await response.json();
-
-        if (!data.accessToken) {
-          throw new Error('Invalid token response from server');
-        }
-
-        // Store the access token
-        this.accessToken = data.accessToken;
-
-
-        return data.accessToken;
-      } catch (error) {
-        console.error('❌ Failed to refresh token:', error);
-        this.accessToken = null;
-        throw error;
-      } finally {
-        this.isRefreshing = false;
-        this.refreshPromise = null;
-      }
-    })();
-
-    return this.refreshPromise;
-  }
-
-  /**
    * Ensure we have a valid access token
-   * Fetches token if we don't have one
+   * Uses centralized token manager to prevent duplicate refresh requests
    *
    * @returns JWT access token
    */
   private async ensureToken(): Promise<string> {
-    if (this.accessToken) {
-      return this.accessToken;
-    }
-
-    return await this.getAccessToken();
+    // Use centralized token manager with 1-minute buffer for API requests
+    return await tokenManager.ensureValidToken(60);
   }
 
   /**
@@ -280,8 +221,8 @@ export class ApiClient {
       // Handle 401 Unauthorized - token expired or invalid
       if (response.status === 401) {
         try {
-          // Force refresh the token
-          await this.getAccessToken();
+          // This completely bypasses any throttling or pre-checks
+          await tokenManager.forceRefresh();
 
           // Retry the original request with new token
           const newHeaders = this.buildHeaders(customHeaders);
@@ -290,12 +231,13 @@ export class ApiClient {
           response = await fetch(url, fetchOptions);
 
           if (response.status === 401) {
-            // Still 401 after refresh - authentication truly failed
+            // Still 401 after forced refresh - authentication truly failed
+            tokenManager.clearToken(); // Clear invalid token
             throw new Error('Authentication failed after token refresh. Please login again.');
           }
         } catch (refreshError) {
           console.error('❌ Token refresh failed:', refreshError);
-          this.accessToken = null; // Clear invalid token
+          tokenManager.clearToken(); // Clear invalid token
           throw new Error('Authentication failed: Unable to refresh token. Please login again.');
         }
       }
@@ -522,14 +464,14 @@ export class ApiClient {
    * Useful for logout scenarios
    */
   public clearToken(): void {
-    this.accessToken = null;
+    tokenManager.clearToken();
   }
 
   /**
    * Check if client has an access token
    */
   public hasToken(): boolean {
-    return this.accessToken !== null;
+    return tokenManager.getToken() !== null;
   }
 
   /**
@@ -572,6 +514,7 @@ export class ApiClient {
       method: 'GET',
       headers,
       signal: options?.signal,
+      credentials: 'include',
     });
 
     if (!response.ok) {

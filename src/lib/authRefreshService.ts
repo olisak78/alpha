@@ -5,7 +5,7 @@
  * This service is called when cached data exists to ensure authentication is still valid.
  */
 
-import { getNewBackendUrl } from "@/constants/developer-portal";
+import { tokenManager } from "./tokenManager";
 
 // Import the global auth error trigger (will be set by AuthErrorContext)
 let globalAuthErrorTrigger: ((message: string) => void) | null = null;
@@ -48,65 +48,30 @@ export const isAuthError = (error: any): boolean => {
          message.includes('session expired');
 };
 
-// Get backend URL from runtime environment or fallback to localhost for development
-const getAuthBaseURL = (): string => {
-  const backendUrl = getNewBackendUrl();
-  return `${backendUrl}/api/auth`;
-};
-
-// Throttling mechanism to prevent multiple simultaneous refresh requests
-let lastRefreshTime = 0;
-let refreshPromise: Promise<void> | null = null;
-const REFRESH_THROTTLE_MS = 5000; // 5 seconds throttle
 
 /**
- * Throttled authentication refresh service
+ * Throttled authentication refresh service with centralized token management
  *
  * This function is called when React Query mounts components with cached data
  * to verify that the user's authentication is still valid.
+ * Now uses centralized token manager to prevent duplicate refresh requests.
  */
 export async function throttledAuthRefresh(): Promise<void> {
-  const now = Date.now();
-
-  // If a refresh is in progress, wait for it
-  if (refreshPromise) {
-    return refreshPromise;
-  }
-
-  // If we recently refreshed successfully, skip
-  if (now - lastRefreshTime < REFRESH_THROTTLE_MS) {
-    return Promise.resolve();
-  }
-
-  // Create and store the refresh promise to prevent concurrent requests
-  refreshPromise = (async () => {
-    try {
-      const authBaseURL = getAuthBaseURL();
-      const response = await fetch(`${authBaseURL}/refresh`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      });
-
-      if (response.ok) {
-        lastRefreshTime = now;
-      } else {
-        // If the refresh endpoint returns a non-OK response, trigger auth error
-        triggerSessionExpiredError('Session expired. Please log in again.');
-      }
-
-    } catch (error) {
-      // When the /refresh fetch request fails, trigger auth error
-      triggerSessionExpiredError('Session expired. Please log in again.');
-    } finally {
-      refreshPromise = null;
+  try {
+    // Check if we have a valid token (2-minute buffer for periodic checks)
+    if (tokenManager.hasValidToken(120)) {
+      // Token is still valid, no need to refresh - SKIP ENTIRELY
+      return Promise.resolve();
     }
-  })();
-
-  return refreshPromise;
+    
+    // Use centralized token manager to ensure token validity
+    // This will only make a refresh request if needed and not already in progress
+    await tokenManager.ensureValidToken(120);
+    
+  } catch (error) {
+    // When token refresh fails, trigger auth error
+    triggerSessionExpiredError('Session expired. Please log in again.');
+  }
 }
 
 /**

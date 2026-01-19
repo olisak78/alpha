@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCreateDocumentation } from "@/hooks/api/useDocumentation";
 import { Loader2 } from "lucide-react";
 import { useTeamById } from "@/hooks/api/useTeams";
+import { isValidGitHubProvider } from "@/utils/githubProviderUtils";
 
 interface AddDocumentationDialogProps {
   open: boolean;
@@ -29,12 +30,13 @@ interface FormErrors {
 const validateGitHubUrl = (url: string): boolean => {
   try {
     const parsedUrl = new URL(url);
-    // Support both github.tools.sap and github.com
-    if (parsedUrl.host !== "github.tools.sap" && parsedUrl.host !== "github.com") {
-      return false;
-    }
+
 
     const parts = parsedUrl.pathname.split('/').filter(p => p);
+
+    if (!isValidGitHubProvider(parsedUrl.hostname)) {
+      return false;
+    }
 
     // Support repository root URLs: /{owner}/{repo}
     if (parts.length === 2) {
@@ -88,7 +90,7 @@ export function AddDocumentationDialog({ open, onOpenChange, teamId }: AddDocume
       case "url":
         if (!value.trim()) return "GitHub URL is required";
         if (!validateGitHubUrl(value.trim())) {
-          return "Please enter a valid GitHub URL (e.g., https://github.tools.sap/org/repo/tree/main/docs)";
+          return "Please enter a valid GitHub URL from a supported provider";
         }
         return undefined;
       default:

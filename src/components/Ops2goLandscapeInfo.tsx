@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCentralLandscapes, type LandscapeInfo } from '@/services/Ops2goApi';
+import { fetchCentralLandscapes } from '@/services/Ops2goApi';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import {
@@ -121,6 +121,19 @@ export function Ops2goLandscapeInfo({ landscapeName }: Ops2goLandscapeInfoProps)
               {landscapeInfo.state}
             </Badge>
           )}
+          {landscapeInfo['CE-onboarded'] !== undefined && (
+            <Badge
+              variant={landscapeInfo['CE-onboarded'] ? "default" : "outline"}
+              className={cn(
+                "text-xs px-2 py-0.5",
+                landscapeInfo['CE-onboarded']
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "border-orange-500 text-orange-600 dark:text-orange-400"
+              )}
+            >
+              CE {landscapeInfo['CE-onboarded'] ? 'Onboarded' : 'Not Onboarded'}
+            </Badge>
+          )}
           {landscapeInfo.displayname_full && (
             <span className="text-xs text-muted-foreground">• {landscapeInfo.displayname_full}</span>
           )}
@@ -200,22 +213,22 @@ export function Ops2goLandscapeInfo({ landscapeName }: Ops2goLandscapeInfoProps)
             {(landscapeInfo['lb-ips'] || landscapeInfo['lb-ips_ipv6'] || landscapeInfo['nat-ips'] ||
               landscapeInfo['ugw-lb-ips'] || landscapeInfo['trial-nat-ips'] || landscapeInfo.dynatrace_ips ||
               landscapeInfo.ipv6_cidr_blocks) && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border/50">
-                  <Network className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-bold text-primary uppercase tracking-wide">Network IPs</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border/50">
+                    <Network className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-bold text-primary uppercase tracking-wide">Network IPs</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {landscapeInfo['lb-ips'] && <NetworkItem label="Load Balancer" value={landscapeInfo['lb-ips']} />}
+                    {landscapeInfo['lb-ips_ipv6'] && <NetworkItem label="LB IPv6" value={landscapeInfo['lb-ips_ipv6']} />}
+                    {landscapeInfo['nat-ips'] && <NetworkItem label="NAT IPs" value={landscapeInfo['nat-ips']} />}
+                    {landscapeInfo['ugw-lb-ips'] && <NetworkItem label="UGW LB" value={landscapeInfo['ugw-lb-ips']} />}
+                    {landscapeInfo['trial-nat-ips'] && <NetworkItem label="Trial NAT" value={landscapeInfo['trial-nat-ips']} />}
+                    {landscapeInfo.dynatrace_ips && <NetworkItem label="Dynatrace" value={landscapeInfo.dynatrace_ips} />}
+                    {landscapeInfo.ipv6_cidr_blocks && <NetworkItem label="IPv6 CIDR" value={landscapeInfo.ipv6_cidr_blocks} />}
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  {landscapeInfo['lb-ips'] && <NetworkItem label="Load Balancer" value={landscapeInfo['lb-ips']} />}
-                  {landscapeInfo['lb-ips_ipv6'] && <NetworkItem label="LB IPv6" value={landscapeInfo['lb-ips_ipv6']} />}
-                  {landscapeInfo['nat-ips'] && <NetworkItem label="NAT IPs" value={landscapeInfo['nat-ips']} />}
-                  {landscapeInfo['ugw-lb-ips'] && <NetworkItem label="UGW LB" value={landscapeInfo['ugw-lb-ips']} />}
-                  {landscapeInfo['trial-nat-ips'] && <NetworkItem label="Trial NAT" value={landscapeInfo['trial-nat-ips']} />}
-                  {landscapeInfo.dynatrace_ips && <NetworkItem label="Dynatrace" value={landscapeInfo.dynatrace_ips} />}
-                  {landscapeInfo.ipv6_cidr_blocks && <NetworkItem label="IPv6 CIDR" value={landscapeInfo.ipv6_cidr_blocks} />}
-                </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       )}

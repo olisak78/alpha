@@ -8,7 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useUpdateDocumentation } from "@/hooks/api/useDocumentation";
 import { Loader2 } from "lucide-react";
 import type { Documentation } from "@/types/documentation";
-import { useTeamById } from "@/hooks/api/useTeams"; 
+import { useTeamById } from "@/hooks/api/useTeams";
+import { getGitHubHostname } from "@/utils/githubProviderUtils";
 
 interface EditDocumentationDialogProps {
   open: boolean;
@@ -67,8 +68,8 @@ export function EditDocumentationDialog({ open, onOpenChange, documentation }: E
   // Initialize form with documentation data when dialog opens
   useEffect(() => {
     if (open && documentation) {
-      // Reconstruct URL from documentation parts
-      const url = `https://${documentation.owner.includes('/') ? 'github.tools.sap' : 'github.com'}/${documentation.owner}/${documentation.repo}/tree/${documentation.branch}/${documentation.docs_path}`;
+      const hostname = getGitHubHostname(documentation.provider);
+      const url = `https://${hostname}/${documentation.owner}/${documentation.repo}/tree/${documentation.branch}/${documentation.docs_path}`;
       setFormData({
         url: url,
         title: documentation.title,

@@ -197,6 +197,7 @@ describe('DocsPage Component', () => {
   ];
 
   const defaultProps = {
+    provider: 'githubtools', // NEW: Add provider
     owner: 'test-owner',
     repo: 'test-repo',
     branch: 'main',
@@ -298,18 +299,23 @@ describe('DocsPage Component', () => {
       // Test with full configuration
       renderWithQueryClient();
       const docsContent = screen.getByTestId('docs-content');
-      expect(docsContent).toHaveTextContent('Config: {"owner":"test-owner","repo":"test-repo","branch":"main","docsPath":"docs"}');
+      // UPDATED: Include provider in config
+      expect(docsContent).toHaveTextContent('Config: {"provider":"githubtools","owner":"test-owner","repo":"test-repo","branch":"main","docsPath":"docs"}');
     });
 
     it('should handle various prop combinations and edge cases', () => {
       const testCases = [
         {
-          props: { owner: 'org1', repo: 'repo1', branch: 'main', docsPath: 'docs' },
-          expectedConfig: '{"owner":"org1","repo":"repo1","branch":"main","docsPath":"docs"}',
+          props: { provider: 'github', owner: 'org1', repo: 'repo1', branch: 'main', docsPath: 'docs' },
+          expectedConfig: '{"provider":"github","owner":"org1","repo":"repo1","branch":"main","docsPath":"docs"}',
         },
         {
-          props: { owner: 'org-with-dashes', repo: 'repo_with_underscores', branch: 'feature/special-branch', docsPath: 'docs/api/v1' },
-          expectedConfig: '{"owner":"org-with-dashes","repo":"repo_with_underscores","branch":"feature/special-branch","docsPath":"docs/api/v1"}',
+          props: { provider: 'githubtools', owner: 'org-with-dashes', repo: 'repo_with_underscores', branch: 'feature/special-branch', docsPath: 'docs/api/v1' },
+          expectedConfig: '{"provider":"githubtools","owner":"org-with-dashes","repo":"repo_with_underscores","branch":"feature/special-branch","docsPath":"docs/api/v1"}',
+        },
+        {
+          props: { provider: 'githubwdf', owner: 'wdf-org', repo: 'wdf-repo', branch: 'develop', docsPath: 'documentation' },
+          expectedConfig: '{"provider":"githubwdf","owner":"wdf-org","repo":"wdf-repo","branch":"develop","docsPath":"documentation"}',
         },
       ];
 
@@ -319,6 +325,20 @@ describe('DocsPage Component', () => {
         expect(docsContent).toHaveTextContent(`Config: ${expectedConfig}`);
         unmount();
       });
+    });
+
+    it('should not create docsConfig when provider is missing', () => {
+      const { unmount } = renderWithQueryClient({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        branch: 'main',
+        docsPath: 'docs',
+        // Missing provider
+      } as any);
+
+      const docsContent = screen.getByTestId('docs-content');
+      expect(docsContent).toHaveTextContent('Config: none');
+      unmount();
     });
   });
 
@@ -525,7 +545,7 @@ describe('DocsPage Component', () => {
   // ============================================================================
 
   describe('GitHub Integration', () => {
-    it('should handle GitHub integration correctly', async () => {
+    it('should handle GitHub integration with githubtools provider correctly', async () => {
       const mockWindowOpen = vi.fn();
       Object.defineProperty(window, 'open', {
         value: mockWindowOpen,
@@ -534,15 +554,19 @@ describe('DocsPage Component', () => {
 
       const user = userEvent.setup();
       
-      // Test with docsConfig
-      const { unmount } = renderWithQueryClient();
+      // Test with githubtools provider
+      const { unmount } = renderWithQueryClient({
+        ...defaultProps,
+        provider: 'githubtools',
+      });
+      
       const githubButtons = screen.getAllByTestId('github-icon');
       expect(githubButtons).toHaveLength(2);
 
       const openButton = screen.getByText('Open');
       expect(openButton.closest('button')).toHaveAttribute('title', 'Open in GitHub');
 
-      // Test GitHub button click
+      // Test GitHub button click - should use github.tools.sap
       const headerGithubButton = githubButtons[0].closest('button');
       if (headerGithubButton) {
         await user.click(headerGithubButton);
@@ -553,8 +577,9 @@ describe('DocsPage Component', () => {
         );
       }
       unmount();
+    });
 
-      // Test without docsConfig
+    it('should not show GitHub buttons without docsConfig', () => {
       renderWithQueryClient({} as any);
       expect(screen.queryByText('Open')).not.toBeInTheDocument();
       expect(screen.queryAllByTestId('github-icon')).toHaveLength(0);
@@ -827,6 +852,69 @@ describe('DocsPage Component', () => {
       
       // Event listeners should be cleaned up
       // Note: The actual cleanup verification depends on the component implementation
+    });
+  });
+
+  // ============================================================================
+  // PROVIDER-SPECIFIC TESTS
+  // ============================================================================
+
+  describe('Provider-Specific Tests', () => {
+    it('should pass correct provider to docsConfig', () => {
+      const providers = ['github', 'githubtools', 'githubwdf'];
+
+      providers.forEach((provider) => {
+        const { unmount } = renderWithQueryClient({
+          ...defaultProps,
+          provider,
+        });
+
+        const docsContent = screen.getByTestId('docs-content');
+        expect(docsContent).toHaveTextContent(`"provider":"${provider}"`);
+        unmount();
+      });
+    });
+
+    it('should handle missing provider gracefully', () => {
+      const { unmount } = renderWithQueryClient({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        branch: 'main',
+        docsPath: 'docs',
+        // No provider
+      } as any);
+
+      // Without provider, docsConfig should be undefined
+      const docsContent = screen.getByTestId('docs-content');
+      expect(docsContent).toHaveTextContent('Config: none');
+      
+      // GitHub buttons should not be present
+      expect(screen.queryByTestId('github-icon')).not.toBeInTheDocument();
+      
+      unmount();
+    });
+
+    it('should handle partial props correctly', () => {
+      const partialCases = [
+        { props: { provider: 'github' }, hasConfig: false },
+        { props: { provider: 'github', owner: 'test-owner' }, hasConfig: false },
+        { props: { provider: 'github', owner: 'test-owner', repo: 'test-repo' }, hasConfig: false },
+        { props: { provider: 'github', owner: 'test-owner', repo: 'test-repo', branch: 'main' }, hasConfig: false },
+        { props: { provider: 'github', owner: 'test-owner', repo: 'test-repo', branch: 'main', docsPath: 'docs' }, hasConfig: true },
+      ];
+
+      partialCases.forEach(({ props, hasConfig }) => {
+        const { unmount } = renderWithQueryClient(props as any);
+        const docsContent = screen.getByTestId('docs-content');
+        
+        if (hasConfig) {
+          expect(docsContent).not.toHaveTextContent('Config: none');
+        } else {
+          expect(docsContent).toHaveTextContent('Config: none');
+        }
+        
+        unmount();
+      });
     });
   });
 });

@@ -1,4 +1,5 @@
 import { getNewBackendUrl } from "@/constants/developer-portal";
+import { tokenManager } from "../lib/tokenManager";
 
 // Get backend URL from runtime environment or fallback to localhost for development
 const backendUrl = getNewBackendUrl();
@@ -52,24 +53,13 @@ const createAuthService = (provider: AuthProvider) => {
           clearInterval(checkClosed);
           window.removeEventListener('message', messageListener);
 
-          // Check if authentication was successful by calling refresh
+          // Check if authentication was successful using centralized token manager
           try {
-            const response = await fetch(`${backendUrl}/api/auth/refresh`, {
-              credentials: 'include',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-              },
-            });
-
-            if (response.ok) {
-              // Authentication successful
-              resolve();
-            } else {
-              reject(new Error(`Authentication failed for ${provider} after popup closed`));
-            }
+            await tokenManager.ensureValidToken(60);
+            // Authentication successful
+            resolve();
           } catch (error) {
-            reject(error);
+            reject(new Error(`Authentication failed for ${provider} after popup closed`));
           }
         }
       }, 1000);
@@ -120,16 +110,11 @@ export const checkAuthStatus = async () => {
       return null;
     }
 
-    const response = await fetch(`${backendUrl}/api/auth/refresh`, {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
-
-    if (response.ok) {
-      return await response.json();
+    // Use centralized token manager instead of direct fetch
+    const token = await tokenManager.ensureValidToken(60);
+    if (token) {
+      // Return a basic auth status object
+      return { accessToken: token, authenticated: true };
     }
 
     return null;
@@ -151,29 +136,19 @@ export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
       return { githubtools: false, githubwdf: false };
     }
 
-    const response = await fetch(`${backendUrl}/api/auth/refresh`, {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      
-      // Check if the response includes auth status for both providers
-      // If backend provides explicit status, use it
-      // Otherwise, if backend returned an accessToken, assume both auths are valid
-      // (backend wouldn't issue token unless both authentications succeeded)
-      const hasAccessToken = !!data.accessToken;
-      
-      const authStatus = {
-        githubtools: data.githubtools ?? (hasAccessToken || data.authenticated || false),
-        githubwdf: data.githubwdf ?? (hasAccessToken || data.authenticated || false),
-      };
-      
-      return authStatus;
+    // Use centralized token manager instead of direct fetch
+    try {
+      const token = await tokenManager.ensureValidToken(60);
+      if (token) {
+        // If we have a valid token, assume both authentications are valid
+        // (backend wouldn't issue token unless both authentications succeeded)
+        return {
+          githubtools: true,
+          githubwdf: true,
+        };
+      }
+    } catch (error) {
+      console.error('Token validation failed:', error);
     }
 
     return { githubtools: false, githubwdf: false };
@@ -192,6 +167,9 @@ export const logoutUser = async (): Promise<void> => {
         'X-Requested-With': 'XMLHttpRequest',
       },
     });
+
+    // Clear centralized token manager
+    tokenManager.clearToken();
 
     // Clear session and authentication-related data only
     try {
@@ -230,6 +208,8 @@ export const logoutUser = async (): Promise<void> => {
     window.location.href = '/login';
   } catch (error) {
     console.error('Logout error:', error);
+    // Clear centralized token manager even on error
+    tokenManager.clearToken();
     // Even if logout fails, clear local state and redirect
     try {
       sessionStorage.clear();

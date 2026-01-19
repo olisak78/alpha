@@ -1,14 +1,10 @@
-/**
- * GitHub Documentation API Service
- * Fetches documentation from GitHub repository via backend proxy
- */
-
 import { ApiClient } from "./ApiClient";
 
 const apiClient = new ApiClient();
 
 // Configuration - can be moved to environment variables
 export const DOCS_CONFIG = {
+  provider: "githubtools",
   owner: "cfs-platform-engineering", // GitHub organization/user
   repo: "cfs-platform-docs", // Repository name
   branch: "main", // Branch name
@@ -77,41 +73,13 @@ export async function fetchGitHubDirectory(
   const fullPath = path ? `${config.docsPath}/${path}` : config.docsPath;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   return apiClient.get<GitHubContent[]>(url, {
     params: { ref: config.branch }
   });
 }
 
-/**
- * Decode base64 string to UTF-8 text
- * Handles Unicode characters properly (unlike atob)
- */
-function decodeBase64ToUTF8(base64: string): string {
-  // Remove all whitespace characters (newlines, spaces, tabs) from base64 string
-  const cleanBase64 = base64.replace(/\s/g, '');
-
-  try {
-    // Decode base64 to binary string
-    const binaryString = atob(cleanBase64);
-
-    // Convert binary string to Uint8Array
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    // Decode Uint8Array to UTF-8 string
-    const decoder = new TextDecoder('utf-8');
-    return decoder.decode(bytes);
-  } catch (error) {
-    console.error('Failed to decode base64:', error);
-    console.error('Base64 length:', cleanBase64.length);
-    console.error('First 100 chars:', cleanBase64.substring(0, 100));
-    throw new Error(`Failed to decode base64 content: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-}
 
 /**
  * Remove YAML frontmatter from markdown content
@@ -151,7 +119,7 @@ export async function fetchGitHubFile(
   const fullPath = path.startsWith(config.docsPath) ? path : `${config.docsPath}/${path}`;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   const data = await apiClient.get<GitHubContent>(url, {
     params: { ref: config.branch }
@@ -178,7 +146,7 @@ export async function fetchGitHubFileWithMetadata(
   const fullPath = path.startsWith(config.docsPath) ? path : `${config.docsPath}/${path}`;
 
   // Backend proxy endpoint - uses ApiClient for automatic JWT authentication
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   const data = await apiClient.get<GitHubContent>(url, {
     params: { ref: config.branch }
@@ -373,7 +341,7 @@ export async function createGitHubFile(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${filePath}`;
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
   return apiClient.post(url, {
     message: commitMessage,
@@ -392,11 +360,15 @@ export async function createGitHubFolder(
   folderPath: string,
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
-  const gitkeepPath = `${folderPath}/.gitkeep`;
-  const commitMessage = `Create folder: ${folderPath}`;
+  const fullPath = `${config.docsPath}/${folderPath}`;
 
-  // Use a single newline as content since backend requires non-empty content
-  return createGitHubFile(gitkeepPath, '\n', commitMessage, config);
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}/.gitkeep`;
+
+  return apiClient.post(url, {
+    message: `Create folder: ${folderPath}`,
+    content: '\n',
+    branch: config.branch,
+  });
 }
 
 /**
@@ -413,17 +385,15 @@ export async function deleteGitHubFile(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${filePath}`;
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
 
-  // Pass body as second parameter to delete method
-  return apiClient.delete(
-    url,
-    {
-      message: commitMessage,
-      sha,
-      branch: config.branch,
-    }
-  );
+  // UPDATED: Use dynamic provider
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/contents/${fullPath}`;
+
+  return apiClient.delete(url, {
+    message: commitMessage,
+    sha,
+    branch: config.branch,
+  });
 }
 
 /**
@@ -438,15 +408,14 @@ export async function deleteGitHubFolder(
   config: typeof DOCS_CONFIG = DOCS_CONFIG
 ): Promise<any> {
   const fullPath = `${config.docsPath}/${folderPath}`;
-  const url = `/github/githubtools/repos/${config.owner}/${config.repo}/folders/${fullPath}`;
 
-  return apiClient.delete(
-    url,
-    {
-      message: commitMessage,
-      branch: config.branch,
-    }
-  );
+  // UPDATED: Use dynamic provider
+  const url = `/github/${config.provider}/repos/${config.owner}/${config.repo}/folders/${fullPath}`;
+
+  return apiClient.delete(url, {
+    message: commitMessage,
+    branch: config.branch,
+  });
 }
 
 /**

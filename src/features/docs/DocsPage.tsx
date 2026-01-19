@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useDocTreeLazy, useDocDirectory, useDocFile, useDocFileWithMetadata } from '@/hooks/api/useDocs';
+import { useDocTreeLazy, useDocFile, useDocFileWithMetadata } from '@/hooks/api/useDocs';
 import { DocsSidebar } from './components/DocsSidebar';
 import { DocsContent } from './components/DocsContent';
 import { DocsTableOfContents } from './components/DocsTableOfContents';
@@ -13,7 +13,7 @@ import { DocsRawEditor } from './components/DocsRawEditor';
 import { CreateItemDialog, CreateItemType } from './components/CreateItemDialog';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { flattenDocTree, DocTreeNode, createGitHubFile, createGitHubFolder, deleteGitHubFile, deleteGitHubFolder, isFolderEmpty } from '@/services/githubDocsApi';
-import { AlertCircle, Loader2, FileText, Eye, Github, FilePlus, FolderPlus, Edit } from 'lucide-react';
+import { AlertCircle, Loader2, Github, FilePlus, FolderPlus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Fuse from 'fuse.js';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,9 +30,10 @@ interface DocsPageProps {
   repo?: string;
   branch?: string;
   docsPath?: string;
+  provider?: string;
 }
 
-const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) => {
+const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath, provider }) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [tableOfContents, setTableOfContents] = useState<TableOfContentsItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,11 +52,11 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
   const [deleteItemType, setDeleteItemType] = useState<'document' | 'folder'>('document');
 
   const queryClient = useQueryClient();
-  const { toast} = useToast();
+  const { toast } = useToast();
 
   // Build config object from props if provided
-  const docsConfig = owner && repo && branch && docsPath
-    ? { owner, repo, branch, docsPath }
+  const docsConfig = provider && owner && repo && branch && docsPath
+    ? { provider, owner, repo, branch, docsPath }
     : undefined;
 
   // Extract the last segment of docsPath as the title (e.g., "docs/coe" -> "coe")
@@ -589,57 +590,57 @@ const DocsPage: React.FC<DocsPageProps> = ({ owner, repo, branch, docsPath }) =>
         </div>
       ) : (
         <div className="flex-1 flex overflow-hidden">
-            <>
-              {/* Markdown Content */}
-              <div id="docs-content-scroll-container" className="flex-1 overflow-y-auto relative">
-                {/* Action Buttons - Floating */}
-                {selectedPath && fileContent && docsConfig && (
-                  <div className="absolute top-1 right-1 min-[1800px]:top-4 min-[1800px]:right-4 z-10 flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const githubUrl = `https://github.tools.sap/${docsConfig.owner}/${docsConfig.repo}/blob/${docsConfig.branch}/${docsConfig.docsPath}/${selectedPath}`;
-                        window.open(githubUrl, '_blank', 'noopener,noreferrer');
-                      }}
-                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
-                      title="Open in GitHub"
-                    >
-                      <Github className="h-4 w-4 min-[1800px]:mr-2" />
-                      <span className="hidden min-[1800px]:inline">Open</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsRawMode(true)}
-                      className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
-                      title="Edit"
-                    >
-                      <Edit className="h-4 w-4 min-[1800px]:mr-2" />
-                      <span className="hidden min-[1800px]:inline">Edit</span>
-                    </Button>
-                  </div>
-                )}
-                <DocsContent
-                  content={fileContent}
-                  isLoading={isFileLoading}
-                  error={fileError}
-                  selectedPath={selectedPath}
-                  onTableOfContentsChange={setTableOfContents}
-                  docsConfig={docsConfig}
-                />
-              </div>
-
-              {/* Right Sidebar - Table of Contents (hidden on mobile) */}
-              {tableOfContents.length > 0 && !isRawMode && (
-                <div className="hidden xl:block w-64 border-l border-gray-200 dark:border-gray-800 flex-shrink-0 overflow-hidden">
-                  <DocsTableOfContents
-                    items={tableOfContents}
-                    activeId={activeHeadingId}
-                  />
+          <>
+            {/* Markdown Content */}
+            <div id="docs-content-scroll-container" className="flex-1 overflow-y-auto relative">
+              {/* Action Buttons - Floating */}
+              {selectedPath && fileContent && docsConfig && (
+                <div className="absolute top-1 right-1 min-[1800px]:top-4 min-[1800px]:right-4 z-10 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const githubUrl = `https://github.tools.sap/${docsConfig.owner}/${docsConfig.repo}/blob/${docsConfig.branch}/${docsConfig.docsPath}/${selectedPath}`;
+                      window.open(githubUrl, '_blank', 'noopener,noreferrer');
+                    }}
+                    className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
+                    title="Open in GitHub"
+                  >
+                    <Github className="h-4 w-4 min-[1800px]:mr-2" />
+                    <span className="hidden min-[1800px]:inline">Open</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsRawMode(true)}
+                    className="shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 h-8 w-8 p-0 min-[1800px]:h-auto min-[1800px]:w-auto min-[1800px]:px-3 min-[1800px]:py-2"
+                    title="Edit"
+                  >
+                    <Edit className="h-4 w-4 min-[1800px]:mr-2" />
+                    <span className="hidden min-[1800px]:inline">Edit</span>
+                  </Button>
                 </div>
               )}
-            </>
+              <DocsContent
+                content={fileContent}
+                isLoading={isFileLoading}
+                error={fileError}
+                selectedPath={selectedPath}
+                onTableOfContentsChange={setTableOfContents}
+                docsConfig={docsConfig}
+              />
+            </div>
+
+            {/* Right Sidebar - Table of Contents (hidden on mobile) */}
+            {tableOfContents.length > 0 && !isRawMode && (
+              <div className="hidden xl:block w-64 border-l border-gray-200 dark:border-gray-800 flex-shrink-0 overflow-hidden">
+                <DocsTableOfContents
+                  items={tableOfContents}
+                  activeId={activeHeadingId}
+                />
+              </div>
+            )}
+          </>
         </div>
       )}
 
