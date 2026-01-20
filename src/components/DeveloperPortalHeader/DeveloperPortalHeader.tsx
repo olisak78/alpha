@@ -1,10 +1,18 @@
-import { Bell, Sun, Moon } from "lucide-react";
+import { Bell, Sun, Moon, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserProfileDropdown } from "@/components/DeveloperPortalHeader/UserProfileDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useActualTheme, useThemeStore } from "@/stores/themeStore";
+import { UtilitiesDialog } from "@/components/DeveloperUtilities/UtilitiesDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useState } from "react";
 
 interface DeveloperPortalHeaderProps {
   unreadCount: number;
@@ -19,6 +27,7 @@ export function DeveloperPortalHeader({
   const navigate = useNavigate();
   const actualTheme = useActualTheme();
   const toggleTheme = useThemeStore(state => state.toggleTheme);
+  const [utilityOpen, setUtilityOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -64,6 +73,26 @@ export function DeveloperPortalHeader({
             )}
           </Button>
 
+          {/* Developer Utilities */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative text-foreground hover:bg-accent border border-border hover:border-border p-2 h-8 w-8 transition-colors"
+                  aria-label="Developer Utilities"
+                  onClick={() => setUtilityOpen(true)}
+                >
+                  <Wrench className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Developer Utilities</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {/* Notifications */}
           <Button
             variant="ghost"
@@ -89,6 +118,9 @@ export function DeveloperPortalHeader({
           )}
         </div>
       </div>
+
+      {/* Developer Utilities Dialog */}
+      <UtilitiesDialog open={utilityOpen} onOpenChange={setUtilityOpen} />
     </div>
   );
 }

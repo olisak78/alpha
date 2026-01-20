@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { QuickLinksGrid } from '@/components/tabs/MePageTabs/QuickLinksGrid';
+import { QuickLinksGrid } from '@/components/QuickLinks/QuickLinksGrid';
 
 // Mock the Zustand store hooks
 vi.mock('@/stores/quickLinksStore', () => ({

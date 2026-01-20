@@ -35,10 +35,10 @@ const Separator = () => (
 
 export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: LandscapeToolsButtonsProps) {
   const { urls, availability } = useLandscapeTools(selectedLandscape, landscapeData);
-  
+
   // Track the last rendered tool for separator logic
   const lastRenderedTool = useRef<string | null>(null);
-  
+
   // Helper to check and render separator if needed
   const renderSeparatorIfNeeded = (currentTool: string) => {
     if (shouldShowSeparator(currentTool, lastRenderedTool.current)) {
@@ -46,7 +46,7 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
     }
     return null;
   };
-  
+
   // Helper to update last rendered tool
   const updateLastRenderedTool = (tool: string) => {
     lastRenderedTool.current = tool;
@@ -299,7 +299,9 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
             variant="outline"
             size="default"
             onClick={() => handleToolClick(urls.cockpit)}
+            disabled={!landscapeData?.isCentral}
             className="flex items-center gap-2"
+            title={!landscapeData?.isCentral ? "Cockpit is only available in central landscapes" : undefined}
           >
             <CockpitIcon className="h-6 w-6" />
             <span className="font-semibold text-sm">Cockpit</span>

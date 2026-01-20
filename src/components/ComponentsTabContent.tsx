@@ -1,5 +1,5 @@
 import { useMemo, ReactNode } from "react";
-import { Search, RefreshCw, AlertCircle } from "lucide-react";
+import { Search, RefreshCw, AlertCircle, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 interface ComponentsTabContentProps {
   title: string;
@@ -47,6 +49,9 @@ interface ComponentsTabContentProps {
   summary?: any;
   isLoadingHealthSummary?: boolean;
   projectId: string;
+  showProvidersOnly?: boolean;
+  onShowProvidersOnlyChange?: (show: boolean) => void;
+  hasProviderComponents?: boolean;
 }
 
 export function ComponentsTabContent({
@@ -79,6 +84,9 @@ export function ComponentsTabContent({
   summary,
   isLoadingHealthSummary = false,
   projectId,
+  showProvidersOnly = false,
+  onShowProvidersOnlyChange,
+  hasProviderComponents = false,
 }: ComponentsTabContentProps) {
   const { libraryComponents, nonLibraryComponents } = useMemo(() => {
     let filtered = components;
@@ -161,6 +169,22 @@ export function ComponentsTabContent({
               data-testid="search-input"
             />
           </div>
+          {hasProviderComponents && onShowProvidersOnlyChange && (
+            <div className="flex items-center gap-2">
+              <Switch
+                id="providers-filter"
+                checked={showProvidersOnly}
+                onCheckedChange={onShowProvidersOnlyChange}
+              />
+              <Label
+                htmlFor="providers-filter"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Only Providers
+                {/* {showProvidersOnly ? "Providers Only" : "Show All"} */}
+              </Label>
+            </div>
+          )}
           {onSortOrderChange && (
             <Select value={sortOrder} onValueChange={onSortOrderChange}>
               <SelectTrigger className="w-[180px]">

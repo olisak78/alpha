@@ -22,6 +22,17 @@ export function ComponentsList({
     teamNamesMap,
     teamColorsMap,
   } = useComponentDisplay();
+  
+  const sortByPinnedStatus = (a: Component, b: Component) => {
+    // Pinned components come first
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  };
+  
+  // Sort components to show pinned ones first
+  const sortedComponents = [...components].sort(sortByPinnedStatus);
+  
   if (!components || components.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -108,7 +119,7 @@ export function ComponentsList({
   if (compactView) {
     // Group components by project_title when project grouping is enabled
     if (showProjectGrouping) {
-      const groupedComponents = components.reduce((groups, component) => {
+      const groupedComponents = sortedComponents.reduce((groups, component) => {
         const projectTitle = component.project_title || '';
         if (!groups[projectTitle]) {
           groups[projectTitle] = [];
@@ -134,7 +145,9 @@ export function ComponentsList({
                 )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {groupedComponents[projectTitle].map(renderCompactComponentItem)}
+                {groupedComponents[projectTitle]
+                  .sort(sortByPinnedStatus)
+                  .map(renderCompactComponentItem)}
               </div>
             </div>
           ))}
@@ -145,7 +158,7 @@ export function ComponentsList({
     // Simple list for compact view without grouping
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {components.map(renderCompactComponentItem)}
+        {sortedComponents.map(renderCompactComponentItem)}
       </div>
     );
   }
@@ -154,13 +167,13 @@ export function ComponentsList({
   if (!showProjectGrouping) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {components.map(renderComponentCard)}
+        {sortedComponents.map(renderComponentCard)}
       </div>
     );
   }
 
   // Group components by project_title when project grouping is enabled
-  const groupedComponents = components.reduce((groups, component) => {
+  const groupedComponents = sortedComponents.reduce((groups, component) => {
     const projectTitle = component.project_title || '';
     if (!groups[projectTitle]) {
       groups[projectTitle] = [];
@@ -186,7 +199,9 @@ export function ComponentsList({
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {groupedComponents[projectTitle].map(renderComponentCard)}
+            {groupedComponents[projectTitle]
+              .sort(sortByPinnedStatus)
+              .map(renderComponentCard)}
           </div>
         </div>
       ))}

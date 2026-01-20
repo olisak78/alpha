@@ -3,6 +3,7 @@ import { Component } from "@/types/api";
 import { HealthStatusBadge } from "./HealthStatusBadge";
 import { SystemInfoBadges } from "./SystemInfoBadges";
 import { type SystemInformation } from "@/services/healthApi";
+import { PinButton } from "@/components/PinButton";
 
 interface ComponentHeaderProps {
   component: Component;
@@ -37,17 +38,24 @@ export function ComponentHeader({
             />
           )}
         </div>
-        {teamName && (
-          <Badge
-            variant="outline"
-            className={`flex items-center gap-1 text-xs px-2 py-0.5 flex-shrink-0 text-white border-0 min-h-[24px] ${
-              isDisabled ? 'bg-gray-500' : ''
-            }`}
-            {...(!isDisabled && teamColor ? { style: { backgroundColor: teamColor } } : {})}
-          >
-            <span>{teamName}</span>
-          </Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {teamName && (
+            <Badge
+              variant="outline"
+              className={`flex items-center gap-1 text-xs px-2 py-0.5 flex-shrink-0 text-white border-0 min-h-[24px] ${
+                isDisabled ? 'bg-gray-500' : ''
+              }`}
+              {...(!isDisabled && teamColor ? { style: { backgroundColor: teamColor } } : {})}
+            >
+              <span>{teamName}</span>
+            </Badge>
+          )}
+          <PinButton 
+            component={component} 
+            size={16} 
+            showOnHover={true}
+          />
+        </div>
       </div>
 
       {/* Version and Central Service Badges Row */}

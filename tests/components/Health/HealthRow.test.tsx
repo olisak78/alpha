@@ -30,6 +30,31 @@ vi.mock('../../../src/services/healthApi', () => ({
   fetchSystemInformation: vi.fn().mockResolvedValue({ status: 'success', data: null }),
 }));
 
+// Mock PinButton component
+vi.mock('../../../src/components/PinButton', () => ({
+  PinButton: ({ component }: { component: Component }) => (
+    <div data-testid="pin-button">{component.name}</div>
+  ),
+}));
+
+// Mock auth-related hooks
+vi.mock('../../../src/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 'test-user', name: 'Test User' },
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+  })),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+vi.mock('../../../src/hooks/usePinComponent', () => ({
+  usePinComponent: vi.fn(() => ({
+    isPinned: false,
+    togglePin: vi.fn(),
+  })),
+}));
+
 // Mock QueryClient for HealthStatusBadge
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn(() => ({
@@ -37,7 +62,17 @@ vi.mock('@tanstack/react-query', () => ({
     isLoading: false,
     error: null,
   })),
-  QueryClient: vi.fn(),
+  QueryClient: vi.fn(() => ({
+    getQueryCache: vi.fn(() => ({
+      subscribe: vi.fn(),
+    })),
+    getMutationCache: vi.fn(() => ({
+      subscribe: vi.fn(),
+    })),
+    clear: vi.fn(),
+    invalidateQueries: vi.fn(),
+    prefetchQuery: vi.fn(),
+  })),
   QueryClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
@@ -123,7 +158,7 @@ describe('HealthRow', () => {
 
     // Component information
     expect(screen.getByText('Accounts Service')).toBeTruthy();
-    expect(screen.getAllByText('accounts-service')).toHaveLength(2); // One in component ID, one in health badge
+    expect(screen.getAllByText('accounts-service')).toHaveLength(3); // One in component ID, one in health badge, one in pin button
     expect(screen.getByTestId('health-status-badge')).toBeTruthy();
     
     // Response time formatting

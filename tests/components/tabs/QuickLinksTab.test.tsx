@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import QuickLinksTab from '@/components/tabs/MePageTabs/QuickLinksTab';
+import QuickLinksTab from '@/components/tabs/QuickLinksTab';
 import type { UserMeResponse } from '@/types/api';
 
 // Mock all child components
-vi.mock('@/components/tabs/MePageTabs/QuickLinksGrid', () => ({
+vi.mock('@/components/QuickLinks/QuickLinksGrid', () => ({
   QuickLinksGrid: vi.fn(() => <div data-testid="quick-links-grid">Grid Content</div>),
 }));
 
-vi.mock('@/components/tabs/MePageTabs/QuickLinksSearchFilter', () => ({
+vi.mock('@/components/QuickLinks/QuickLinksSearchFilter', () => ({
   QuickLinksSearchFilter: vi.fn(({ onAddLinkClick }) => (
     <div data-testid="search-filter">
       <button onClick={onAddLinkClick} data-testid="add-link-from-filter">Add Link</button>
@@ -17,7 +17,7 @@ vi.mock('@/components/tabs/MePageTabs/QuickLinksSearchFilter', () => ({
   )),
 }));
 
-vi.mock('@/components/tabs/MePageTabs/QuickLinksStates', () => ({
+vi.mock('@/components/QuickLinks/QuickLinksStates', () => ({
   LoadingState: vi.fn(() => <div data-testid="loading-state">Loading...</div>),
 }));
 
@@ -46,7 +46,7 @@ vi.mock('@/components/dialogs/EditLinkDialog', () => ({
   )),
 }));
 
-vi.mock('@/components/tabs/MePageTabs/DeleteConfirmationDialog', () => ({
+vi.mock('@/components/dialogs/DeleteConfirmationDialog', () => ({
   DeleteConfirmationDialog: vi.fn(() => <div data-testid="delete-dialog">Delete Dialog</div>),
 }));
 

@@ -22,6 +22,8 @@ import { ViewSwitcher } from "./ViewSwitcher";
 import { Badge } from "./ui/badge";
 import { HealthStatusFilter } from "./HealthStatusFilter";
 import { ComponentDisplayProvider } from "@/contexts/ComponentDisplayContext";
+import { Button } from "./ui/button";
+import { Filter } from "lucide-react";
 
 export interface ProjectLayoutProps {
   projectName: string;
@@ -47,7 +49,6 @@ export function ProjectLayout({
   alertsUrl,
   children
 }: ProjectLayoutProps) {
-  // Common state management
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [teamComponentsExpanded, setTeamComponentsExpanded] = useState<Record<string, boolean>>({});
@@ -55,6 +56,8 @@ export function ProjectLayout({
   const [componentSortOrder, setComponentSortOrder] = useState<'alphabetic' | 'team'>('alphabetic');
   const [componentView, setComponentView] = useState<'grid' | 'table'>('grid');
   const [hideDownComponents, setHideDownComponents] = useState(false);
+  const [showProvidersOnly, setShowProvidersOnly] = useState(false);
+
 
   // Navigation and routing hooks
   const { setTabs, activeTab: headerActiveTab } = useHeaderNavigation();
@@ -259,6 +262,24 @@ export function ProjectLayout({
     });
   }, [apiComponents, hideDownComponents, isCentralLandscape]);
 
+  const hasProviderComponents = useMemo(() => {
+    return apiComponents.some(component =>
+      (component.name || '').toLowerCase().includes('provider') ||
+      (component.title || '').toLowerCase().includes('provider')
+    );
+  }, [apiComponents]);
+
+  const displayedComponents = useMemo(() => {
+    if (!showProvidersOnly) {
+      return visibleComponents;
+    }
+
+    return visibleComponents.filter(component =>
+      (component.name || '').toLowerCase().includes('provider') ||
+      (component.title || '').toLowerCase().includes('provider')
+    );
+  }, [visibleComponents, showProvidersOnly]);
+
   const handleComponentClick = (componentName: string) => {
     navigate(`/${projectId}/component/${componentName}`);
   };
@@ -311,7 +332,7 @@ export function ProjectLayout({
                   {selectedLandscape && visibleComponents.length > 0 ? (
                     <ComponentsTabContent
                       title=""
-                      components={visibleComponents}
+                      components={displayedComponents}
                       teamName={projectName}
                       isLoading={componentsLoading}
                       error={componentsError}
@@ -338,6 +359,9 @@ export function ProjectLayout({
                       summary={summary}
                       isLoadingHealthSummary={isLoadingHealth}
                       projectId={projectId}
+                      showProvidersOnly={showProvidersOnly}
+                      onShowProvidersOnlyChange={setShowProvidersOnly}
+                      hasProviderComponents={hasProviderComponents}
                     />
                   ) : (
                     <div className="border-2 border-dashed rounded-lg p-12 text-center">
@@ -371,7 +395,7 @@ export function ProjectLayout({
                     </div>
                   </div>
 
-                  {selectedLandscape && visibleComponents.length > 0 ? (
+                  {selectedLandscape && displayedComponents.length > 0 ? (
                     <ComponentDisplayProvider
                       projectId={projectId}
                       selectedLandscape={selectedLandscape}
@@ -391,7 +415,7 @@ export function ProjectLayout({
                         healthChecks={healthChecks}
                         isLoading={isLoadingHealth}
                         landscape={selectedApiLandscape?.name || ''}
-                        components={visibleComponents}
+                        components={displayedComponents}
                         onComponentClick={handleComponentClick}
                         hideDownComponents={hideDownComponents}
                         isCentralLandscape={isCentralLandscape}

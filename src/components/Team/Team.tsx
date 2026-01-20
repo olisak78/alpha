@@ -6,7 +6,7 @@ import { TeamMemberDialog } from "@/components/dialogs/TeamMemberDialog";
 import { AddLinkDialog } from "@/components/dialogs/AddLinkDialog";
 import { ScoreBoards } from "./ScoreBoards";
 import { MemberList } from "./MemberList";
-import QuickLinksTab from "@/components/tabs/MePageTabs/QuickLinksTab";
+import QuickLinksTab from "@/components/tabs/QuickLinksTab";
 import { TeamJiraIssues } from "./TeamJiraIssues";
 import { ComponentsList } from "@/components/ComponentsList";
 import { OnDutyAndCall } from "./OnDutyAndCall";

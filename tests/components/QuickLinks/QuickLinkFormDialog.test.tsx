@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-import { QuickLinkFormDialog } from '../../../src/components/tabs/MePageTabs/QuickLinkFormDialog';
+import { QuickLinkFormDialog } from '../../../src/components/QuickLinks/QuickLinkFormDialog';
 import { QuickLinkFormData } from '../../../src/types/developer-portal';
 import { createMockFormProps, FORM_FIELD_TESTS } from '../../utils/testHelpers';
 

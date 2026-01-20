@@ -14,7 +14,7 @@ export const TeamsIcon: React.FC<TeamsIconProps> = ({ className = "h-4 w-4" }) =
       height="100"
       viewBox="0 0 48 48"
       className={className}
-      style={{ minWidth: '1.5rem', minHeight: '1.5rem' }}
+      style={{ minWidth: '1.3rem', minHeight: '1.3rem' }}
     >
       <path 
         fill="#5c6bc0" 

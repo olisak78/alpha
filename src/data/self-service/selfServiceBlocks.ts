@@ -53,6 +53,18 @@ export const selfServiceBlocks: SelfServiceDialog[] = [
       jaasName: "atom",
       jobName: "hello-deverloper-portal"
     }
-
+  },
+  {
+    id: "update-multicis",
+    title: "Update MultiCIS Environment",
+    description: "This job updates your CF Multi-CIS v2 2.0 instance with specific jar from branch.",
+    icon: Cloud,
+    category: "Infrastructure",
+    dialogType: "dynamic",
+    dataFilePath: "/data/self-service/dynamic-jobs/multi-cis-update.json",
+    jenkinsJob: {
+      jaasName: "atom",
+      jobName: "multi-cis-v3-docker-update"
+    }
   }
 ];

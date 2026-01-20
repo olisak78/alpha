@@ -55,7 +55,7 @@ export default function ComponentCard({
       style={isClickable ? { cursor: 'pointer' } : undefined}
       onClick={handleCardClick} 
       className={cn(
-        "transition-all duration-200 border-border/60",
+        "group transition-all duration-200 border-border/60",
         isDisabled && "border-gray-300 dark:border-gray-600 bg-muted/50",
         !isDisabled && !healthCheck?.response?.healthy,
         !isDisabled && "hover:shadow-lg hover:border-border"

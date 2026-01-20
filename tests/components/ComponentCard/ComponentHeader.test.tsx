@@ -23,6 +23,15 @@ vi.mock('../../../src/components/ui/badge', () => ({
   ),
 }));
 
+// Mock PinButton component
+vi.mock('../../../src/components/PinButton', () => ({
+  PinButton: ({ component, size, showOnHover }: any) => (
+    <div data-testid="pin-button">
+      Pin Button - {component.id} - size: {size} - showOnHover: {showOnHover}
+    </div>
+  ),
+}));
+
 // Mock child components
 vi.mock('../../../src/components/ComponentCard/HealthStatusBadge', () => ({
   HealthStatusBadge: ({ component, isDisabled }: any) => (
@@ -48,7 +57,6 @@ describe('ComponentHeader', () => {
     name: 'test-service',
     title: 'Test Service',
     description: 'A test service component',
-    project_id: 'proj-1',
     owner_id: 'team-1',
     'central-service': false,
   };
@@ -59,13 +67,17 @@ describe('ComponentHeader', () => {
   };
 
   const mockContextProps = {
+    projectId: 'test-project',
     selectedLandscape: 'prod' as string | null,
     selectedLandscapeData: { name: 'Production', route: 'prod.example.com' },
     isCentralLandscape: false,
+    noCentralLandscapes: false,
     teamNamesMap: {},
     teamColorsMap: {},
     componentHealthMap: {} as Record<string, ComponentHealthCheck>,
     isLoadingHealth: false,
+    componentSystemInfoMap: {},
+    isLoadingSystemInfo: false,
     expandedComponents: {},
     onToggleExpanded: vi.fn(),
     system: 'test-system',

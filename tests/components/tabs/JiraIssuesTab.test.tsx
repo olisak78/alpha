@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import JiraIssuesTab from '../../../src/components/tabs/MePageTabs/JiraIssuesTab';
+import JiraIssuesTab from '../../../src/components/tabs/JiraIssuesTab';
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({

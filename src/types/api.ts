@@ -330,6 +330,8 @@ export interface Component {
   'is-library'?: boolean; // Indicates if component is a library
   health?: boolean;
   'central-service'?: boolean;
+  project_title?: string;
+  isPinned?:boolean;
 }
 
 

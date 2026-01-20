@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-import GithubPrsTab from '../../../src/components/tabs/MePageTabs/GithubPrsTab';
+import GithubPrsTab from '../../../src/components/tabs/GithubPrsTab';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as githubApi from '../../../src/services/githubApi';
 

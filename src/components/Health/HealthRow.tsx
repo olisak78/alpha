@@ -4,6 +4,7 @@ import type { Component } from '@/types/api';
 import { HealthStatusBadge } from '../ComponentCard/HealthStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PinButton } from '@/components/PinButton';
 import { Activity } from 'lucide-react';
 import { GithubIcon } from '../icons/GithubIcon';
 import { cn } from '@/lib/utils';
@@ -20,10 +21,7 @@ interface HealthRowProps {
 
 export function HealthRow({
   healthCheck,
-  isExpanded,
-  onToggle,
   onComponentClick,
-  isUnsupported = false,
   component,
 }: HealthRowProps) {
   const { 
@@ -137,13 +135,22 @@ export function HealthRow({
     <>
       <tr
         className={cn(
-          "transition-colors",
+          "transition-colors group",
           isDisabled && "opacity-50 bg-muted/50",
           !isDisabled && "hover:bg-gray-50 dark:hover:bg-gray-900/50",
           isClickable ? 'cursor-pointer' : ''
         )}
         onClick={isClickable ? handleRowClick : undefined}
       >
+        {/* Pin Column */}
+        <td className="px-3 py-4 whitespace-nowrap pointer-events-auto">
+          <PinButton 
+            component={component} 
+            size={16} 
+            showOnHover={true}
+          />
+        </td>
+
         <td className={cn(
           "px-6 py-4 whitespace-nowrap",
           isClickable ? 'cursor-pointer' : ''

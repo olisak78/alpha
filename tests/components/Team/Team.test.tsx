@@ -21,7 +21,7 @@ vi.mock('@/components/Team/MemberList', () => ({
   MemberList: vi.fn(() => <div data-testid="member-list">Member List</div>),
 }));
 
-vi.mock('@/components/tabs/MePageTabs/QuickLinksTab', () => ({
+vi.mock('@/components/tabs/QuickLinksTab', () => ({
   default: vi.fn(() => <div data-testid="quick-links-tab">Quick Links Tab</div>),
 }));
 

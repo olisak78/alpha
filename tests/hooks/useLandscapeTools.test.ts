@@ -137,6 +137,22 @@ describe('useLandscapeTools', () => {
   });
 
   describe('URL Extraction', () => {
+
+    it('should show cockpit when landscape is central', () => {
+      const centralLandscape = {
+        ...mockLandscapeData,
+        isCentral: true,
+        cockpit: 'https://cockpit.example.com'
+      };
+
+      const { result } = renderHook(() =>
+        useLandscapeTools('landscape-1', centralLandscape)
+      );
+
+      expect(result.current.urls.cockpit).toBe('https://cockpit.example.com');
+      expect(result.current.availability.cockpit).toBe(true);
+    });
+
     it('should extract git URL', () => {
       const { result } = renderHook(() =>
         useLandscapeTools('landscape-1', mockLandscapeData)

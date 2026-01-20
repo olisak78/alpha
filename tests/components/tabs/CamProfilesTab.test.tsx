@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-import CamProfilesTab from '../../../src/components/tabs/MePageTabs/CamProfilesTab';
+import CamProfilesTab from '../../../src/components/tabs/CamProfilesTab';
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({

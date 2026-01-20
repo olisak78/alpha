@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { QuickLinksGrid } from "./QuickLinksGrid";
-import { LoadingState} from "./QuickLinksStates";
+import { QuickLinksGrid } from "@/components/QuickLinks/QuickLinksGrid";
+import { LoadingState} from "@/components/QuickLinks/QuickLinksStates";
 import { UserMeResponse } from "@/types/api";
 import { useCurrentUser } from "@/hooks/api/useMembers";
 import { AddLinkDialog } from "@/components/dialogs/AddLinkDialog";
-import { QuickLinksSearchFilter } from "./QuickLinksSearchFilter";
+import { QuickLinksSearchFilter } from "@/components/QuickLinks/QuickLinksSearchFilter";
 import { QuickLinksProvider, useQuickLinksContext } from "@/contexts/QuickLinksContext";
 import { EditLinkDialog } from "@/components/dialogs/EditLinkDialog";
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { DeleteConfirmationDialog } from "@/components/dialogs/DeleteConfirmationDialog";
 import { useEditDialog, useEditDialogActions } from "@/stores/quickLinksStore";
 
 interface QuickLinksTabProps {

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchQPATimeline } from '@/services/QPATimelineApi';
-import { TimelineTable } from './TimelineTable';
+import { TimelineTable } from '../Timeline/TimelineTable';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, Calendar } from 'lucide-react';

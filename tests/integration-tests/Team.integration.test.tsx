@@ -181,7 +181,7 @@ vi.mock('../../src/components/Team/MemberList', () => ({
   ),
 }));
 
-vi.mock('../../src/components/tabs/MePageTabs/QuickLinksTab', () => ({
+vi.mock('../../src/components/tabs/QuickLinksTab', () => ({
   default: ({ 
     userData, 
     onDeleteLink, 

@@ -25,12 +25,13 @@ interface HealthTableProps {
     sonar?: string;
     'is-library'?: boolean;
     'central-service'?: boolean;
+    isPinned?: boolean;
   }>;
   hideDownComponents?: boolean;
   isCentralLandscape?: boolean;
 }
 
-type SortField = 'component' | 'status' | 'team';
+type SortField = 'component' | 'status' | 'team' | 'responseTime' | 'lastChecked';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface SortState {
@@ -150,6 +151,13 @@ export function HealthTable({
     // Sort both arrays
     const sortComponents = (componentsArray: typeof allComponentsWithHealth) => {
       return [...componentsArray].sort((a, b) => {
+        const componentA = filteredComponents.find(comp => comp.id === a.componentId);
+        const componentB = filteredComponents.find(comp => comp.id === b.componentId);
+        
+        // Always prioritize pinned components first (same as ComponentsList)
+        if (componentA?.isPinned && !componentB?.isPinned) return -1;
+        if (!componentA?.isPinned && componentB?.isPinned) return 1;
+
         // If manual column sort is active, use it
         if (sortState.field && sortState.direction) {
           let comparison = 0;
@@ -281,6 +289,11 @@ export function HealthTable({
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-900">
                     <tr>
+                      {/* Pin Column - Not Sortable */}
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                        {/* Empty header for pin column */}
+                      </th>
+
                       {/* Component Column - Sortable */}
                       <th
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors select-none"
@@ -378,6 +391,11 @@ export function HealthTable({
                   <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-900">
                       <tr>
+                        {/* Pin Column - Not Sortable */}
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                          {/* Empty header for pin column */}
+                        </th>
+
                         {/* Component Column - Sortable */}
                         <th
                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors select-none"
