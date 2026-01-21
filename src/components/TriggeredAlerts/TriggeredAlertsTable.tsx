@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Activity, ChevronDown, ChevronRight } from 'lucide-react';
-import { formatAlertDate } from '@/utils/dateUtils';
+import { formatAlertDateOnly, formatAlertTimeOnly } from '@/utils/dateUtils';
 import {
   getSeverityColor, 
   getStatusColor
@@ -121,12 +121,20 @@ export function TriggeredAlertsTable({ showRegion = true, onShowAlertDefinition 
 
                     {/* Start Time */}
                     <div className="col-span-1 text-xs text-muted-foreground">
-                      {formatAlertDate(alert.startsAt)}
+                      <div className="flex flex-col">
+                        <div>{formatAlertDateOnly(alert.startsAt)}</div>
+                        <div>{formatAlertTimeOnly(alert.startsAt)}</div>
+                      </div>
                     </div>
 
                     {/* End Time */}
                     <div className="col-span-1 text-xs text-muted-foreground">
-                      {alert.endsAt ? formatAlertDate(alert.endsAt) : ''}
+                      {alert.endsAt ? (
+                        <div className="flex flex-col">
+                          <div>{formatAlertDateOnly(alert.endsAt)}</div>
+                          <div>{formatAlertTimeOnly(alert.endsAt)}</div>
+                        </div>
+                      ) : ''}
                     </div>
 
                     {/* Status */}
