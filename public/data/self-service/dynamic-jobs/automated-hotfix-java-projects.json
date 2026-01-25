@@ -1,0 +1,15 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "gkecfsrelease",
+    "jobName": "automated-hotfix-java-projects"
+  },
+  "steps": [
+    {
+      "name": "job-parameters",
+      "title": "Job Parameters",
+      "description": "Configure the parameters for this Jenkins job",
+      "isDynamic": true
+    }
+  ]
+}

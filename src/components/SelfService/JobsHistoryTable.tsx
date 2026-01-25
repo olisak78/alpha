@@ -516,8 +516,8 @@ export default function JobsHistoryTable({
                       <React.Fragment key={job.id}>
                         <TableRow
                           className={`hover:bg-muted/30 ${isMyJob(job)
-                              ? 'bg-blue-50 dark:bg-blue-950/20'
-                              : ''
+                            ? 'bg-blue-50 dark:bg-blue-950/20'
+                            : ''
                             }`}
                         >
                           <TableCell>
@@ -568,7 +568,7 @@ export default function JobsHistoryTable({
                                 <span className="font-medium">{job.jobName}</span>
                               )}
                               <span className="text-xs text-muted-foreground">
-                                Build #{job.buildNumber} • {job.buildNumber ? `${job.buildNumber}m ago` : getTimeAgo(job.lastPolledAt)}
+                                Build #{job.buildNumber} • {getTimeAgo(job.lastPolledAt)}
                               </span>
                             </div>
                           </TableCell>

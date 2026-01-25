@@ -1,0 +1,15 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "atomrelease",
+    "jobName": "cd-release-process-canary-to-hotfix-to-live-non-product"
+  },
+  "steps": [
+    {
+      "name": "job-parameters",
+      "title": "Job Parameters",
+      "description": "Configure the parameters for this Jenkins job",
+      "isDynamic": true
+    }
+  ]
+}

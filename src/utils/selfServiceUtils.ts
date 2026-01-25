@@ -134,11 +134,11 @@ export const getTimeAgo = (lastPolledAt: string): string => {
   const days = Math.floor(hours / 24);
 
   if (days > 0) {
-    return `${days}d ${hours % 24}h ago`;
-  } else if (hours > 0) {
-    return `${hours}h ${minutes % 60}m ago`;
+    return `${days}d ${hours % 24}h`;  // ← No "ago" suffix
+  } else if (minutes > 59) {  // ← Changed condition
+    return `${hours}h ${minutes % 60}m`;  // ← "Nh Mm" format
   } else if (minutes > 0) {
-    return `${minutes}m ago`;
+    return `${minutes}m ago`;  // ← Keep "ago" for < 60 minutes
   } else {
     return 'Just now';
   }

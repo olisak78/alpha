@@ -254,6 +254,7 @@ export interface User {
   memberId?:string;
   team_role?: string;
   portal_admin?: boolean;
+  organization?: string;
 }
 
 export interface AuthContextType {

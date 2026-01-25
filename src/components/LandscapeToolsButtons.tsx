@@ -84,55 +84,7 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
         </>
       )}
 
-      {availability.vault && (
-        <>
-          {renderSeparatorIfNeeded('vault')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.vault)}
-            className="flex items-center gap-2"
-          >
-            <VaultIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">Vault</span>
-          </Button>
-          {updateLastRenderedTool('vault')}
-        </>
-      )}
-
-      {availability.workspace && (
-        <>
-          {renderSeparatorIfNeeded('workspace')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.workspace)}
-            className="flex items-center gap-2"
-          >
-            <WorkspaceIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">Workspace</span>
-          </Button>
-          {updateLastRenderedTool('workspace')}
-        </>
-      )}
-
-      {availability.concourse && (
-        <>
-          {renderSeparatorIfNeeded('concourse')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.concourse)}
-            className="flex items-center gap-2"
-          >
-            <ConcourseIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">Concourse</span>
-          </Button>
-          {updateLastRenderedTool('concourse')}
-        </>
-      )}
-
-      {availability.applicationLogging && (
+       {availability.applicationLogging && (
         <>
           {renderSeparatorIfNeeded('applicationLogging')}
           <Button
@@ -148,39 +100,7 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
         </>
       )}
 
-      {availability.platformLogging && (
-        <>
-          {renderSeparatorIfNeeded('platformLogging')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.platformLogging)}
-            className="flex items-center gap-2"
-          >
-            <LogsIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">Infra Logs</span>
-          </Button>
-          {updateLastRenderedTool('platformLogging')}
-        </>
-      )}
-
-      {availability.dynatrace && (
-        <>
-          {renderSeparatorIfNeeded('dynatrace')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.dynatrace)}
-            className="flex items-center gap-2"
-          >
-            <DynatraceIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">Dynatrace</span>
-          </Button>
-          {updateLastRenderedTool('dynatrace')}
-        </>
-      )}
-
-      {availability.plutono && (
+       {availability.plutono && (
         <>
           {renderSeparatorIfNeeded('plutono')}
           <Button
@@ -244,19 +164,19 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
         </>
       )}
 
-      {availability.avs && (
+      {availability.vault && (
         <>
-          {renderSeparatorIfNeeded('avs')}
+          {renderSeparatorIfNeeded('vault')}
           <Button
             variant="outline"
             size="default"
-            onClick={() => handleToolClick(urls.avs)}
+            onClick={() => handleToolClick(urls.vault)}
             className="flex items-center gap-2"
           >
-            <AvsIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">AVS</span>
+            <VaultIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">Vault</span>
           </Button>
-          {updateLastRenderedTool('avs')}
+          {updateLastRenderedTool('vault')}
         </>
       )}
 
@@ -273,6 +193,102 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
             <span className="font-semibold text-sm">CAM</span>
           </Button>
           {updateLastRenderedTool('cam')}
+        </>
+      )}
+
+      {availability.workspace && (
+        <>
+          {renderSeparatorIfNeeded('workspace')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.workspace)}
+            className="flex items-center gap-2"
+          >
+            <WorkspaceIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">Workspace</span>
+          </Button>
+          {updateLastRenderedTool('workspace')}
+        </>
+      )}
+
+      {availability.cad && (
+        <>
+          {renderSeparatorIfNeeded('cad')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.cad)}
+            className="flex items-center gap-2"
+          >
+            <CadIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">CAD</span>
+          </Button>
+          {updateLastRenderedTool('cad')}
+        </>
+      )}
+
+      {availability.concourse && (
+        <>
+          {renderSeparatorIfNeeded('concourse')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.concourse)}
+            className="flex items-center gap-2"
+          >
+            <ConcourseIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">Concourse</span>
+          </Button>
+          {updateLastRenderedTool('concourse')}
+        </>
+      )}
+
+      {availability.platformLogging && (
+        <>
+          {renderSeparatorIfNeeded('platformLogging')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.platformLogging)}
+            className="flex items-center gap-2"
+          >
+            <LogsIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">Infra Logs</span>
+          </Button>
+          {updateLastRenderedTool('platformLogging')}
+        </>
+      )}
+
+      {availability.dynatrace && (
+        <>
+          {renderSeparatorIfNeeded('dynatrace')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.dynatrace)}
+            className="flex items-center gap-2"
+          >
+            <DynatraceIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">Dynatrace</span>
+          </Button>
+          {updateLastRenderedTool('dynatrace')}
+        </>
+      )}
+
+      {availability.avs && (
+        <>
+          {renderSeparatorIfNeeded('avs')}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => handleToolClick(urls.avs)}
+            className="flex items-center gap-2"
+          >
+            <AvsIcon className="h-6 w-6" />
+            <span className="font-semibold text-sm">AVS</span>
+          </Button>
+          {updateLastRenderedTool('avs')}
         </>
       )}
 
@@ -326,21 +342,6 @@ export function LandscapeToolsButtons({ selectedLandscape, landscapeData }: Land
         </>
       )}
 
-      {availability.cad && (
-        <>
-          {renderSeparatorIfNeeded('cad')}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => handleToolClick(urls.cad)}
-            className="flex items-center gap-2"
-          >
-            <CadIcon className="h-6 w-6" />
-            <span className="font-semibold text-sm">CAD</span>
-          </Button>
-          {updateLastRenderedTool('cad')}
-        </>
-      )}
     </div>
   );
 }

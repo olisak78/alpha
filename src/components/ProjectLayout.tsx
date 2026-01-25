@@ -22,8 +22,7 @@ import { ViewSwitcher } from "./ViewSwitcher";
 import { Badge } from "./ui/badge";
 import { HealthStatusFilter } from "./HealthStatusFilter";
 import { ComponentDisplayProvider } from "@/contexts/ComponentDisplayContext";
-import { Button } from "./ui/button";
-import { Filter } from "lucide-react";
+import { ProvidersFilter } from "./ProvidersFilter";
 
 export interface ProjectLayoutProps {
   projectName: string;
@@ -57,6 +56,10 @@ export function ProjectLayout({
   const [componentView, setComponentView] = useState<'grid' | 'table'>('grid');
   const [hideDownComponents, setHideDownComponents] = useState(false);
   const [showProvidersOnly, setShowProvidersOnly] = useState(false);
+
+  useEffect(() => {
+    setShowProvidersOnly(false);
+  }, [projectId]);
 
 
   // Navigation and routing hooks
@@ -321,10 +324,18 @@ export function ProjectLayout({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      {!noCentralLandscapes && (<HealthStatusFilter
-                        hideDownComponents={hideDownComponents}
-                        onToggle={setHideDownComponents}
-                      />)}
+                      {!noCentralLandscapes && (
+                        <HealthStatusFilter
+                          hideDownComponents={hideDownComponents}
+                          onToggle={setHideDownComponents}
+                        />
+                      )}
+                      {hasProviderComponents && projectId === 'ca' && (
+                        <ProvidersFilter
+                          showProvidersOnly={showProvidersOnly}
+                          onToggle={setShowProvidersOnly}
+                        />
+                      )}
                       <ViewSwitcher view={componentView} onViewChange={setComponentView} />
                     </div>
                   </div>
@@ -359,9 +370,6 @@ export function ProjectLayout({
                       summary={summary}
                       isLoadingHealthSummary={isLoadingHealth}
                       projectId={projectId}
-                      showProvidersOnly={showProvidersOnly}
-                      onShowProvidersOnlyChange={setShowProvidersOnly}
-                      hasProviderComponents={hasProviderComponents}
                     />
                   ) : (
                     <div className="border-2 border-dashed rounded-lg p-12 text-center">
@@ -387,10 +395,18 @@ export function ProjectLayout({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      {!noCentralLandscapes && (<HealthStatusFilter
-                        hideDownComponents={hideDownComponents}
-                        onToggle={setHideDownComponents}
-                      />)}
+                      {!noCentralLandscapes && (
+                        <HealthStatusFilter
+                          hideDownComponents={hideDownComponents}
+                          onToggle={setHideDownComponents}
+                        />
+                      )}
+                      {hasProviderComponents && projectId === 'ca' && (
+                        <ProvidersFilter
+                          showProvidersOnly={showProvidersOnly}
+                          onToggle={setShowProvidersOnly}
+                        />
+                      )}
                       <ViewSwitcher view={componentView} onViewChange={setComponentView} />
                     </div>
                   </div>

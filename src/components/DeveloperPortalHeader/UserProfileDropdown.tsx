@@ -77,10 +77,12 @@ export function UserProfileDropdown({ user, onLogout, isLoading }: UserProfileDr
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleSwaggerClick}>
-            <SwaggerIcon className="mr-2 h-4 w-4" />
-            <span>Swagger</span>
-          </DropdownMenuItem>
+          {authUser?.organization === 'sap-cfs' && (
+            <DropdownMenuItem onClick={handleSwaggerClick}>
+              <SwaggerIcon className="mr-2 h-4 w-4" />
+              <span>Swagger</span>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={onLogout} disabled={isLoading}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>{isLoading ? 'Logging out...' : 'Log out'}</span>

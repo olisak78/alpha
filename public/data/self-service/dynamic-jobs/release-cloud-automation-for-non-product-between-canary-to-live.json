@@ -1,0 +1,15 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "atomrelease",
+    "jobName": "release-cloud-automation-for-non-product-between-canary-to-live"
+  },
+  "steps": [
+    {
+      "name": "job-parameters",
+      "title": "Job Parameters",
+      "description": "Configure the parameters for this Jenkins job",
+      "isDynamic": true
+    }
+  ]
+}

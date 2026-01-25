@@ -4,6 +4,8 @@ import type { HealthSummary } from '@/types/health';
 interface HealthOverviewProps {
   summary: HealthSummary;
   isLoading: boolean;
+  activeFilter?: 'UP' | 'DOWN' | null;
+  onFilterClick?: (filter: 'UP' | 'DOWN' | null) => void;
 }
 
 // Helper function to calculate percentage based on label
@@ -22,7 +24,7 @@ export const calculateHealthPercentage = (label: string, summary: HealthSummary)
   }
 };
 
-export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
+export function HealthOverview({ summary, isLoading, activeFilter, onFilterClick }: HealthOverviewProps) {
   // Handle undefined summary gracefully
   if (!summary) {
     return null;
@@ -43,6 +45,8 @@ export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       borderColor: 'border-green-200 dark:border-green-800',
+      filterValue: 'UP' as const,
+      clickable: !showNA,
     },
     {
       label: 'Down',
@@ -52,6 +56,8 @@ export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
       color: 'text-red-600 dark:text-red-400',
       bgColor: 'bg-red-50 dark:bg-red-900/20',
       borderColor: 'border-red-200 dark:border-red-800',
+      filterValue: 'DOWN' as const,
+      clickable: !showNA,
     },
     {
       label: 'Avg Response',
@@ -68,10 +74,29 @@ export function HealthOverview({ summary, isLoading }: HealthOverviewProps) {
     <div className="flex gap-3" data-testid="health-overview">
       {cards.map((card) => {
         const Icon = card.icon;
+        const isActive = 'filterValue' in card && activeFilter === card.filterValue;
+        const isClickable = 'clickable' in card && card.clickable && onFilterClick;
+        
+        const handleClick = () => {
+          if (isClickable && 'filterValue' in card) {
+            onFilterClick(card.filterValue);
+          }
+        };
+
         return (
           <div
             key={card.label}
-            className={`${card.bgColor} ${card.borderColor} border rounded-lg p-2 min-w-[160px] h-10 flex items-center`}
+            className={`${isActive ? (card.filterValue === 'UP' ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40') : card.bgColor} rounded-lg p-2 min-w-[160px] h-10 flex items-center ${
+              isClickable ? 'cursor-pointer hover:opacity-80 transition-all duration-200' : ''
+            } ${
+              isActive 
+                ? 'border-2 border-solid' +
+                  (card.filterValue === 'UP' 
+                    ? ' border-green-600 dark:border-green-400' 
+                    : ' border-red-600 dark:border-red-400')
+                : `border border-solid ${card.borderColor}`
+            }`}
+            onClick={handleClick}
           >
             <div className="flex items-center gap-2 w-full">
               <Icon className={`h-5 w-5 ${card.color} flex-shrink-0`} />

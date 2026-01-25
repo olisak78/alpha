@@ -1,15 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { BreadcrumbPage } from "@/components/BreadcrumbPage";
 import { useComponentsByProject } from "@/hooks/api/useComponents";
 import { useLandscapesByProject } from "@/hooks/api/useLandscapes";
 import { usePortalState } from "@/contexts/hooks";
 import { useHeaderNavigation } from "@/contexts/HeaderNavigationContext";
-import { fetchComponentHealth } from "@/services/healthApi";
 import { useSonarMeasures } from "@/hooks/api/useSonarMeasures";
+import { useComponentHealth } from "@/hooks/api/useComponentHealth";
 import { getDefaultLandscapeId } from "@/services/LandscapesApi";
 import type { Component } from "@/types/api";
-import type { HealthResponse } from "@/types/health";
 import { useSwaggerUI } from "@/hooks/api/useSwaggerUI";
 import { ComponentViewApi } from "@/components/ComponentViewApi";
 import { ComponentViewOverview } from "@/components/ComponentViewOverview";
@@ -85,12 +84,6 @@ export function ComponentViewPage() {
         return component?.['central-service'] !== true || isCentralLandscape;
     }, [component, isCentralLandscape]);
 
-    // State for health data
-    const [healthData, setHealthData] = useState<HealthResponse | null>(null);
-    const [healthLoading, setHealthLoading] = useState(false);
-    const [healthError, setHealthError] = useState<string | null>(null);
-    const [responseTime, setResponseTime] = useState<number | null>(null);
-    const [statusCode, setStatusCode] = useState<number | null>(null);
 
     // Find the selected landscape data
     const landscapeConfig = useMemo(() => {
@@ -98,10 +91,32 @@ export function ComponentViewPage() {
         const landscape = landscapesData.find(l => l.id === effectiveSelectedLandscape);
         if (!landscape) return null;
         return {
+            id: effectiveSelectedLandscape,
             name: landscape.name,
             route: landscape.landscape_url || 'sap.hana.ondemand.com'
         };
     }, [landscapesData, effectiveSelectedLandscape]);
+
+    // Use React Query hook for health data
+    const {
+        data: healthResult,
+        isLoading: healthLoading,
+        isError: healthHasError,
+        error: healthQueryError
+    } = useComponentHealth(
+        component?.id,
+        effectiveSelectedLandscape,
+        component?.health === true,
+        {
+            enabled: !!component && !!effectiveSelectedLandscape && isExistInLandscape
+        }
+    );
+
+    // Extract health data from the hook result
+    const healthData = healthResult?.data || null;
+    const healthError = healthHasError ? (healthQueryError?.message || healthResult?.error || 'Failed to fetch health data') : null;
+    const responseTime = healthResult?.responseTime || null;
+    const statusCode = healthResult?.status === 'error' ? 500 : (healthData ? 200 : null);
 
     // Fetch Swagger data
     const { data: swaggerData, isLoading: isLoadingSwagger, error: swaggerError } = useSwaggerUI(
@@ -151,37 +166,6 @@ export function ComponentViewPage() {
         }
     }, [apiLandscapes, effectiveSelectedLandscape, setSelectedLandscapeForProject, projectName]);
 
-    // Fetch health data when component or landscape changes using new endpoint
-    useEffect(() => {
-        if (!component || !selectedApiLandscape) {
-            setHealthData(null);
-            return;
-        }
-
-        const fetchHealth = async () => {
-            setHealthLoading(true);
-            setHealthError(null);
-
-            try {
-                const result = await fetchComponentHealth(component.id, selectedApiLandscape.id);
-
-                if (result.status === 'success' && result.data) {
-                    setHealthData(result.data);
-                    setResponseTime(result.responseTime || null);
-                    setStatusCode(200);
-                } else {
-                    setHealthError(result.error || 'Failed to fetch health data');
-                    setStatusCode(result.error ? 500 : 404);
-                }
-            } catch (error) {
-                 setHealthError(error instanceof Error ? error.message : 'Unknown error');
-            } finally {
-                setHealthLoading(false);
-            }
-        };
-        if(component && isExistInLandscape)
-            fetchHealth();
-    }, [component, selectedApiLandscape]);
 
     // Handle error states after all hooks are called
     if (!component) {

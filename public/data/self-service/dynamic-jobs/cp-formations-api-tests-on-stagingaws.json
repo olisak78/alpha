@@ -1,0 +1,15 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "gkecfsautomation",
+    "jobName": "cp-formations-api-tests-on-stagingaws"
+  },
+  "steps": [
+    {
+      "name": "job-parameters",
+      "title": "Job Parameters",
+      "description": "Configure the parameters for this Jenkins job",
+      "isDynamic": true
+    }
+  ]
+}

@@ -121,17 +121,13 @@ export function Ops2goLandscapeInfo({ landscapeName }: Ops2goLandscapeInfoProps)
               {landscapeInfo.state}
             </Badge>
           )}
-          {landscapeInfo['CE-onboarded'] !== undefined && (
+          {/* Only show badge when CE is NOT onboarded */}
+          {landscapeInfo['CE-onboarded'] === false && (
             <Badge
-              variant={landscapeInfo['CE-onboarded'] ? "default" : "outline"}
-              className={cn(
-                "text-xs px-2 py-0.5",
-                landscapeInfo['CE-onboarded']
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "border-orange-500 text-orange-600 dark:text-orange-400"
-              )}
+              variant="outline"
+              className="text-xs px-2 py-0.5 border-orange-500 text-orange-600 dark:text-orange-400"
             >
-              CE {landscapeInfo['CE-onboarded'] ? 'Onboarded' : 'Not Onboarded'}
+              CE Not Onboarded
             </Badge>
           )}
           {landscapeInfo.displayname_full && (

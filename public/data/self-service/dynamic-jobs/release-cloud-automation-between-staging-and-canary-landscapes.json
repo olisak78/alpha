@@ -1,0 +1,15 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "atomrelease",
+    "jobName": "release-cloud-automation-between-staging-and-canary-landscapes"
+  },
+  "steps": [
+    {
+      "name": "job-parameters",
+      "title": "Job Parameters",
+      "description": "Configure the parameters for this Jenkins job",
+      "isDynamic": true
+    }
+  ]
+}

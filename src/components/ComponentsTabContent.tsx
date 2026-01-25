@@ -1,4 +1,4 @@
-import { useMemo, ReactNode } from "react";
+import { useMemo, ReactNode, useState } from "react";
 import { Search, RefreshCw, AlertCircle, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,8 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
 
 interface ComponentsTabContentProps {
   title: string;
@@ -54,6 +52,8 @@ interface ComponentsTabContentProps {
   hasProviderComponents?: boolean;
 }
 
+type HealthFilter = 'UP' | 'DOWN' | null;
+
 export function ComponentsTabContent({
   title,
   components,
@@ -88,6 +88,11 @@ export function ComponentsTabContent({
   onShowProvidersOnlyChange,
   hasProviderComponents = false,
 }: ComponentsTabContentProps) {
+  const [healthFilter, setHealthFilter] = useState<HealthFilter>(null);
+
+  const handleHealthFilterClick = (filter: HealthFilter) => {
+    setHealthFilter(healthFilter === filter ? null : filter);
+  };
   const { libraryComponents, nonLibraryComponents } = useMemo(() => {
     let filtered = components;
 
@@ -99,6 +104,23 @@ export function ComponentsTabContent({
           component.title?.toLowerCase().includes(searchLower) ||
           component.description?.toLowerCase().includes(searchLower)
       );
+    }
+
+    // Apply health filter
+    if (healthFilter) {
+      filtered = filtered.filter((component) => {
+        const healthCheck = componentHealthMap[component.id];
+        if (!healthCheck) return false;
+        
+        if (healthFilter === 'UP') {
+          return healthCheck.response?.healthy === true;
+        } else if (healthFilter === 'DOWN') {
+          return healthCheck.response?.healthy === false || 
+                 healthCheck.status === 'DOWN' || 
+                 healthCheck.status === 'ERROR';
+        }
+        return true;
+      });
     }
 
     // Separate library and non-library components
@@ -130,7 +152,7 @@ export function ComponentsTabContent({
       libraryComponents: sortComponents(libraries),
       nonLibraryComponents: sortComponents(nonLibraries),
     };
-  }, [components, searchTerm, sortOrder, teamNamesMap]);
+  }, [components, searchTerm, sortOrder, teamNamesMap, healthFilter, componentHealthMap]);
 
   if (isLoading) {
     return (
@@ -169,22 +191,6 @@ export function ComponentsTabContent({
               data-testid="search-input"
             />
           </div>
-          {hasProviderComponents && onShowProvidersOnlyChange && (
-            <div className="flex items-center gap-2">
-              <Switch
-                id="providers-filter"
-                checked={showProvidersOnly}
-                onCheckedChange={onShowProvidersOnlyChange}
-              />
-              <Label
-                htmlFor="providers-filter"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Only Providers
-                {/* {showProvidersOnly ? "Providers Only" : "Show All"} */}
-              </Label>
-            </div>
-          )}
           {onSortOrderChange && (
             <Select value={sortOrder} onValueChange={onSortOrderChange}>
               <SelectTrigger className="w-[180px]">
@@ -205,7 +211,12 @@ export function ComponentsTabContent({
               <RefreshCw className="h-4 w-4" />
             </Button>
           )}
-          <HealthOverview summary={summary} isLoading={isLoadingHealthSummary} />
+          <HealthOverview 
+            summary={summary} 
+            isLoading={isLoadingHealthSummary}
+            activeFilter={healthFilter}
+            onFilterClick={handleHealthFilterClick}
+          />
         </div>
       )}
 

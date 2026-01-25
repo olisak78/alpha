@@ -9,6 +9,8 @@ import { buildJiraFeedbackUrl } from '@/lib/utils';
 import { useProjects, useSidebarItems, useProjectsLoading } from '@/stores/projectsStore';
 import { usePlugins } from '@/hooks/api/usePlugins';
 import { isProduction } from '@/utils/environment';
+import { useAuth } from '@/contexts/AuthContext';
+import { isUserInSapCfsOrganization, getAllowedSidebarItemsForNonSapCfs } from '@/utils/organization-utils';
 
 
 interface SideBarProps {
@@ -59,6 +61,7 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
     const projectsData = useProjects();
     const isLoading = useProjectsLoading();
     const sidebarItems = useSidebarItems();
+    const { user } = useAuth();
 
     const { isProjectVisible } = useProjectVisibility();
     const [visibilityKey, setVisibilityKey] = useState(0);
@@ -95,6 +98,12 @@ export const SideBar: React.FC<SideBarProps> = ({ activeProject, onProjectChange
     }, []);
 
    const isProjectVisibleInSidebar = (project: string, projectsData: any[]) => {
+    // Organization-based filtering: if user is not in sap-cfs, only show Home and AI Arena
+    if (!isUserInSapCfsOrganization(user)) {
+        const allowedItems = getAllowedSidebarItemsForNonSapCfs();
+        return allowedItems.includes(project);
+    }
+
     // Hide Plugins in production
     if (project === 'Plugins' && isProduction()) {  // ← Fixed: isProduction()
         return false;

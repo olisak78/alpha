@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
     setGithubToolsAuthenticated,
     setGithubWdfAuthenticated,
+    setUserOrganization,
     isBothAuthenticated,
     reset: resetDualAuth,
   } = useDualAuthStore();
@@ -47,24 +48,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setGithubToolsAuthenticated(authStatuses.githubtools);
       setGithubWdfAuthenticated(authStatuses.githubwdf);
 
-      // Only proceed if both authentications are valid
-      if (authStatuses.githubtools && authStatuses.githubwdf) {
-        // Fetch user from /users/me
-        const me = await fetchCurrentUser();
-        if (me) {
-          const user = buildUserFromMe(me);
-          setUser(user);
-        } else {
+      // If GitHub Tools is authenticated, fetch user info to determine organization
+      if (authStatuses.githubtools) {
+        try {
+          const me = await fetchCurrentUser();
+          if (me) {
+            const user = buildUserFromMe(me);
+            setUser(user);
+            setUserOrganization(user.organization || null);
+            
+            // Check if authentication is complete based on organization
+            // For sap-cfs users, both authentications are required
+            // For non-sap-cfs users, only GitHub Tools is required
+            const isAuthComplete = user.organization === 'sap-cfs' 
+              ? (authStatuses.githubtools && authStatuses.githubwdf)
+              : authStatuses.githubtools;
+              
+            if (!isAuthComplete) {
+              // Partial authentication - user info is available but auth is not complete
+              // This is handled by the login page
+            }
+          } else {
+            setUser(null);
+          }
+        } catch (userError) {
+          console.error('Failed to fetch user info:', userError);
           setUser(null);
         }
       } else {
-        // Not fully authenticated, clear user state
+        // Not authenticated at all, clear user state
         setUser(null);
+        setUserOrganization(null);
       }
     } catch (error) {
       setUser(null);
       setGithubToolsAuthenticated(false);
       setGithubWdfAuthenticated(false);
+      setUserOrganization(null);
     } finally {
       setIsLoading(false);
     }
@@ -74,20 +94,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
 
-      // Wait for both authentications to complete
+      // Wait for authentication to complete
       // The LoginPage handles the actual authentication flow
-      // This method is called after both are complete
+      // This method is called after authentication is complete
       
-      // Verify both authentications
+      // Verify authentications
       const authStatuses = await checkDualAuthStatus();
       setGithubToolsAuthenticated(authStatuses.githubtools);
       setGithubWdfAuthenticated(authStatuses.githubwdf);
 
-      if (!authStatuses.githubtools || !authStatuses.githubwdf) {
-        throw new Error('Both authentications are required to access the portal');
+      if (!authStatuses.githubtools) {
+        throw new Error('GitHub Tools authentication is required to access the portal');
       }
 
-      // After successful dual authentication, refresh user state
+      // After successful authentication, refresh user state
       await refreshAuth();
     } catch (error) {
       console.error('Login error:', error);
@@ -123,12 +143,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setGithubToolsAuthenticated(authStatuses.githubtools);
       setGithubWdfAuthenticated(authStatuses.githubwdf);
 
-      if (authStatuses.githubtools && authStatuses.githubwdf) {
-        // Then fetch current user profile and update UI state
+      if (authStatuses.githubtools) {
+        // Fetch current user profile and update UI state
         const me = await fetchCurrentUser();
         if (me) {
           const updatedUser = buildUserFromMe(me);
           setUser(updatedUser);
+          setUserOrganization(updatedUser.organization || null);
+          
+          // Check if authentication is complete based on organization
+          const isAuthComplete = updatedUser.organization === 'sap-cfs' 
+            ? (authStatuses.githubtools && authStatuses.githubwdf)
+            : authStatuses.githubtools;
+            
+          if (!isAuthComplete) {
+            throw new Error(updatedUser.organization === 'sap-cfs' 
+              ? 'Both GitHub Tools and GitHub WDF authentications are required for sap-cfs users'
+              : 'GitHub Tools authentication is required');
+          }
+          
           try {
             localStorage.removeItem('quick-links');
           } catch (error) {
@@ -139,9 +172,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           throw new Error('Failed to fetch current user');
         }
       } else {
-        // Not fully authenticated
+        // Not authenticated at all
         setUser(null);
-        throw new Error('Both authentications are required');
+        setUserOrganization(null);
+        throw new Error('GitHub Tools authentication is required');
       }
     } catch (error) {
       console.error('Refresh auth error:', error);

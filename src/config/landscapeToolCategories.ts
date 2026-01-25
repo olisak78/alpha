@@ -8,7 +8,17 @@ export const LANDSCAPE_TOOL_CATEGORIES: ToolCategory[] = [
   {
     id: 'development',
     label: 'Development',
-    tools: ['git', 'vault', 'workspace', 'concourse', 'cam', 'cad']
+    tools: ['git', 'vault', 'concourse']
+  },
+  {
+    id: 'cam',
+    label: 'Cam',
+    tools: ['cam']
+  },
+  {
+    id: 'cad',
+    label: 'CAD & Workspace',
+    tools: ['cad','workspace']
   },
   {
     id: 'monitoring',

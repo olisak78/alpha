@@ -1,0 +1,136 @@
+{  
+  "onSubmit": "triggerJenkinsJob",
+  "jenkinsJob": {
+    "jaasName": "atom",
+    "jobName": "deploy-dev-landscape"
+  },
+  "steps": [
+    {
+      "name": "cluster-configuration",
+      "title": "Cluster Configuration",
+      "description": "Configure the cluster deployment options and settings",
+      "fields": [
+        {
+          "defaultParameterValue": {
+            "value": ""
+          },
+          "description": "Please enter the name of the cluster - you should put in your I-USER to match deploy-dev-landscape convention.",
+          "name": "ClusterName",
+          "type": "text",
+          "required": true
+        },
+        {
+          "defaultParameterValue": {
+            "value": false
+          },
+          "description": "\u003cb\u003eWARNING!!!\u003c/b\u003e If checked, your cluster data will be completely deleted, including the AWS services of this cluster!!! \u003cbr/\u003e\n\nChecking this option will do the following:\u003cbr/\u003e\n\u003cli\u003e Delete the \u003cb\u003eGardener cluster\u003c/b\u003e.\u003c/li\u003e\n\u003cli\u003e Delete the cluster's \u003cb\u003eS3 bucket\u003c/b\u003e and its \u003cb\u003eOpenSearch index\u003c/b\u003e.\u003c/li\u003e\n\u003cli\u003e Delete the cluster branch from atom-cfs/landscape-dev.\u003c/li\u003e\n\u003cli\u003e \u003cb\u003eCreate a new cluster\u003c/b\u003e according to the configuration below.\u003c/li\u003e\n",
+          "name": "DELETE_CLUSTER",
+          "type": "checkbox"
+        },
+        {
+          "defaultParameterValue": {
+            "value": true
+          },
+          "description": "Syncs your cluste's charts.yaml and kustomization.yaml with the components version from staging.\u003cbr/\u003e\nIn case of a new cluster, fetching staging version will be done even if this option is not checked.",
+          "name": "FETCH_STAGING_VERSION",
+          "type": "checkbox"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "DEPLOY_CLUSTER"
+          },
+          "description": null,
+          "name": "DEPLOYMENT_OPTION",
+          "type": "radio",
+          "options": [
+            { "id": "DEPLOY_CLUSTER", "label": "Deploy cluster", "value": "DEPLOY_CLUSTER" },
+            { "id": "WAKEUP_FROM_HIBERNATION", "label": "Wake up hibernated cluster", "value": "WAKEUP_FROM_HIBERNATION" },
+            { "id": "SKIP_DEPLOYMENT", "label": "Skip cluster deployment — only configure the cluster branch", "value": "SKIP_DEPLOYMENT" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "component-deployment",
+      "title": "Component Deployment",
+      "description": "Select components to deploy from your branch",
+      "fields": [
+        {
+          "defaultParameterValue": {
+            "value": "None"
+          },
+          "description": "Deploy one of the following components from your branch",
+          "name": "GIT_ORG_REPO",
+          "type": "radio",
+          "options": [
+            { "id": "none", "label": "None", "value": "None" },
+            { "id": "workspace-server", "label": "atom-cfs/workspace-server", "value": "atom-cfs/workspace-server" },
+            { "id": "workspace-app", "label": "atom-cfs/workspace-app", "value": "atom-cfs/workspace-app" },
+            { "id": "atom-unleash", "label": "atom-cfs/atom-unleash", "value": "atom-cfs/atom-unleash" },
+            { "id": "base-logging", "label": "atom-base-logging", "value": "atom-base-logging" },
+            { "id": "base-monitoring-crd", "label": "atom-base-monitoring-crd", "value": "atom-base-monitoring-crd" },
+            { "id": "base-monitoring-stack", "label": "atom-base-monitoring-stack", "value": "atom-base-monitoring-stack" },
+            { "id": "gate-keeper", "label": "atom-cfs/atom-gate-keeper", "value": "atom-cfs/atom-gate-keeper" },
+            { "id": "initial-content", "label": "atom-cfs/atom-initial-content", "value": "atom-cfs/atom-initial-content" },
+            { "id": "rtd-governance", "label": "atom-cfs/atom-rtd-governance", "value": "atom-cfs/atom-rtd-governance" },
+            { "id": "availability-hub", "label": "atom-cfs/availability-hub", "value": "atom-cfs/availability-hub" },
+            { "id": "aws-elasticache-controller", "label": "atom-cfs/aws-elasticache-controller", "value": "atom-cfs/aws-elasticache-controller" },
+            { "id": "aws-iam-controller", "label": "atom-cfs/aws-iam-controller", "value": "atom-cfs/aws-iam-controller" },
+            { "id": "aws-opensearch-controller", "label": "atom-cfs/aws-opensearch-controller", "value": "atom-cfs/aws-opensearch-controller" },
+            { "id": "aws-rds-controller", "label": "atom-cfs/aws-rds-controller", "value": "atom-cfs/aws-rds-controller" },
+            { "id": "aws-s3-controller", "label": "atom-cfs/aws-s3-controller", "value": "atom-cfs/aws-s3-controller" },
+            { "id": "btp-bridge-operator", "label": "atom-cfs/btp-bridge-operator", "value": "atom-cfs/btp-bridge-operator" },
+            { "id": "btp-solution-operator", "label": "atom-cfs/btp-solution-operator", "value": "atom-cfs/btp-solution-operator" },
+            { "id": "btp-subaccount-operator", "label": "atom-cfs/btp-subaccount-operator", "value": "atom-cfs/btp-subaccount-operator" },
+            { "id": "cert-manager", "label": "atom-cfs/cert-manager", "value": "atom-cfs/cert-manager" },
+            { "id": "commercial-integration-manager", "label": "atom-cfs/commercial-integration-manager", "value": "atom-cfs/commercial-integration-manager" },
+            { "id": "deploy-cycle-charts", "label": "atom-cfs/deploy-cycle-charts", "value": "atom-cfs/deploy-cycle-charts" },
+            { "id": "e2e-initial-content", "label": "atom-cfs/e2e-initial-content", "value": "atom-cfs/e2e-initial-content" },
+            { "id": "feature-toggle-extension", "label": "atom-cfs/feature-toggle-extension", "value": "atom-cfs/feature-toggle-extension" },
+            { "id": "feature-toggle-manager", "label": "atom-cfs/feature-toggle-manager", "value": "atom-cfs/feature-toggle-manager" },
+            { "id": "healthcheck", "label": "atom-cfs/healthcheck", "value": "atom-cfs/healthcheck" },
+            { "id": "internal-monitoring", "label": "atom-cfs/internal-monitoring", "value": "atom-cfs/internal-monitoring" },
+            { "id": "istio-operator", "label": "atom-cfs/istio-operator", "value": "atom-cfs/istio-operator" },
+            { "id": "jaeger", "label": "atom-cfs/jaeger", "value": "atom-cfs/jaeger" },
+            { "id": "kyverno-atom-wrapper", "label": "atom-cfs/kyverno-atom-wrapper", "value": "atom-cfs/kyverno-atom-wrapper" },
+            { "id": "opentelemetry-collector", "label": "atom-cfs/opentelemetry-collector", "value": "atom-cfs/opentelemetry-collector" },
+            { "id": "unified-account", "label": "atom-cfs/unified-account", "value": "atom-cfs/unified-account" },
+            { "id": "unified-cloud-automation", "label": "atom-cfs/unified-cloud-automation", "value": "atom-cfs/unified-cloud-automation" },
+            { "id": "unified-platform-providers", "label": "atom-cfs/unified-platform-providers", "value": "atom-cfs/unified-platform-providers" },
+            { "id": "unified-service-orchestration", "label": "atom-cfs/unified-service-orchestration", "value": "atom-cfs/unified-service-orchestration" },
+            { "id": "vector", "label": "atom-cfs/vector", "value": "atom-cfs/vector" },
+            { "id": "core-controllers", "label": "resource-manager/core-controllers", "value": "resource-manager/core-controllers" },
+            { "id": "resource-automation-operator", "label": "resource-manager/resource-automation-operator", "value": "resource-manager/resource-automation-operator" },
+            { "id": "resources-server", "label": "resource-manager/resources-server", "value": "resource-manager/resources-server" },
+            { "id": "sap-btp-operator", "label": "sap-btp-operator", "value": "sap-btp-operator" },
+            { "id": "secret-provider", "label": "unified-resource-manager/secret-provider", "value": "unified-resource-manager/secret-provider" },
+            { "id": "secrets-provider", "label": "unified-resource-manager/secrets-provider", "value": "unified-resource-manager/secrets-provider" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "deployment-settings",
+      "title": "Deployment Settings",
+      "description": "Configure branch and additional deployment options",
+      "fields": [
+        {
+          "defaultParameterValue": {
+            "value": ""
+          },
+          "description": "Choose the branch of GIT_ORG_REPO",
+          "name": "BRANCH",
+          "type": "text"
+        },
+        {
+          "defaultParameterValue": {
+            "value": false
+          },
+          "description": "Deploy the performance monitoring components (if not already deployed).\u003cbr/\u003e\n\u003cb\u003eThis option is only relevant when fetching Staging version.\u003c/b\u003e",
+          "name": "DEPLOY_PERFORMANCE_MONITORING",
+          "type": "checkbox"
+        }
+      ]
+    }
+  ]
+}

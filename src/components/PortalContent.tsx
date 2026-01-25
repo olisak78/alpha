@@ -9,6 +9,8 @@ import { HeaderNavigation } from "./DeveloperPortalHeader/HeaderNavigation";
 import { SideBar } from "./Sidebar/SideBar";
 import { NotificationPopup } from "./NotificationPopup";
 import { Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { isUserInSapCfsOrganization } from "@/utils/organization-utils";
 
 export const PortalContent: React.FC<{
   activeProject: string;
@@ -22,6 +24,10 @@ export const PortalContent: React.FC<{
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
+  const { user } = useAuth();
+
+  // Check if user is in sap-cfs organization to determine if sidebar should be shown
+  const shouldShowSidebar = isUserInSapCfsOrganization(user);
 
   // Check if we're on the AI Arena chat page
   const isAIArenaChat = location.pathname.startsWith('/ai-arena') &&
@@ -44,7 +50,7 @@ export const PortalContent: React.FC<{
       <div
         className="top-0 left-0 right-0 z-30 bg-background border-b border-border transition-all duration-300 flex-shrink-0"
         style={{
-          paddingLeft: isMobile ? undefined : `${sidebarWidth}px`
+          paddingLeft: isMobile ? undefined : (shouldShowSidebar ? `${sidebarWidth}px` : '0px')
         }}
       >
         <DeveloperPortalHeader
@@ -60,12 +66,14 @@ export const PortalContent: React.FC<{
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <SideBar
-          activeProject={activeProject}
-          projects={projects}
-          onProjectChange={onProjectChange}
-        />
+        {/* Sidebar - only show for sap-cfs users */}
+        {shouldShowSidebar && (
+          <SideBar
+            activeProject={activeProject}
+            projects={projects}
+            onProjectChange={onProjectChange}
+          />
+        )}
 
         {/* Main content - takes remaining width */}
         <main className={`flex-1 bg-background ${isAIArenaChat ? 'overflow-hidden' : 'overflow-auto'}`}>

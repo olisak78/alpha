@@ -23,7 +23,7 @@ export function ComponentHeader({
   isDisabled,
 }: ComponentHeaderProps) {
   return (
-    <div>
+    <div className="group">
       {/* Component Name and Team Badge Row */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -50,11 +50,17 @@ export function ComponentHeader({
               <span>{teamName}</span>
             </Badge>
           )}
-          <PinButton 
-            component={component} 
-            size={16} 
-            showOnHover={true}
-          />
+          <div className={`overflow-hidden transition-all duration-200 ${
+            component.isPinned 
+              ? 'w-4' 
+              : 'w-0 group-hover:w-4'
+          }`}>
+            <PinButton 
+              component={component} 
+              size={16} 
+              showOnHover={false}
+            />
+          </div>
         </div>
       </div>
 

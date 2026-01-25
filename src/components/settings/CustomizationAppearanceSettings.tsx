@@ -2,6 +2,8 @@ import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import ProjectVisibilitySection from './ProjectVisibilitySection';
 import ThemeSection from './ThemeSection';
+import { useAuth } from '@/contexts/AuthContext';
+import { isUserInSapCfsOrganization } from '@/utils/organization-utils';
 
 interface CustomizationAppearanceSettingsProps {
   visibilityState: { [projectId: string]: boolean };
@@ -16,6 +18,9 @@ export default function CustomizationAppearanceSettings({
   onSelectAll,
   onDeselectAll
 }: CustomizationAppearanceSettingsProps) {
+  const { user } = useAuth();
+  const isUserInSapCfs = isUserInSapCfsOrganization(user);
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto pr-2">
@@ -25,17 +30,19 @@ export default function CustomizationAppearanceSettings({
           <Separator className="mt-4" />
         </div>
         
-        {/* Customization Section */}
-        <div className="mb-6 flex-shrink-0">
-          <h4 className="text-md font-medium mb-4">Customization</h4>
-          
-          <ProjectVisibilitySection
-            visibilityState={visibilityState}
-            onVisibilityChange={onVisibilityChange}
-            onSelectAll={onSelectAll}
-            onDeselectAll={onDeselectAll}
-          />
-        </div>
+        {/* Customization Section - Only show for sap-cfs users */}
+        {isUserInSapCfs && (
+          <div className="mb-6 flex-shrink-0">
+            <h4 className="text-md font-medium mb-4">Customization</h4>
+            
+            <ProjectVisibilitySection
+              visibilityState={visibilityState}
+              onVisibilityChange={onVisibilityChange}
+              onSelectAll={onSelectAll}
+              onDeselectAll={onDeselectAll}
+            />
+          </div>
+        )}
 
         {/* Appearance Section */}
         <div className="flex-shrink-0">

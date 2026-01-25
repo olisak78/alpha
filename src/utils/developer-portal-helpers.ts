@@ -162,6 +162,7 @@ export const buildUserFromMe = (me: UserMeResponse): User => {
     provider: 'githubtools',
     team_role: me.team_role,
     portal_admin: me.portal_admin,
+    organization: me.organization || undefined,
   };
   return baseUser;
 };

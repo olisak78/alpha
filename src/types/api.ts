@@ -1118,6 +1118,7 @@ export interface UserMeResponse {
   team_role: string;
   link: UserLink[];
   portal_admin?: boolean;
+  organization?: string
 }
 
 

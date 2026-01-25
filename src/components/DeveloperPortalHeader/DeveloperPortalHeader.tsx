@@ -73,25 +73,27 @@ export function DeveloperPortalHeader({
             )}
           </Button>
 
-          {/* Developer Utilities */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative text-foreground hover:bg-accent border border-border hover:border-border p-2 h-8 w-8 transition-colors"
-                  aria-label="Developer Utilities"
-                  onClick={() => setUtilityOpen(true)}
-                >
-                  <Wrench className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Developer Utilities</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {/* Developer Utilities - Only visible for sap-cfs organization */}
+          {user?.organization === 'sap-cfs' && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="relative text-foreground hover:bg-accent border border-border hover:border-border p-2 h-8 w-8 transition-colors"
+                    aria-label="Developer Utilities"
+                    onClick={() => setUtilityOpen(true)}
+                  >
+                    <Wrench className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Developer Utilities</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
           {/* Notifications */}
           <Button

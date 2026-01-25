@@ -13,6 +13,9 @@ interface DualAuthState {
   githubToolsError: string | null;
   githubWdfError: string | null;
   
+  // User organization info
+  userOrganization: string | null;
+  
   // Actions
   setGithubToolsAuthenticated: (authenticated: boolean) => void;
   setGithubWdfAuthenticated: (authenticated: boolean) => void;
@@ -20,10 +23,12 @@ interface DualAuthState {
   setGithubWdfLoading: (loading: boolean) => void;
   setGithubToolsError: (error: string | null) => void;
   setGithubWdfError: (error: string | null) => void;
+  setUserOrganization: (organization: string | null) => void;
   
   // Computed
   isBothAuthenticated: () => boolean;
   isAnyLoading: () => boolean;
+  requiresWdfAuth: () => boolean;
   
   // Reset
   reset: () => void;
@@ -36,6 +41,7 @@ const initialState = {
   isGithubWdfLoading: false,
   githubToolsError: null,
   githubWdfError: null,
+  userOrganization: null,
 };
 
 export const useDualAuthStore = create<DualAuthState>((set, get) => ({
@@ -59,14 +65,27 @@ export const useDualAuthStore = create<DualAuthState>((set, get) => ({
   setGithubWdfError: (error) => 
     set({ githubWdfError: error, isGithubWdfLoading: false }),
   
+  setUserOrganization: (organization) => 
+    set({ userOrganization: organization }),
+  
   isBothAuthenticated: () => {
     const state = get();
-    return state.isGithubToolsAuthenticated && state.isGithubWdfAuthenticated;
+    // For sap-cfs users, both authentications are required
+    if (state.userOrganization === 'sap-cfs') {
+      return state.isGithubToolsAuthenticated && state.isGithubWdfAuthenticated;
+    }
+    // For non-sap-cfs users, only GitHub Tools authentication is required
+    return state.isGithubToolsAuthenticated;
   },
   
   isAnyLoading: () => {
     const state = get();
     return state.isGithubToolsLoading || state.isGithubWdfLoading;
+  },
+  
+  requiresWdfAuth: () => {
+    const state = get();
+    return state.userOrganization === 'sap-cfs';
   },
   
   reset: () => set(initialState),
