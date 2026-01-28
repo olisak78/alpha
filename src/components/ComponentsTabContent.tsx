@@ -34,8 +34,6 @@ interface ComponentsTabContentProps {
   showComponentMetrics?: boolean;
   selectedLandscape?: string | null;
   selectedLandscapeData?: any;
-  teamNamesMap?: Record<string, string>;
-  teamColorsMap?: Record<string, string>;
   sortOrder?: 'alphabetic' | 'team';
   onSortOrderChange?: (order: 'alphabetic' | 'team') => void;
   componentHealthMap?: Record<string, ComponentHealthCheck>;
@@ -55,38 +53,29 @@ interface ComponentsTabContentProps {
 type HealthFilter = 'UP' | 'DOWN' | null;
 
 export function ComponentsTabContent({
-  title,
   components,
-  teamName,
   isLoading,
   error,
   teamComponentsExpanded,
   onToggleExpanded,
   onRefresh,
   showRefreshButton = true,
-  showComponentMetrics = true,
   emptyStateMessage,
   searchTerm = "",
   onSearchTermChange,
   system,
   selectedLandscape,
   selectedLandscapeData,
-  teamNamesMap = {},
-  teamColorsMap = {},
   sortOrder = 'alphabetic',
   onSortOrderChange,
   componentHealthMap = {},
   isLoadingHealth = false,
-  viewSwitcher,
   onComponentClick,
   isCentralLandscape = false,
   noCentralLandscapes = false,
   summary,
   isLoadingHealthSummary = false,
   projectId,
-  showProvidersOnly = false,
-  onShowProvidersOnlyChange,
-  hasProviderComponents = false,
 }: ComponentsTabContentProps) {
   const [healthFilter, setHealthFilter] = useState<HealthFilter>(null);
 
@@ -135,15 +124,19 @@ export function ComponentsTabContent({
       }
     });
 
-    // Sort both arrays
+    // Sort both arrays based on the selected sort order
     const sortComponents = (componentsArray: Component[]) => {
       return [...componentsArray].sort((a, b) => {
         if (sortOrder === 'team') {
-          const teamA = a.owner_id ? teamNamesMap[a.owner_id] || '' : '';
-          const teamB = b.owner_id ? teamNamesMap[b.owner_id] || '' : '';
-          const teamCompare = teamA.localeCompare(teamB);
-          if (teamCompare !== 0) return teamCompare;
+          // Sort by owner first (using first owner_id), then alphabetically within owners
+          const ownerA = a.owner_ids?.[0] || '';
+          const ownerB = b.owner_ids?.[0] || '';
+          const ownerComparison = ownerA.localeCompare(ownerB);
+          if (ownerComparison !== 0) {
+            return ownerComparison;
+          }
         }
+        // Default to alphabetic sorting (or secondary sort for team mode)
         return (a.title || a.name).localeCompare(b.title || b.name);
       });
     };
@@ -152,7 +145,7 @@ export function ComponentsTabContent({
       libraryComponents: sortComponents(libraries),
       nonLibraryComponents: sortComponents(nonLibraries),
     };
-  }, [components, searchTerm, sortOrder, teamNamesMap, healthFilter, componentHealthMap]);
+  }, [components, searchTerm, sortOrder, healthFilter, componentHealthMap]);
 
   if (isLoading) {
     return (
@@ -179,46 +172,42 @@ export function ComponentsTabContent({
   return (
     <div className="space-y-4">
       {/* Search and Controls */}
-      {onSearchTermChange && (
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search components..."
-              value={searchTerm}
-              onChange={(e) => onSearchTermChange(e.target.value)}
-              className="pl-10"
-              data-testid="search-input"
-            />
-          </div>
-          {onSortOrderChange && (
-            <Select value={sortOrder} onValueChange={onSortOrderChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="alphabetic">Alphabetic</SelectItem>
-                <SelectItem value="team">By Team</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          {showRefreshButton && onRefresh && (
-            <Button
-              onClick={onRefresh}
-              variant="outline"
-              size="sm"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          )}
-          <HealthOverview 
-            summary={summary} 
-            isLoading={isLoadingHealthSummary}
-            activeFilter={healthFilter}
-            onFilterClick={handleHealthFilterClick}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search components..."
+            value={searchTerm}
+            onChange={(e) => onSearchTermChange(e.target.value)}
+            className="pl-10"
+            data-testid="search-input"
           />
         </div>
-      )}
+        <Select value={sortOrder} onValueChange={onSortOrderChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="alphabetic">Alphabetic</SelectItem>
+            <SelectItem value="team">By Team</SelectItem>
+          </SelectContent>
+        </Select>
+        {showRefreshButton && onRefresh && (
+          <Button
+            onClick={onRefresh}
+            variant="outline"
+            size="sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
+        <HealthOverview 
+          summary={summary} 
+          isLoading={isLoadingHealthSummary}
+          activeFilter={healthFilter}
+          onFilterClick={handleHealthFilterClick}
+        />
+      </div>
 
       {/* Components Content */}
       {libraryComponents.length === 0 && nonLibraryComponents.length === 0 ? (
@@ -229,21 +218,19 @@ export function ComponentsTabContent({
         </div>
       ) : (
         <div className="space-y-6">
-          <ComponentDisplayProvider
-            projectId={projectId}
-            selectedLandscape={selectedLandscape}
-            selectedLandscapeData={selectedLandscapeData}
-            isCentralLandscape={isCentralLandscape}
-            noCentralLandscapes={noCentralLandscapes}
-            teamNamesMap={teamNamesMap}
-            teamColorsMap={teamColorsMap}
-            componentHealthMap={componentHealthMap}
-            isLoadingHealth={isLoadingHealth}
-            expandedComponents={teamComponentsExpanded}
-            onToggleExpanded={onToggleExpanded}
-            system={system}
-            components={[...nonLibraryComponents, ...libraryComponents]}
-          >
+            <ComponentDisplayProvider
+              projectId={projectId}
+              selectedLandscape={selectedLandscape}
+              selectedLandscapeData={selectedLandscapeData}
+              isCentralLandscape={isCentralLandscape}
+              noCentralLandscapes={noCentralLandscapes}
+              componentHealthMap={componentHealthMap}
+              isLoadingHealth={isLoadingHealth}
+              expandedComponents={teamComponentsExpanded}
+              onToggleExpanded={onToggleExpanded}
+              system={system}
+              components={components}
+            >
             {/* Non-Library Components Section */}
             {nonLibraryComponents.length > 0 && (
               <div>

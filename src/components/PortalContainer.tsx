@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PortalProviders } from "@/contexts/PortalProviders";
 import { PortalContent } from "./PortalContent";
 import { useProjects, useSidebarItems } from "@/stores/projectsStore";
+import { trackEvent } from "@/utils/analytics";
 
 // Mapping from project/page to routes
 const staticRouteToProjectMap: Record<string, string> = {
@@ -11,7 +12,7 @@ const staticRouteToProjectMap: Record<string, string> = {
   "/links": "Links",
   "/self-service": "Self Service",
   "/ai-arena": "AI Arena",
-  "/plugin-marketplace": "Plugin Marketplace",  
+  "/plugin-marketplace": "Plugin Marketplace",
 };
 
 const staticProjectToRouteMap: Record<string, string> = {
@@ -26,7 +27,7 @@ const staticProjectToRouteMap: Record<string, string> = {
 export const PortalContainer: React.FC = () => {
   const projects = useProjects();
   const sidebarItems = useSidebarItems();
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProject, setActiveProject] = useState("");
@@ -79,6 +80,12 @@ export const PortalContainer: React.FC = () => {
   }, [location.pathname, projects]);
 
   const handleProjectChange = (project: string) => {
+    trackEvent('project_changed', {
+      from: activeProject,
+      to: project,
+      timestamp: new Date().toISOString(),
+    });
+
     // Handle pinned plugin navigation (format: "plugins/{slug}")
     if (project.startsWith('plugins/')) {
       navigate(`/${project}`);

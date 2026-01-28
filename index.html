@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developer Portal</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
 
-    <meta property="og:title" content="code-compass-core" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer Portal</title>
+  <meta name="description" content="Lovable Generated Project" />
+  <meta name="author" content="Lovable" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-     <script>
-      (function() {
-        try {
-          const stored = localStorage.getItem('developer-portal-theme');
-          let theme = 'dark';
-          
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            theme = parsed.state?.theme || 'dark';
-            if (theme === 'system') {
-              theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-          } else {
+  <meta property="og:title" content="code-compass-core" />
+  <meta property="og:description" content="Lovable Generated Project" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@lovable_dev" />
+  <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem('developer-portal-theme');
+        let theme = 'dark';
+
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          theme = parsed.state?.theme || 'dark';
+          if (theme === 'system') {
             theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
           }
-          
-          document.documentElement.className = theme;
-        } catch (e) {
-          document.documentElement.className = 'dark';
+        } else {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
-      })();
-    </script>
-  </head>
 
-  <body>
-    <div id="root"></div>
-    <!-- Load runtime environment variables BEFORE React app -->
-    <script src="/env.js"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        document.documentElement.className = theme;
+      } catch (e) {
+        document.documentElement.className = 'dark';
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- Load runtime environment variables BEFORE React app -->
+  <script src="/env.js"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

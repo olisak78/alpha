@@ -22,10 +22,12 @@ import { useProjects, useProjectsLoading, useProjectsError } from '@/stores/proj
 import { useProjectsSync } from "./hooks/useProjectSync";
 import { useAuth } from "@/contexts/AuthContext";
 import { isUserInSapCfsOrganization } from "@/utils/organization-utils";
+import { useEffect } from "react";
+import { trackPageView } from "./utils/analytics";
 // --- Wrapper components for dynamic projects ---
 const DynamicProjectPageWrapper = () => {
   const { projectName } = useParams<{ projectName: string }>();
-  
+
   const projects = useProjects();
   const isLoading = useProjectsLoading();
   const error = useProjectsError();
@@ -41,7 +43,7 @@ const DynamicProjectPageWrapper = () => {
 
 const ComponentViewPageWrapper = () => {
   const { projectName } = useParams<{ projectName: string }>();
-  
+
   const projects = useProjects();
   const isLoading = useProjectsLoading();
   const error = useProjectsError();
@@ -83,6 +85,22 @@ const DefaultRouteWrapper = () => {
   }
 };
 
+const AnalyticsTracker = () => {
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Only track page views for authenticated users
+    if (isAuthenticated) {
+      // Track the page view with the full pathname (including query params if needed)
+      const pageUrl = location.pathname + location.search;
+      trackPageView(pageUrl);
+    }
+  }, [location.pathname, location.search, isAuthenticated]);
+
+  return null; // This component renders nothing
+};
+
 // --- AppContent Component (calls useProjectsSync) ---
 const AppContent = () => {
   useProjectsSync();
@@ -92,6 +110,7 @@ const AppContent = () => {
       <Toaster />
       <Sonner />
       <AuthProvider>
+        <AnalyticsTracker />
         <Routes>
           {/* Public */}
           <Route path="/login" element={<LoginPage />} />

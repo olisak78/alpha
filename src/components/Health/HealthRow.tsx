@@ -9,6 +9,7 @@ import { Activity } from 'lucide-react';
 import { GithubIcon } from '../icons/GithubIcon';
 import { cn } from '@/lib/utils';
 import { useComponentDisplay } from '@/contexts/ComponentDisplayContext';
+import { useComponentOwner } from '@/hooks/useComponentOwner';
 
 interface HealthRowProps {
   healthCheck: ComponentHealthCheck;
@@ -34,8 +35,7 @@ export function HealthRow({
   } = useComponentDisplay();
   
   // Get team info from context - same as ComponentCard
-  const teamName = component.owner_id ? teamNamesMap[component.owner_id] : undefined;
-  const teamColor = component.owner_id ? teamColorsMap[component.owner_id] : undefined;
+  const { teamNames, teamColors, displayName } = useComponentOwner(component);
   
   // Get URLs from component data - same as ComponentCard
   const githubUrl = component.github;
@@ -211,16 +211,21 @@ export function HealthRow({
           "px-6 py-4 whitespace-nowrap",
           isClickable ? 'cursor-pointer' : ''
         )}>
-          {teamName ? (
-            <Badge
-              variant="outline"
-              className={`text-xs px-1.5 py-0.5 flex-shrink-0 text-white border-0 min-h-[24px] ${
-                isDisabled ? 'bg-gray-500' : ''
-              }`}
-              {...(!isDisabled && teamColor ? { style: { backgroundColor: teamColor } } : {})}
-            >
-              {teamName}
-            </Badge>
+          {teamNames && teamNames.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {teamNames.map((teamName, index) => (
+                <Badge
+                  key={teamName}
+                  variant="outline"
+                  className={`text-xs px-1.5 py-0.5 flex-shrink-0 text-white border-0 min-h-[24px] ${
+                    isDisabled ? 'bg-gray-500' : ''
+                  }`}
+                  {...(!isDisabled && teamColors[index] ? { style: { backgroundColor: teamColors[index] } } : {})}
+                >
+                  {teamName}
+                </Badge>
+              ))}
+            </div>
           ) : (
             <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
           )}

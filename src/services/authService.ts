@@ -1,5 +1,7 @@
 import { getNewBackendUrl } from "@/constants/developer-portal";
 import { tokenManager } from "../lib/tokenManager";
+import { trackEvent } from "@/utils/analytics";
+import { sessionManager } from "@/lib/sessionManager";
 
 // Get backend URL from runtime environment or fallback to localhost for development
 const backendUrl = getNewBackendUrl();
@@ -59,6 +61,11 @@ const createAuthService = (provider: AuthProvider) => {
             // Authentication successful
             resolve();
           } catch (error) {
+            trackEvent('login_failed', {
+              provider,
+              error: error instanceof Error ? error.message : 'Authentication failed',
+              timestamp: new Date().toISOString(),
+            });
             reject(new Error(`Authentication failed for ${provider} after popup closed`));
           }
         }
@@ -159,6 +166,11 @@ export const checkDualAuthStatus = async (): Promise<DualAuthStatus> => {
 
 export const logoutUser = async (): Promise<void> => {
   try {
+    // Track logout BEFORE clearing session
+    trackEvent('user_logout', {
+      timestamp: new Date().toISOString(),
+    });
+
     await fetch(`${backendUrl}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
@@ -170,6 +182,7 @@ export const logoutUser = async (): Promise<void> => {
 
     // Clear centralized token manager
     tokenManager.clearToken();
+    sessionManager.clearSession(); // Clear session metadata for analytics
 
     // Clear session and authentication-related data only
     try {
@@ -210,6 +223,7 @@ export const logoutUser = async (): Promise<void> => {
     console.error('Logout error:', error);
     // Clear centralized token manager even on error
     tokenManager.clearToken();
+    sessionManager.clearSession(); // Clear session metadata for analytics
     // Even if logout fails, clear local state and redirect
     try {
       sessionStorage.clear();

@@ -7,8 +7,8 @@ import { PinButton } from "@/components/PinButton";
 
 interface ComponentHeaderProps {
   component: Component;
-  teamName?: string;
-  teamColor?: string;
+  teamNames?: string[];
+  teamColors?: string[];
   systemInfo: SystemInformation | null;
   loadingSystemInfo: boolean;
   isDisabled: boolean;
@@ -16,8 +16,8 @@ interface ComponentHeaderProps {
 
 export function ComponentHeader({
   component,
-  teamName,
-  teamColor,
+  teamNames = [],
+  teamColors = [],
   systemInfo,
   loadingSystemInfo,
   isDisabled,
@@ -39,17 +39,18 @@ export function ComponentHeader({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {teamName && (
+          {teamNames.length > 0 && teamNames.map((teamName, index) => (
             <Badge
+              key={`${teamName}-${index}`}
               variant="outline"
               className={`flex items-center gap-1 text-xs px-2 py-0.5 flex-shrink-0 text-white border-0 min-h-[24px] ${
                 isDisabled ? 'bg-gray-500' : ''
               }`}
-              {...(!isDisabled && teamColor ? { style: { backgroundColor: teamColor } } : {})}
+              {...(!isDisabled && teamColors[index] ? { style: { backgroundColor: teamColors[index] } } : {})}
             >
               <span>{teamName}</span>
             </Badge>
-          )}
+          ))}
           <div className={`overflow-hidden transition-all duration-200 ${
             component.isPinned 
               ? 'w-4' 

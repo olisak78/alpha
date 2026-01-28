@@ -23,6 +23,8 @@ import { Badge } from "./ui/badge";
 import { HealthStatusFilter } from "./HealthStatusFilter";
 import { ComponentDisplayProvider } from "@/contexts/ComponentDisplayContext";
 import { ProvidersFilter } from "./ProvidersFilter";
+import { getAnalyticsContext } from "@/lib/analyticsContext";
+import { trackEvent } from "@/utils/analytics";
 
 export interface ProjectLayoutProps {
   projectName: string;
@@ -174,27 +176,6 @@ export function ProjectLayout({
     }, {});
   }, [healthChecks]);
 
-  // Build team maps
-  const teamNamesMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    if (teamsData?.teams) {
-      teamsData.teams.forEach((team: any) => {
-        map[team.id] = team.title || team.name;
-      });
-    }
-    return map;
-  }, [teamsData]);
-
-  const teamColorsMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    if (teamsData?.teams) {
-      teamsData.teams.forEach((team: any) => {
-        map[team.id] = team.metadata?.color;
-      });
-    }
-    return map;
-  }, [teamsData]);
-
   // Tab label mapping
   const getTabLabel = (tabId: string): string => {
     return tabId.charAt(0).toUpperCase() + tabId.slice(1);
@@ -216,6 +197,15 @@ export function ProjectLayout({
   // Update local activeTab when URL tab changes
   useEffect(() => {
     if (currentTabFromUrl && currentTabFromUrl !== activeTab) {
+      const context = getAnalyticsContext();
+    
+    trackEvent('tab_changed', {
+      fromTab: activeTab,
+      projectName: projectName,
+      toTab: headerActiveTab,
+      userName: context.userName,
+      timestamp: new Date().toISOString(),
+    });
       setActiveTab(currentTabFromUrl);
     }
   }, [currentTabFromUrl, activeTab]);
@@ -358,8 +348,6 @@ export function ProjectLayout({
                       showLandscapeFilter={showLandscapeFilter}
                       selectedLandscape={selectedLandscape}
                       selectedLandscapeData={selectedApiLandscape}
-                      teamNamesMap={teamNamesMap}
-                      teamColorsMap={teamColorsMap}
                       sortOrder={componentSortOrder}
                       onSortOrderChange={setComponentSortOrder}
                       componentHealthMap={componentHealthMap}
@@ -418,8 +406,6 @@ export function ProjectLayout({
                       selectedLandscapeData={selectedApiLandscape}
                       isCentralLandscape={isCentralLandscape}
                       noCentralLandscapes={noCentralLandscapes}
-                      teamNamesMap={teamNamesMap}
-                      teamColorsMap={teamColorsMap}
                       componentHealthMap={componentHealthMap}
                       isLoadingHealth={isLoadingHealth}
                       expandedComponents={teamComponentsExpanded}
@@ -461,8 +447,6 @@ export function ProjectLayout({
             selectedLandscapeData={selectedApiLandscape}
             isCentralLandscape={isCentralLandscape}
             noCentralLandscapes={noCentralLandscapes}
-            teamNamesMap={teamNamesMap}
-            teamColorsMap={teamColorsMap}
             componentHealthMap={componentHealthMap}
             isLoadingHealth={isLoadingHealth}
             expandedComponents={teamComponentsExpanded}

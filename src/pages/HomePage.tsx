@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import {
   CheckCircle,
-  GitBranch,
   MessageSquare,
   Info,
   ChevronRight,
@@ -21,9 +20,8 @@ import camProfilesData from "@/data/profiles/cam_profiles.json";
 import QuickLinksTab from "@/components/tabs/QuickLinksTab";
 import JiraIssuesTab from "@/components/tabs/JiraIssuesTab";
 import GithubPrsTab from "@/components/tabs/GithubPrsTab";
-import { useMyJiraIssuesCount, useMyJiraIssues } from "@/hooks/api/useJira";
+import { useMyJiraIssuesCount} from "@/hooks/api/useJira";
 import { useCurrentUser } from "@/hooks/api/useMembers";
-import { useGitHubPRs } from "@/hooks/api/useGitHubPRs";
 import { useGitHubContributions } from "@/hooks/api/useGitHubContributions";
 import { useGitHubPRReviewComments } from "@/hooks/api/useGitHubPRReviewComments";
 import { StatItem } from '@/types/api';
@@ -32,6 +30,8 @@ import { useGitHubAveragePRTime } from '@/hooks/api/useGitHubAveragePRtime';
 import { QUICK_ACCESS_TAB_KEY } from '@/constants/developer-portal';
 import { useHeaderNavigation } from '@/contexts/HeaderNavigationContext';
 import { GitHubContributionsStat } from '@/components/stats/GitHubContributionsStat';
+import { getAnalyticsContext } from '@/lib/analyticsContext';
+import { trackEvent } from '@/utils/analytics';
 
 
 
@@ -79,18 +79,12 @@ export default function HomePage() {
   });
   const issuesResolved = jiraResolvedCountData?.count || 0;
 
-  // Get all Jira issues to calculate total count for completion rate
-  const { data: allIssuesData, isLoading: isAllIssuesLoading, error: allIssuesError } = useMyJiraIssues({
-    limit: 100 // Get a large number to ensure we get all issues
-  });
-
   // Get GitHub contributions from API
   const {
     data: contributionsData,
     isLoading: isContributionsLoading,
     error: contributionsError
   } = useGitHubContributions();
-  const totalContributions = contributionsData?.total_contributions || 0;
 
   // Get GitHub average PR time from API
   const {
@@ -121,6 +115,25 @@ export default function HomePage() {
   const [activeQuickAccessTab, setActiveQuickAccessTab] = useState<string>(() => {
     return sessionStorage.getItem(QUICK_ACCESS_TAB_KEY) || 'links';
   });
+
+  // Handler for tab changes with analytics tracking
+const handleQuickAccessTabChange = (newTab: string) => {
+  if (newTab !== activeQuickAccessTab) {
+    // Track analytics
+    const context = getAnalyticsContext();
+    trackEvent('tab_changed', {
+      fromTab: activeQuickAccessTab,
+      toTab: newTab,
+      projectName: 'Home',
+      userName: context.userName,
+      userId: context.userId,
+      timestamp: new Date().toISOString(),
+    });
+    
+    // Update state
+    setActiveQuickAccessTab(newTab);
+  }
+};
   // Persist tab selection to sessionStorage
   useEffect(() => {
     sessionStorage.setItem(QUICK_ACCESS_TAB_KEY, activeQuickAccessTab);
@@ -331,7 +344,7 @@ export default function HomePage() {
           >
             <Card className="border-slate-200 dark:border-slate-700 h-full overflow-hidden">
               <CardContent className="p-0">
-                <Tabs value={activeQuickAccessTab} onValueChange={setActiveQuickAccessTab} className="w-full">
+                <Tabs value={activeQuickAccessTab} onValueChange={handleQuickAccessTabChange} className="w-full">
                   <TabsList className="grid w-full grid-cols-4 gap-0 !bg-white dark:!bg-slate-800 p-0 h-auto border-b border-slate-200 dark:border-slate-700">
                     <TabsTrigger
                       value="links"

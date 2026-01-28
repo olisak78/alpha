@@ -8,10 +8,12 @@ import { useDualAuthStore } from '@/stores/useDualAuthStore';
 import { authService, authServiceWdf } from '@/services/authService';
 import { fetchCurrentUser } from '@/hooks/api/useMembers';
 import { buildUserFromMe } from '@/utils/developer-portal-helpers';
+import { trackEvent } from '@/utils/analytics';
+import { sessionManager } from '@/lib/sessionManager';
 
 const LoginPage: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   const {
     isGithubToolsAuthenticated,
     isGithubWdfAuthenticated,
@@ -31,18 +33,56 @@ const LoginPage: React.FC = () => {
     requiresWdfAuth,
   } = useDualAuthStore();
 
-  // Redirect to home when authentication is complete
+  // Track successful login and redirect when both authentications complete
   useEffect(() => {
-    if (isBothAuthenticated()) {
-      // Clear the justLoggedOut flag before redirect
-      sessionStorage.removeItem('justLoggedOut');
-      // Small delay to show success message
-      const timer = setTimeout(() => {
-        window.location.href = '/';
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isGithubToolsAuthenticated, isGithubWdfAuthenticated, userOrganization, isBothAuthenticated]);
+    const trackLoginAndRedirect = async () => {
+      if (isBothAuthenticated()) {
+        try {
+          // Fetch user information to include in analytics
+          const userMe = await fetchCurrentUser();
+          const user = buildUserFromMe(userMe);
+          sessionManager.startSession(user);  // Start tracking session for analytics
+
+          // Track single login  event with comprehensive user data
+          trackEvent('user_login', {
+            userId: user.id,
+            userName: user.name,
+            email: user.email,
+            organization: user.organization || 'unknown',
+            isSapCfs: user.organization === 'sap-cfs',
+            providersUsed: requiresWdfAuth()
+              ? ['githubtools', 'githubwdf']
+              : ['githubtools'],
+            timestamp: new Date().toISOString(),
+          });
+        } catch (error) {
+          console.error('Failed to fetch user data for analytics:', error);
+
+          // Still track login even if user fetch fails, but with limited data
+          trackEvent('user_login', {
+            organization: userOrganization || 'unknown',
+            isSapCfs: userOrganization === 'sap-cfs',
+            providersUsed: requiresWdfAuth()
+              ? ['githubtools', 'githubwdf']
+              : ['githubtools'],
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        // Clear the justLoggedOut flag before redirect
+        sessionStorage.removeItem('justLoggedOut');
+
+        // Small delay to ensure analytics event is sent
+        const timer = setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
+
+        return () => clearTimeout(timer);
+      }
+    };
+
+    trackLoginAndRedirect();
+  }, [isGithubToolsAuthenticated, isGithubWdfAuthenticated, userOrganization, isBothAuthenticated, requiresWdfAuth]);
 
   // Redirect if already fully authenticated
   if (isAuthenticated && isBothAuthenticated()) {
@@ -63,21 +103,21 @@ const LoginPage: React.FC = () => {
     if (isGithubToolsAuthenticated) {
       return;
     }
-    
+
     try {
       setGithubToolsLoading(true);
       setGithubToolsError(null);
-      
+
       // Clear the justLoggedOut flag when starting login
       sessionStorage.removeItem('justLoggedOut');
-      
+
       await authService({
         returnUrl: undefined,
         storeReturnUrl: false,
       });
-      
+
       setGithubToolsAuthenticated(true);
-      
+
       // After successful GitHub Tools authentication, fetch user info to get organization
       await fetchUserOrganization();
     } catch (error) {
@@ -92,19 +132,19 @@ const LoginPage: React.FC = () => {
     if (isGithubWdfAuthenticated) {
       return;
     }
-    
+
     try {
       setGithubWdfLoading(true);
       setGithubWdfError(null);
-      
+
       // Clear the justLoggedOut flag when starting login
       sessionStorage.removeItem('justLoggedOut');
-      
+
       await authServiceWdf({
         returnUrl: undefined,
         storeReturnUrl: false,
       });
-      
+
       setGithubWdfAuthenticated(true);
     } catch (error) {
       console.error('SAP GitHub WDF login failed:', error);
@@ -125,23 +165,23 @@ const LoginPage: React.FC = () => {
     );
   }
 
-  const showCompletionMessage = (isGithubToolsAuthenticated || isGithubWdfAuthenticated) 
+  const showCompletionMessage = (isGithubToolsAuthenticated || isGithubWdfAuthenticated)
     && !isBothAuthenticated();
 
   // Determine the description text based on user organization
   const getDescriptionText = () => {
     if (showCompletionMessage) {
-      return requiresWdfAuth() 
+      return requiresWdfAuth()
         ? 'Please complete the second authentication to access the portal'
         : 'Authentication complete! Redirecting...';
     }
-    
+
     if (isGithubToolsAuthenticated && userOrganization !== null) {
       return requiresWdfAuth()
         ? 'Complete both authentications to access the portal'
         : 'GitHub Tools authentication complete! You can now access the portal.';
     }
-    
+
     return 'Sign in with GitHub Tools to access the portal';
   };
 

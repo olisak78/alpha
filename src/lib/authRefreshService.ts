@@ -5,7 +5,9 @@
  * This service is called when cached data exists to ensure authentication is still valid.
  */
 
+import { trackEvent } from "@/utils/analytics";
 import { tokenManager } from "./tokenManager";
+import { sessionManager } from "./sessionManager";
 
 // Import the global auth error trigger (will be set by AuthErrorContext)
 let globalAuthErrorTrigger: ((message: string) => void) | null = null;
@@ -92,6 +94,7 @@ export const triggerAuthError = (error: any) => {
  */
 const triggerSessionExpiredError = (message: string) => {
   if (globalAuthErrorTrigger && !authErrorTriggered) {
+    trackSessionExpired();
     globalAuthErrorTrigger(message);
 
     // Set flag to prevent duplicate triggers
@@ -104,3 +107,35 @@ const triggerSessionExpiredError = (message: string) => {
     }, 10000);
   }
 };
+
+function trackSessionExpired(): void {
+  // Get user info and session duration from session manager
+  const userInfo = sessionManager.getUserInfo();
+  const sessionDuration = sessionManager.getSessionDuration();
+
+  // Build event data
+  const eventData: Record<string, any> = {
+    lastPage: window.location.pathname,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Add user info if available
+  if (userInfo) {
+    if (userInfo.userId) eventData.userId = userInfo.userId;
+    if (userInfo.userName) eventData.userName = userInfo.userName;
+    if (userInfo.email) eventData.email = userInfo.email;
+    if (userInfo.organization) eventData.organization = userInfo.organization;
+  }
+
+  // Add session duration if available
+  if (sessionDuration !== null) {
+    eventData.sessionDuration = sessionDuration;
+    eventData.sessionDurationMinutes = Math.floor(sessionDuration / 60);
+  }
+
+  // Track the event
+  trackEvent('session_expired', eventData);
+
+  // Clear session metadata after tracking
+  sessionManager.clearSession();
+}

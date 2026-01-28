@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode, useState, useEffect, useMemo } from 'react';
 import type { ComponentHealthCheck, Component } from '@/types/health';
 import { type SystemInformation, fetchSystemInformation } from '@/services/healthApi';
+import { useTeams } from '@/hooks/api/useTeams';
 
 interface ComponentDisplayContextType {
   // Project data
@@ -41,8 +42,6 @@ interface ComponentDisplayProviderProps {
   selectedLandscapeData: any;
   isCentralLandscape: boolean;
   noCentralLandscapes: boolean;
-  teamNamesMap: Record<string, string>;
-  teamColorsMap: Record<string, string>;
   componentHealthMap: Record<string, ComponentHealthCheck>;
   isLoadingHealth: boolean;
   expandedComponents: Record<string, boolean>;
@@ -53,7 +52,7 @@ interface ComponentDisplayProviderProps {
     name: string;
     title?: string;
     description?: string;
-    owner_id?: string | null;
+    owner_ids?: string[];
     'central-service'?: boolean;
     [key: string]: any;
   }>;
@@ -66,8 +65,6 @@ export function ComponentDisplayProvider({
   selectedLandscapeData,
   isCentralLandscape,
   noCentralLandscapes,
-  teamNamesMap,
-  teamColorsMap,
   componentHealthMap,
   isLoadingHealth,
   expandedComponents,
@@ -77,6 +74,30 @@ export function ComponentDisplayProvider({
 }: ComponentDisplayProviderProps) {
   const [componentSystemInfoMap, setComponentSystemInfoMap] = useState<Record<string, SystemInformation>>({});
   const [isLoadingSystemInfo, setIsLoadingSystemInfo] = useState(false);
+
+  // Get teams data and build team maps
+  const { data: teamsData } = useTeams();
+
+  // Build team maps from API data
+  const teamNamesMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (teamsData?.teams) {
+      teamsData.teams.forEach((team: any) => {
+        map[team.id] = team.title || team.name;
+      });
+    }
+    return map;
+  }, [teamsData]);
+
+  const teamColorsMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (teamsData?.teams) {
+      teamsData.teams.forEach((team: any) => {
+        map[team.id] = team.metadata?.color;
+      });
+    }
+    return map;
+  }, [teamsData]);
 
   // Memoize component IDs to prevent unnecessary re-renders
   const componentIds = useMemo(() => {
@@ -124,7 +145,7 @@ export function ComponentDisplayProvider({
             name: component.name,
             title: component.title || component.name, // Use name as fallback for title
             description: component.description || '',
-            owner_id: component.owner_id || '',
+            owner_ids: component.owner_ids || [],
             github: component.github,
             qos: component.qos,
             sonar: component.sonar,

@@ -1,0 +1,418 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PluginCard > Snapshot > should match snapshot for non-owner view 1`] = `
+<div
+  class="h-full flex flex-col hover:shadow-md transition-shadow relative"
+  data-testid="card"
+>
+  <div
+    class="p-5 flex flex-col h-full"
+    data-testid="card-content"
+  >
+    <button
+      aria-label="Pin plugin"
+      class="absolute top-4 right-4 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+      title="Pin to sidebar"
+    >
+      <div
+        class="h-4 w-4 "
+        data-testid="pin-icon"
+      >
+        Pin
+      </div>
+    </button>
+    <div
+      class="flex items-start gap-3 mb-3 pr-6"
+    >
+      <div
+        class="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0"
+      >
+        <div
+          class="h-5 w-5"
+          data-icon-name="TestIcon"
+          data-testid="dynamic-icon"
+        >
+          TestIcon
+        </div>
+      </div>
+      <div
+        class="flex-1 min-w-0"
+      >
+        <h3
+          class="font-semibold text-sm leading-tight truncate"
+        >
+          Test Plugin
+        </h3>
+        <div
+          class="flex items-center gap-1.5 mt-1.5"
+        >
+          <span
+            class="text-[10px] px-1.5 py-0 h-5 font-medium color-development"
+            data-testid="badge"
+            data-variant="secondary"
+          >
+            Development
+          </span>
+          <span
+            class="text-muted-foreground text-xs"
+          >
+            •
+          </span>
+          <span
+            class="text-xs text-muted-foreground"
+          >
+            v1.0.0
+          </span>
+        </div>
+      </div>
+    </div>
+    <p
+      class="text-sm text-muted-foreground line-clamp-3 flex-1 mb-4"
+    >
+      A test plugin for unit testing
+    </p>
+    <div
+      class="flex items-center justify-between mt-auto pt-2"
+    >
+      <span
+        class="text-xs text-muted-foreground"
+      >
+        By 
+        Test User
+      </span>
+      <div
+        class="flex items-center gap-1.5"
+      >
+        <button
+          class="h-8 px-4"
+          data-size="sm"
+          data-testid="button"
+        >
+          Open
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PluginCard > Snapshot > should match snapshot for pinned plugin 1`] = `
+<div
+  class="h-full flex flex-col hover:shadow-md transition-shadow relative"
+  data-testid="card"
+>
+  <div
+    class="p-5 flex flex-col h-full"
+    data-testid="card-content"
+  >
+    <button
+      aria-label="Unpin plugin"
+      class="absolute top-4 right-4 transition-colors text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      title="Unpin from sidebar"
+    >
+      <div
+        class="h-4 w-4 fill-current"
+        data-testid="pin-icon"
+      >
+        Pin
+      </div>
+    </button>
+    <div
+      class="flex items-start gap-3 mb-3 pr-6"
+    >
+      <div
+        class="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0"
+      >
+        <div
+          class="h-5 w-5"
+          data-icon-name="TestIcon"
+          data-testid="dynamic-icon"
+        >
+          TestIcon
+        </div>
+      </div>
+      <div
+        class="flex-1 min-w-0"
+      >
+        <h3
+          class="font-semibold text-sm leading-tight truncate"
+        >
+          Test Plugin
+        </h3>
+        <div
+          class="flex items-center gap-1.5 mt-1.5"
+        >
+          <span
+            class="text-[10px] px-1.5 py-0 h-5 font-medium color-development"
+            data-testid="badge"
+            data-variant="secondary"
+          >
+            Development
+          </span>
+          <span
+            class="text-muted-foreground text-xs"
+          >
+            •
+          </span>
+          <span
+            class="text-xs text-muted-foreground"
+          >
+            v1.0.0
+          </span>
+        </div>
+      </div>
+    </div>
+    <p
+      class="text-sm text-muted-foreground line-clamp-3 flex-1 mb-4"
+    >
+      A test plugin for unit testing
+    </p>
+    <div
+      class="flex items-center justify-between mt-auto pt-2"
+    >
+      <span
+        class="text-xs text-muted-foreground"
+      >
+        By 
+        Test User
+      </span>
+      <div
+        class="flex items-center gap-1.5"
+      >
+        <div
+          data-testid="tooltip-provider"
+        >
+          <div
+            data-testid="tooltip"
+          >
+            <div
+              data-testid="tooltip-trigger"
+            >
+              <button
+                class="h-8 w-8 p-0"
+                data-size="sm"
+                data-testid="button"
+                data-variant="ghost"
+              >
+                <div
+                  class="h-3.5 w-3.5"
+                  data-testid="edit-icon"
+                >
+                  Edit
+                </div>
+              </button>
+            </div>
+            <div
+              data-testid="tooltip-content"
+            >
+              <p>
+                Edit plugin
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          data-testid="tooltip-provider"
+        >
+          <div
+            data-testid="tooltip"
+          >
+            <div
+              data-testid="tooltip-trigger"
+            >
+              <button
+                class="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-size="sm"
+                data-testid="button"
+                data-variant="ghost"
+                disabled=""
+              >
+                <div
+                  class="h-3.5 w-3.5"
+                  data-testid="trash-icon"
+                >
+                  Trash
+                </div>
+              </button>
+            </div>
+            <div
+              data-testid="tooltip-content"
+            >
+              <p>
+                Unpin the plugin before deleting
+              </p>
+            </div>
+          </div>
+        </div>
+        <button
+          class="h-8 px-4"
+          data-size="sm"
+          data-testid="button"
+        >
+          Open
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PluginCard > Snapshot > should match snapshot for unpinned plugin as owner 1`] = `
+<div
+  class="h-full flex flex-col hover:shadow-md transition-shadow relative"
+  data-testid="card"
+>
+  <div
+    class="p-5 flex flex-col h-full"
+    data-testid="card-content"
+  >
+    <button
+      aria-label="Pin plugin"
+      class="absolute top-4 right-4 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+      title="Pin to sidebar"
+    >
+      <div
+        class="h-4 w-4 "
+        data-testid="pin-icon"
+      >
+        Pin
+      </div>
+    </button>
+    <div
+      class="flex items-start gap-3 mb-3 pr-6"
+    >
+      <div
+        class="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0"
+      >
+        <div
+          class="h-5 w-5"
+          data-icon-name="TestIcon"
+          data-testid="dynamic-icon"
+        >
+          TestIcon
+        </div>
+      </div>
+      <div
+        class="flex-1 min-w-0"
+      >
+        <h3
+          class="font-semibold text-sm leading-tight truncate"
+        >
+          Test Plugin
+        </h3>
+        <div
+          class="flex items-center gap-1.5 mt-1.5"
+        >
+          <span
+            class="text-[10px] px-1.5 py-0 h-5 font-medium color-development"
+            data-testid="badge"
+            data-variant="secondary"
+          >
+            Development
+          </span>
+          <span
+            class="text-muted-foreground text-xs"
+          >
+            •
+          </span>
+          <span
+            class="text-xs text-muted-foreground"
+          >
+            v1.0.0
+          </span>
+        </div>
+      </div>
+    </div>
+    <p
+      class="text-sm text-muted-foreground line-clamp-3 flex-1 mb-4"
+    >
+      A test plugin for unit testing
+    </p>
+    <div
+      class="flex items-center justify-between mt-auto pt-2"
+    >
+      <span
+        class="text-xs text-muted-foreground"
+      >
+        By 
+        Test User
+      </span>
+      <div
+        class="flex items-center gap-1.5"
+      >
+        <div
+          data-testid="tooltip-provider"
+        >
+          <div
+            data-testid="tooltip"
+          >
+            <div
+              data-testid="tooltip-trigger"
+            >
+              <button
+                class="h-8 w-8 p-0"
+                data-size="sm"
+                data-testid="button"
+                data-variant="ghost"
+              >
+                <div
+                  class="h-3.5 w-3.5"
+                  data-testid="edit-icon"
+                >
+                  Edit
+                </div>
+              </button>
+            </div>
+            <div
+              data-testid="tooltip-content"
+            >
+              <p>
+                Edit plugin
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          data-testid="tooltip-provider"
+        >
+          <div
+            data-testid="tooltip"
+          >
+            <div
+              data-testid="tooltip-trigger"
+            >
+              <button
+                class="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-size="sm"
+                data-testid="button"
+                data-variant="ghost"
+              >
+                <div
+                  class="h-3.5 w-3.5"
+                  data-testid="trash-icon"
+                >
+                  Trash
+                </div>
+              </button>
+            </div>
+            <div
+              data-testid="tooltip-content"
+            >
+              <p>
+                Delete plugin
+              </p>
+            </div>
+          </div>
+        </div>
+        <button
+          class="h-8 px-4"
+          data-size="sm"
+          data-testid="button"
+        >
+          Open
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;

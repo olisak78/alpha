@@ -325,7 +325,7 @@ export interface Component {
   github?: string; // Direct GitHub URL
   qos?: string; // Quality of Service info
   sonar?: string; // Sonar dashboard URL
-  owner_id: string; // UUID
+  owner_ids: string[]; // Array of UUIDs for multiple owners
   metadata?: ComponentMetadata;
   'is-library'?: boolean; // Indicates if component is a library
   health?: boolean;

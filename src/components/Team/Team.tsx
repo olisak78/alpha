@@ -280,21 +280,19 @@ export default function Team({
         )}
 
         {activeCommonTab === "components" && (
-          <ComponentDisplayProvider
-            projectId={projectIdForProvider}
-            selectedLandscape={null}
-            selectedLandscapeData={null}
-            isCentralLandscape={false}
-            noCentralLandscapes={true}
-            teamNamesMap={{}}
-            teamColorsMap={{}}
-            componentHealthMap={{}}
-            isLoadingHealth={false}
-            expandedComponents={teamComponents.teamComponentsExpanded}
-            onToggleExpanded={teamComponents.toggleComponentExpansion}
-            system="services"
-            components={teamComponents.componentsData?.components || []}
-          >
+            <ComponentDisplayProvider
+              projectId={projectIdForProvider}
+              selectedLandscape={null}
+              selectedLandscapeData={null}
+              isCentralLandscape={false}
+              noCentralLandscapes={true}
+              componentHealthMap={{}}
+              isLoadingHealth={false}
+              expandedComponents={{}}
+              onToggleExpanded={() => {}}
+              system="services"
+              components={teamComponents.componentsData?.components || []}
+            >
             <ComponentsList
               components={teamComponents.componentsData?.components || []}
               showProjectGrouping={true}

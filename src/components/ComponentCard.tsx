@@ -5,6 +5,7 @@ import { ComponentHeader } from "./ComponentCard/ComponentHeader";
 import { ActionButtons } from "./ComponentCard/ActionButtons";
 import { QualityMetricsGrid } from "./ComponentCard/QualityMetricsGrid";
 import { useComponentDisplay } from "@/contexts/ComponentDisplayContext";
+import { useComponentOwner } from "@/hooks/useComponentOwner";
 import { toast } from "@/hooks/use-toast";
 
 interface ComponentCardProps {
@@ -19,16 +20,13 @@ export default function ComponentCard({
   const {
     isCentralLandscape,
     noCentralLandscapes,
-    teamNamesMap,
-    teamColorsMap,
     componentHealthMap,
     componentSystemInfoMap,
     isLoadingSystemInfo,
   } = useComponentDisplay();
 
-  // Get team info from context
-  const teamName = component.owner_id ? teamNamesMap[component.owner_id] : undefined;
-  const teamColor = component.owner_id ? teamColorsMap[component.owner_id] : undefined;
+  // Get team info using the hook
+  const { teamNames, teamColors } = useComponentOwner(component);
   const healthCheck = componentHealthMap[component.id];
   const systemInfo = componentSystemInfoMap[component.id] || null;
   const isDisabled = component['central-service'] === true && !isCentralLandscape && !noCentralLandscapes;
@@ -68,8 +66,8 @@ export default function ComponentCard({
         )}>
           <ComponentHeader
             component={component}
-            teamName={teamName}
-            teamColor={teamColor}
+            teamNames={teamNames}
+            teamColors={teamColors}
             systemInfo={systemInfo}
             loadingSystemInfo={isLoadingSystemInfo}
             isDisabled={isDisabled}

@@ -1,9 +1,7 @@
 import ComponentCard from "@/components/ComponentCard";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { Component } from "@/types/api";
-import { GithubIcon } from "./icons/GithubIcon";
-import { useComponentDisplay } from "@/contexts/ComponentDisplayContext";
+import { ComponentItem } from "@/components/ComponentItem";
 
 interface ComponentsListProps {
   components: Component[];
@@ -18,10 +16,6 @@ export function ComponentsList({
   compactView = false,
   onComponentClick,
 }: ComponentsListProps) {
-  const {
-    teamNamesMap,
-    teamColorsMap,
-  } = useComponentDisplay();
   
   const sortByPinnedStatus = (a: Component, b: Component) => {
     // Pinned components come first
@@ -41,64 +35,14 @@ export function ComponentsList({
     );
   }
 
-  const openLink = (url: string) => {
-    if (url && url !== "#") {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-  };
-
   // Helper function to render a compact component item (for team pages)
   const renderCompactComponentItem = (component: Component) => {
-    const ownerTeamName = component.owner_id ? teamNamesMap[component.owner_id] : undefined;
-    const ownerTeamColor = component.owner_id ? teamColorsMap[component.owner_id] : undefined;
-
-    const handleClick = (e: React.MouseEvent) => {
-      // Don't trigger navigation if clicking on buttons
-      const target = e.target as HTMLElement;
-      if (!target.closest('button') && onComponentClick) {
-        onComponentClick(component.name);
-      }
-    };
-
     return (
-      <div
+      <ComponentItem
         key={component.id}
-        className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer"
-        onClick={handleClick}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold truncate">{component.title || component.name}</h4>
-              {ownerTeamName && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs flex-shrink-0 text-white border-0"
-                  {...(ownerTeamColor ? { style: { backgroundColor: ownerTeamColor } } : { style: { backgroundColor: '#6b7280' } })}
-                >
-                  {ownerTeamName}
-                </Badge>
-              )}
-            </div>
-            {component.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {component.description}
-              </p>
-            )}
-          </div>
-          {component.github && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => openLink(component.github!)}
-              className="flex-shrink-0"
-            >
-              <GithubIcon className="h-3.5 w-3.5 mr-1.5" />
-              GitHub
-            </Button>
-          )}
-        </div>
-      </div>
+        component={component}
+        onComponentClick={onComponentClick}
+      />
     );
   };
 
